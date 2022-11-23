@@ -1,6 +1,4 @@
 """Manage an iCloud session."""
-from __future__ import annotations
-
 import getpass
 import http.cookiejar as cookielib
 import inspect
@@ -20,7 +18,6 @@ from data.icloud.exceptions import (
     ICloudFailedLoginException,
     ICloudServiceNotActivatedException,
 )
-from data.icloud.manager.contact import ContactManager
 
 LOGGER = logging.getLogger(__name__)
 
@@ -93,7 +90,7 @@ class ICloudSessionManager:
         else:
             self.session_data.update({"client_id": self.client_id})
 
-        self.session = ICloudSession(self)
+        self.session = _ICloudSession(self)
         self.session.verify = verify
         self.session.headers.update(
             {"Origin": self.HOME_ENDPOINT, "Referer": "%s/" % self.HOME_ENDPOINT}
@@ -113,12 +110,6 @@ class ICloudSessionManager:
 
         self._webservices = None
         self.authenticate()
-
-    @property
-    def contacts_manager(self) -> ContactManager:
-        """Gets the 'Contacts' manager."""
-        service_root = self.get_webservice_url("contacts")
-        return ContactManager(service_root, self.session, self.params)
 
     @property
     def cookiejar_path(self) -> str:
@@ -445,14 +436,16 @@ class ICloudSessionManager:
         return "<%s>" % str(self)
 
 
-class ICloudSession(requests.Session):
+class _ICloudSession(requests.Session):
     """iCloud session."""
 
     def __init__(self, manager: ICloudSessionManager) -> None:
         self.manager = manager
         requests.Session.__init__(self)
 
-    def request(self, method: str, url: str | bytes | Text, **kwargs) -> requests.Response:
+    def request(
+        self, method: str, url: str | bytes | Text, **kwargs
+    ) -> requests.Response:
         # Change logging to the right manager endpoint
         callee = inspect.stack()[2]
         module = inspect.getmodule(callee[0])
@@ -464,7 +457,7 @@ class ICloudSession(requests.Session):
 
         has_retried = kwargs.get("retried")
         kwargs.pop("retried", None)
-        response = super(ICloudSession, self).request(method, url, **kwargs)
+        response = super(_ICloudSession, self).request(method, url, **kwargs)
 
         content_type = response.headers.get("Content-Type", "").split(";")[0]
         json_mimetypes = ["application/json", "text/json"]

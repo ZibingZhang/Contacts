@@ -1,24 +1,26 @@
 """iCloud contacts api wrapper."""
+from __future__ import annotations
+
 import json
 import re
 import typing
 import uuid
 
+from data.icloud import model
+
 if typing.TYPE_CHECKING:
-    from data.icloud.manager.session import ICloudSession
+    from data.icloud.manager.session import ICloudSessionManager
 
 
-class ContactManager:
+class ICloudContactManager:
     """
     The 'Contacts' iCloud manager, connects to iCloud and returns contacts.
     """
 
-    def __init__(
-        self, service_root: str, session: 'ICloudSession', params: dict[str, str]
-    ) -> None:
-        self.session = session
-        self.params = params
-        self._service_root = service_root
+    def __init__(self, session_manager: ICloudSessionManager) -> None:
+        self.session = session_manager.session
+        self.params = session_manager.params
+        self._service_root = session_manager.get_webservice_url("contacts")
         self._contacts_endpoint = "%s/co" % self._service_root
         self._contacts_refresh_url = "%s/startup" % self._contacts_endpoint
         self._contacts_next_url = "%s/contacts" % self._contacts_endpoint
@@ -123,7 +125,9 @@ class ContactManager:
         ).json()
         self._update_sync_token(resp["syncToken"])
 
-    def get_contacts_and_groups(self) -> dict:
+    def get_contacts_and_groups(
+        self,
+    ) -> tuple[list[model.ICloudContact], list[model.ICloudGroup]]:
         """
         Fetches the contacts and groups.
         """
@@ -138,7 +142,7 @@ class ContactManager:
         ).json()
         self.pref_token = resp["prefToken"]
         self._update_sync_token(resp["syncToken"])
-        groups = resp["groups"]
+        raw_groups = resp["groups"]
 
         params_contacts = dict(self.params)
         params_contacts.update(
@@ -150,8 +154,12 @@ class ContactManager:
             }
         )
         resp = self.session.get(self._contacts_next_url, params=params_contacts).json()
-        contacts = resp["contacts"]
-        return {"contacts": contacts, "groups": groups}
+        raw_contacts = resp["contacts"]
+
+        contacts = [model.ICloudContact.from_dict(contact) for contact in raw_contacts]
+        groups = [model.ICloudGroup.from_dict(group) for group in raw_groups]
+
+        return contacts, groups
 
     def _update_sync_token(self, sync_token: str) -> None:
         self.sync_token_prefix = re.search(r"^.*S=", sync_token)[0]
