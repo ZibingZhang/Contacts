@@ -1,0 +1,3 @@
+from transformer import icloud_contact_to_contact
+
+icloud_contact_to_contact = icloud_contact_to_contact.icloud_contact_to_contact

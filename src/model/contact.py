@@ -2,7 +2,7 @@ import dataclasses
 
 import dataclasses_json
 
-from common import dataclasses_utils
+from common.utils import dataclasses_utils
 
 NO_YEAR = 0
 
@@ -17,14 +17,14 @@ def date_field():
 
 
 @dataclasses.dataclass
-class Date:
+class Date(dataclasses_utils.DataClassJsonMixin):
     day: int
     month: int
     year: int | None = None
 
 
 @dataclasses.dataclass
-class Name:
+class Name(dataclasses_utils.DataClassJsonMixin):
     first_name: str | None = None
     nickname: str | None = None
     middle_name: str | None = None
@@ -33,5 +33,5 @@ class Name:
 
 
 @dataclasses.dataclass
-class Contact:
+class Contact(dataclasses_utils.DataClassJsonMixin):
     name: Name | None = None

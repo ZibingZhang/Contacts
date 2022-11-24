@@ -2,41 +2,42 @@ import dataclasses
 import enum
 import uuid
 
-import model
-
 import dataclasses_json
 
-from common import dataclasses_utils
+import model
+from common.utils import dataclasses_utils
 
 NO_YEAR = 1604
 
 
-def date_field():
-    return dataclasses.field(
-        metadata=dataclasses_json.config(
+def date_field(required: bool = False) -> dataclasses.Field:
+    kwargs = {
+        "metadata": dataclasses_json.config(
             encoder=dataclasses_utils.date_encoder(NO_YEAR),
             decoder=dataclasses_utils.date_decoder(NO_YEAR),
         )
-    )
+    }
+
+    if not required:
+        kwargs["default"] = None
+
+    return dataclasses.field(**kwargs)
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class Date:
+class Date(dataclasses_utils.DataClassJsonMixin):
     label: str
-    field: model.Date = date_field()
+    field: model.Date = date_field(required=True)
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class EmailAddress:
+class EmailAddress(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class IMField:
+class IMField(dataclasses_utils.DataClassJsonMixin):
     IMService: str
     userName: str
 
@@ -48,23 +49,20 @@ class IMLabel(str, enum.Enum):
     WORK = "WORK"
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class IM:
+class IM(dataclasses_utils.DataClassJsonMixin):
     field: IMField
     label: IMLabel
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class Phone:
+class Phone(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str | None = None
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class Profile:
+class Profile(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str | None = None
     displayName: str | None = None
@@ -72,16 +70,14 @@ class Profile:
     userId: str | None = None
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class RelatedName:
+class RelatedName(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class StreetAddressField:
+class StreetAddressField(dataclasses_utils.DataClassJsonMixin):
     country: str | None = None
     countryCode: str | None = None
     city: str | None = None
@@ -91,23 +87,20 @@ class StreetAddressField:
     subLocality: str | None = None
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class StreetAddress:
+class StreetAddress(dataclasses_utils.DataClassJsonMixin):
     field: StreetAddressField
     label: str
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class Url:
+class Url(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class ICloudContact:
+class ICloudContact(dataclasses_utils.DataClassJsonMixin):
     contactId: uuid.UUID
     etag: str
     isCompany: bool
