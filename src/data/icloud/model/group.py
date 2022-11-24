@@ -1,12 +1,11 @@
 import dataclasses
 import uuid
 
-import dataclasses_json
+from common.utils import dataclasses_utils
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class HeaderPositions:
+class HeaderPositions(dataclasses_utils.DataClassJsonMixin):
     A: int | None = None
     B: int | None = None
     C: int | None = None
@@ -35,9 +34,8 @@ class HeaderPositions:
     Z: int | None = None
 
 
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
-class ICloudGroup:
+class ICloudGroup(dataclasses_utils.DataClassJsonMixin):
     contactIds: list[uuid.UUID]
     etag: str
     groupId: uuid.UUID
