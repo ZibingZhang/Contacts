@@ -2,14 +2,29 @@ import dataclasses
 import enum
 import uuid
 
+import model
+
 import dataclasses_json
+
+from common import dataclasses_utils
+
+NO_YEAR = 1604
+
+
+def date_field():
+    return dataclasses.field(
+        metadata=dataclasses_json.config(
+            encoder=dataclasses_utils.date_encoder(NO_YEAR),
+            decoder=dataclasses_utils.date_decoder(NO_YEAR),
+        )
+    )
 
 
 @dataclasses_json.dataclass_json
 @dataclasses.dataclass(frozen=True)
 class Date:
-    field: str
     label: str
+    field: model.Date = date_field()
 
 
 @dataclasses_json.dataclass_json
@@ -99,8 +114,8 @@ class ICloudContact:
     isGuardianApproved: bool
     normalized: str
     whitelisted: bool
+    birthday: model.Date | None = date_field()
     IMs: list[IM] | None = None
-    birthday: str | None = None
     companyName: str | None = None
     dates: list[Date] | None = None
     department: str | None = None
