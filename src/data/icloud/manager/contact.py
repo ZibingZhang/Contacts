@@ -6,7 +6,7 @@ import re
 import typing
 import uuid
 
-from data.icloud import model
+from data import icloud
 
 if typing.TYPE_CHECKING:
     from data.icloud.manager.session import ICloudSessionManager
@@ -45,8 +45,10 @@ class ICloudContactManager:
         return f"{self.sync_token_prefix}{self.sync_token_number}"
 
     def create_contact(self, new_contact: dict) -> None:
-        """
-        Creates a contact.
+        """Create a contact.
+
+        Args:
+            new_contact: the new contact
         """
         body = self._singleton_contact_body(new_contact)
         params = dict(self.params)
@@ -64,8 +66,10 @@ class ICloudContactManager:
         self._update_sync_token(resp["syncToken"])
 
     def update_contact(self, updated_contact: dict) -> None:
-        """
-        Updates a contact.
+        """Update a contact.
+
+        Args:
+            updated_contact: the updated contact
         """
         self._update_etag(updated_contact)
         body = self._singleton_contact_body(updated_contact)
@@ -84,12 +88,14 @@ class ICloudContactManager:
         ).json()
         self._update_sync_token(resp["syncToken"])
 
-    def create_group(self, group: dict) -> None:
+    def create_group(self, contact_group: dict) -> None:
+        """Create a contact group.
+
+        Args:
+            contact_group: the new contact group
         """
-        Creates a contact group.
-        """
-        group["groupId"] = str(uuid.uuid4())
-        body = self._singleton_group_body(group)
+        contact_group["groupId"] = str(uuid.uuid4())
+        body = self._singleton_group_body(contact_group)
         params = dict(self.params)
         params.update(
             {
@@ -104,12 +110,14 @@ class ICloudContactManager:
         ).json()
         self._update_sync_token(resp["syncToken"])
 
-    def delete_group(self, group: dict) -> None:
+    def delete_group(self, contact_group: dict) -> None:
+        """Delete a contact group.
+
+        Args:
+            contact_group: the deleted contact group
         """
-        Deletes a contact group.
-        """
-        self._update_etag(group)
-        body = self._singleton_group_body(group)
+        self._update_etag(contact_group)
+        body = self._singleton_group_body(contact_group)
         params = dict(self.params)
         params.update(
             {
@@ -127,9 +135,11 @@ class ICloudContactManager:
 
     def get_contacts_and_groups(
         self,
-    ) -> tuple[list[model.ICloudContact], list[model.ICloudGroup]]:
-        """
-        Fetches the contacts and groups.
+    ) -> tuple[list[icloud.ICloudContact], list[icloud.ICloudGroup]]:
+        """Get all contact and contact groups.
+
+        Returns:
+            All the contacts and contact groups.
         """
         params_contacts = dict(self.params)
         params_contacts.update(
@@ -156,8 +166,8 @@ class ICloudContactManager:
         resp = self.session.get(self._contacts_next_url, params=params_contacts).json()
         raw_contacts = resp["contacts"]
 
-        contacts = [model.ICloudContact.from_dict(contact) for contact in raw_contacts]
-        groups = [model.ICloudGroup.from_dict(group) for group in raw_groups]
+        contacts = [icloud.ICloudContact.from_dict(contact) for contact in raw_contacts]
+        groups = [icloud.ICloudGroup.from_dict(group) for group in raw_groups]
 
         return contacts, groups
 
