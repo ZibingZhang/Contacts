@@ -1,4 +1,4 @@
-from data.icloud.model import contact, group
+from data.icloud.model import icloud_contact, icloud_group
 
-ICloudContact = contact.ICloudContact
-ICloudGroup = group.ICloudGroup
+ICloudContact = icloud_contact.ICloudContact
+ICloudGroup = icloud_group.ICloudGroup

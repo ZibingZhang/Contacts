@@ -11,6 +11,14 @@ CONTACTS_FILE_NAME = "contacts.json"
 # GROUPS_FILE_NAME = "groups.json"
 
 
+def get_icloud_contact_manager() -> icloud.ICloudContactManager:
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    username = config["login"]["username"]
+    password = config["login"]["password"]
+    return icloud.ICloudContactManager(username, password)
+
+
 def get_icloud_contacts_and_groups(
     cached: bool,
 ) -> tuple[list[icloud.ICloudContact], list[icloud.ICloudGroup]]:
@@ -23,16 +31,8 @@ def get_icloud_contacts_and_groups(
         )
         return contacts, groups
 
-    config = configparser.ConfigParser()
-    config.read("config.ini")
-    username = config["login"]["username"]
-    password = config["login"]["password"]
-
-    session_manager = icloud.ICloudSessionManager(username, password)
-    session_manager.login()
-    contacts_manager = icloud.ICloudContactManager(session_manager)
-
-    contacts, groups = contacts_manager.get_contacts_and_groups()
+    contact_manager = get_icloud_contact_manager()
+    contacts, groups = contact_manager.get_contacts_and_groups()
 
     file_io_utils.write_dataclass_objects_as_json_array(
         ICLOUD_CONTACTS_FILE_NAME, contacts
@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     patch.json_encode_uuid()
 
-    icloud_contacts, icloud_groups = get_icloud_contacts_and_groups(cached=False)
+    icloud_contacts, icloud_groups = get_icloud_contacts_and_groups(cached=True)
 
     contacts = [
         transformer.icloud_contact_to_contact(icloud_contact)

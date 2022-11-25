@@ -1,4 +1,5 @@
 import json
+import textwrap
 from typing import Type, TypeVar
 
 from common.utils import dataclasses_utils
@@ -17,7 +18,5 @@ def write_dataclass_objects_as_json_array(
 ) -> None:
     with open(path, mode="w", encoding="utf-8") as f:
         f.write("[\n")
-        for obj in objects[:-1]:
-            f.write(f"    {obj.to_json()},\n")
-        f.write(f"    {objects[-1].to_json()}\n")
-        f.write("]\n")
+        f.write(textwrap.indent(",\n".join(obj.to_json() for obj in objects), "    "))
+        f.write("\n]\n")

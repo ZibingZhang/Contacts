@@ -83,14 +83,14 @@ class ICloudSessionManager:
         try:
             with open(self.session_path) as session_f:
                 self.session_data = json.load(session_f)
-        except Exception:
+        except FileNotFoundError:
             LOGGER.info("Session file does not exist")
         if self.session_data.get("client_id"):
             self.client_id = self.session_data.get("client_id")
         else:
             self.session_data.update({"client_id": self.client_id})
 
-        self.session = _ICloudSession(self)
+        self.session = ICloudSession(self)
         self.session.verify = verify
         self.session.headers.update(
             {"Origin": self.HOME_ENDPOINT, "Referer": "%s/" % self.HOME_ENDPOINT}
@@ -229,7 +229,7 @@ class ICloudSessionManager:
                 try:
                     self._authenticate_with_credentials_service(service)
                     login_successful = True
-                except Exception:
+                except ICloudFailedLoginException:
                     LOGGER.debug(
                         "Could not log into manager. Attempting brand new login."
                     )
@@ -436,7 +436,7 @@ class ICloudSessionManager:
         return "<%s>" % str(self)
 
 
-class _ICloudSession(requests.Session):
+class ICloudSession(requests.Session):
     """iCloud session."""
 
     def __init__(self, manager: ICloudSessionManager) -> None:
@@ -457,7 +457,7 @@ class _ICloudSession(requests.Session):
 
         has_retried = kwargs.get("retried")
         kwargs.pop("retried", None)
-        response = super(_ICloudSession, self).request(method, url, **kwargs)
+        response = super(ICloudSession, self).request(method, url, **kwargs)
 
         content_type = response.headers.get("Content-Type", "").split(";")[0]
         json_mimetypes = ["application/json", "text/json"]
@@ -515,7 +515,7 @@ class _ICloudSession(requests.Session):
 
         try:
             data = response.json()
-        except Exception:
+        except requests.JSONDecodeError:
             request_logger.warning("Failed to parse response with JSON mimetype")
             return response
 

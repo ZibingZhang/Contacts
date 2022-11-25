@@ -56,7 +56,7 @@ def date_encoder(no_year: int) -> Callable[[model.Date], str | None]:
 
     def encoder(date: model.Date | None) -> str | None:
         if date is None:
-            return None
+            return
         return (
             f"{date.year if date.year is not None else no_year:04}"
             f"-{date.month:02}"
@@ -80,7 +80,7 @@ def date_decoder(no_year: int) -> Callable[[str], model.Date | None]:
         import model
 
         if date is None:
-            return None
+            return
         if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
             print(date)
             raise error.DecodingError
