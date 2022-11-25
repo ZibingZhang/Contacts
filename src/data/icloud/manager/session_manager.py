@@ -90,7 +90,7 @@ class ICloudSessionManager:
         else:
             self.session_data.update({"client_id": self.client_id})
 
-        self.session = _ICloudSession(self)
+        self.session = ICloudSession(self)
         self.session.verify = verify
         self.session.headers.update(
             {"Origin": self.HOME_ENDPOINT, "Referer": "%s/" % self.HOME_ENDPOINT}
@@ -436,7 +436,7 @@ class ICloudSessionManager:
         return "<%s>" % str(self)
 
 
-class _ICloudSession(requests.Session):
+class ICloudSession(requests.Session):
     """iCloud session."""
 
     def __init__(self, manager: ICloudSessionManager) -> None:
@@ -457,7 +457,7 @@ class _ICloudSession(requests.Session):
 
         has_retried = kwargs.get("retried")
         kwargs.pop("retried", None)
-        response = super(_ICloudSession, self).request(method, url, **kwargs)
+        response = super(ICloudSession, self).request(method, url, **kwargs)
 
         content_type = response.headers.get("Content-Type", "").split(";")[0]
         json_mimetypes = ["application/json", "text/json"]

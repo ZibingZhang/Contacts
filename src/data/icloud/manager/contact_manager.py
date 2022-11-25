@@ -1,25 +1,27 @@
 """iCloud contacts api wrapper."""
 from __future__ import annotations
 
+import functools
 import json
 import re
-import typing
 import uuid
 
+from common import singleton
 from data import icloud
 
-if typing.TYPE_CHECKING:
-    from data.icloud.manager.session import ICloudSessionManager
 
-
-class ICloudContactManager:
+class ICloudContactManager(metaclass=singleton.Singleton):
     """
     The 'Contacts' iCloud manager, connects to iCloud and returns contacts.
     """
 
-    def __init__(self, session_manager: ICloudSessionManager) -> None:
-        self.session = session_manager.session
-        self.params = session_manager.params
+    def __init__(
+        self, apple_id: str | None = None, password: str | None = None
+    ) -> None:
+        session_manager = icloud.ICloudSessionManager(apple_id, password)
+        session_manager.login()
+        self._session = session_manager.session
+        self._params = session_manager.params
         self._service_root = session_manager.get_webservice_url("contacts")
         self._contacts_endpoint = "%s/co" % self._service_root
         self._contacts_refresh_url = "%s/startup" % self._contacts_endpoint
@@ -32,7 +34,7 @@ class ICloudContactManager:
         self.pref_token = ""
         self.sync_token_prefix = ""
         self.sync_token_number = -1
-        self.params.update(
+        self._params.update(
             {
                 "clientVersion": "2.1",
                 "locale": "en_US",
@@ -51,14 +53,14 @@ class ICloudContactManager:
             new_contact: the new contact
         """
         body = self._singleton_contact_body(new_contact)
-        params = dict(self.params)
+        params = dict(self._params)
         params.update(
             {
                 "prefToken": self.pref_token,
                 "syncToken": self.sync_token,
             }
         )
-        resp = self.session.post(
+        resp = self._session.post(
             self._contacts_update_url,
             params=params,
             data=json.dumps(body),
@@ -73,7 +75,7 @@ class ICloudContactManager:
         """
         self._update_etag(updated_contact)
         body = self._singleton_contact_body(updated_contact)
-        params = dict(self.params)
+        params = dict(self._params)
         params.update(
             {
                 "method": "PUT",
@@ -81,7 +83,7 @@ class ICloudContactManager:
                 "syncToken": self.sync_token,
             }
         )
-        resp = self.session.post(
+        resp = self._session.post(
             self._contacts_update_url,
             params=params,
             data=json.dumps(body),
@@ -96,14 +98,14 @@ class ICloudContactManager:
         """
         contact_group["groupId"] = str(uuid.uuid4())
         body = self._singleton_group_body(contact_group)
-        params = dict(self.params)
+        params = dict(self._params)
         params.update(
             {
                 "prefToken": self.pref_token,
                 "syncToken": self.sync_token,
             }
         )
-        resp = self.session.post(
+        resp = self._session.post(
             self._groups_update_url,
             params=params,
             data=json.dumps(body),
@@ -118,7 +120,7 @@ class ICloudContactManager:
         """
         self._update_etag(contact_group)
         body = self._singleton_group_body(contact_group)
-        params = dict(self.params)
+        params = dict(self._params)
         params.update(
             {
                 "method": "DELETE",
@@ -126,7 +128,7 @@ class ICloudContactManager:
                 "syncToken": self.sync_token,
             }
         )
-        resp = self.session.post(
+        resp = self._session.post(
             self._groups_update_url,
             params=params,
             data=json.dumps(body),
@@ -141,20 +143,20 @@ class ICloudContactManager:
         Returns:
             All the contacts and contact groups.
         """
-        params_contacts = dict(self.params)
+        params_contacts = dict(self._params)
         params_contacts.update(
             {
                 "order": "last,first",
             }
         )
-        resp = self.session.get(
+        resp = self._session.get(
             self._contacts_refresh_url, params=params_contacts
         ).json()
         self.pref_token = resp["prefToken"]
         self._update_sync_token(resp["syncToken"])
         raw_groups = resp["groups"]
 
-        params_contacts = dict(self.params)
+        params_contacts = dict(self._params)
         params_contacts.update(
             {
                 "prefToken": self.pref_token,
@@ -163,7 +165,7 @@ class ICloudContactManager:
                 "offset": "0",
             }
         )
-        resp = self.session.get(self._contacts_next_url, params=params_contacts).json()
+        resp = self._session.get(self._contacts_next_url, params=params_contacts).json()
         raw_contacts = resp["contacts"]
 
         contacts = [icloud.ICloudContact.from_dict(contact) for contact in raw_contacts]
