@@ -24,19 +24,19 @@ def date_field(required: bool = False) -> dataclasses.Field:
     return dataclasses.field(**kwargs)
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class Date(dataclasses_utils.DataClassJsonMixin):
     label: str
     field: model.Date = date_field(required=True)
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class EmailAddress(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class IMField(dataclasses_utils.DataClassJsonMixin):
     IMService: str
     userName: str
@@ -49,19 +49,19 @@ class IMLabel(str, enum.Enum):
     WORK = "WORK"
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class IM(dataclasses_utils.DataClassJsonMixin):
     field: IMField
     label: IMLabel
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class Phone(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str | None = None
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class Profile(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str | None = None
@@ -70,13 +70,13 @@ class Profile(dataclasses_utils.DataClassJsonMixin):
     userId: str | None = None
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class RelatedName(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class StreetAddressField(dataclasses_utils.DataClassJsonMixin):
     country: str | None = None
     countryCode: str | None = None
@@ -87,19 +87,19 @@ class StreetAddressField(dataclasses_utils.DataClassJsonMixin):
     subLocality: str | None = None
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class StreetAddress(dataclasses_utils.DataClassJsonMixin):
     field: StreetAddressField
     label: str
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class Url(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class ICloudContact(dataclasses_utils.DataClassJsonMixin):
     contactId: uuid.UUID
     etag: str

@@ -457,7 +457,7 @@ class ICloudSession(requests.Session):
 
         has_retried = kwargs.get("retried")
         kwargs.pop("retried", None)
-        response = super(ICloudSession, self).request(method, url, **kwargs)
+        response = super().request(method, url, **kwargs)
 
         content_type = response.headers.get("Content-Type", "").split(";")[0]
         json_mimetypes = ["application/json", "text/json"]

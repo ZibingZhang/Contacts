@@ -4,7 +4,7 @@ import uuid
 from common.utils import dataclasses_utils
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class HeaderPositions(dataclasses_utils.DataClassJsonMixin):
     A: int | None = None
     B: int | None = None
@@ -34,7 +34,7 @@ class HeaderPositions(dataclasses_utils.DataClassJsonMixin):
     Z: int | None = None
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class ICloudGroup(dataclasses_utils.DataClassJsonMixin):
     contactIds: list[uuid.UUID]
     etag: str

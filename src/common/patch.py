@@ -7,7 +7,7 @@ def json_encode_uuid():
 
     def new_default(self, obj):
         if isinstance(obj, UUID):
-            return str(obj)
+            return str(obj).upper()
         return old_default(self, obj)
 
     JSONEncoder.default = new_default

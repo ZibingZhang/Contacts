@@ -42,12 +42,28 @@ def get_icloud_contacts_and_groups(
     return contacts, groups
 
 
+def get_test_contact(
+    icloud_contacts: list[icloud.ICloudContact],
+    uuid: str = "623ae0b7-eb13-47bb-8ccf-09f2eae2e4a3",
+) -> icloud.ICloudContact:
+    for contact in icloud_contacts:
+        if str(contact.contactId) == uuid:
+            return contact
+    raise ValueError
+
+
 if __name__ == "__main__":
     from common import patch
 
     patch.json_encode_uuid()
 
-    icloud_contacts, icloud_groups = get_icloud_contacts_and_groups(cached=True)
+    icloud_contacts, icloud_groups = get_icloud_contacts_and_groups(cached=False)
+
+    test_contact = get_test_contact(icloud_contacts)
+
+    test_contact.firstName = "New First Name"
+
+    get_icloud_contact_manager().update_contact(test_contact)
 
     contacts = [
         transformer.icloud_contact_to_contact(icloud_contact)

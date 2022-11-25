@@ -70,7 +70,7 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         ).json()
         self._update_sync_token(resp["syncToken"])
 
-    def update_contact(self, updated_contact: dict) -> None:
+    def update_contact(self, updated_contact: icloud.ICloudContact) -> None:
         """Update a contact.
 
         Args:
@@ -180,16 +180,16 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         self._sync_token_prefix = re.search(r"^.*S=", sync_token)[0]
         self._sync_token_number = int(re.search(r"\d+$", sync_token)[0])
 
-    def _update_etag(self, obj: dict) -> None:
-        etag = obj["etag"]
+    def _update_etag(self, contact: icloud.ICloudContact) -> None:
+        etag = contact.etag
         last_sync_number = int(re.search(r"(?<=^C=)\d+", etag)[0])
-        if last_sync_number >= self._sync_token_number:
+        if self._sync_token_number >= last_sync_number:
             etag = re.sub(r"^C=\d+", f"C={self._sync_token_number}", etag)
-            obj.update({"etag": etag})
+            contact.etag = etag
 
     @staticmethod
-    def _singleton_contact_body(contact: dict) -> dict:
-        return {"contacts": [contact]}
+    def _singleton_contact_body(contact: icloud.ICloudContact) -> dict:
+        return {"contacts": [contact.to_dict()]}
 
     @staticmethod
     def _singleton_group_body(contact_group: dict) -> dict:
