@@ -83,7 +83,7 @@ class ICloudSessionManager:
         try:
             with open(self.session_path) as session_f:
                 self.session_data = json.load(session_f)
-        except Exception:
+        except FileNotFoundError:
             LOGGER.info("Session file does not exist")
         if self.session_data.get("client_id"):
             self.client_id = self.session_data.get("client_id")
@@ -229,7 +229,7 @@ class ICloudSessionManager:
                 try:
                     self._authenticate_with_credentials_service(service)
                     login_successful = True
-                except Exception:
+                except ICloudFailedLoginException:
                     LOGGER.debug(
                         "Could not log into manager. Attempting brand new login."
                     )
@@ -515,7 +515,7 @@ class ICloudSession(requests.Session):
 
         try:
             data = response.json()
-        except Exception:
+        except requests.JSONDecodeError:
             request_logger.warning("Failed to parse response with JSON mimetype")
             return response
 
