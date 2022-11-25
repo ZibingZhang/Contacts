@@ -18,8 +18,12 @@ class ICloudContactManager(metaclass=singleton.Singleton):
     def __init__(
         self, apple_id: str | None = None, password: str | None = None
     ) -> None:
+        if apple_id is None or password is None:
+            raise ValueError
+
         session_manager = icloud.ICloudSessionManager(apple_id, password)
         session_manager.login()
+
         self._session = session_manager.session
         self._params = session_manager.params
         self._service_root = session_manager.get_webservice_url("contacts")
@@ -31,9 +35,9 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         self._groups_endpoint = "%s/groups" % self._contacts_endpoint
         self._groups_update_url = "%s/card" % self._groups_endpoint
 
-        self.pref_token = ""
-        self.sync_token_prefix = ""
-        self.sync_token_number = -1
+        self._pref_token = ""
+        self._sync_token_prefix = ""
+        self._sync_token_number = -1
         self._params.update(
             {
                 "clientVersion": "2.1",
@@ -44,7 +48,7 @@ class ICloudContactManager(metaclass=singleton.Singleton):
 
     @property
     def sync_token(self) -> str:
-        return f"{self.sync_token_prefix}{self.sync_token_number}"
+        return f"{self._sync_token_prefix}{self._sync_token_number}"
 
     def create_contact(self, new_contact: dict) -> None:
         """Create a contact.
@@ -56,7 +60,7 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         params = dict(self._params)
         params.update(
             {
-                "prefToken": self.pref_token,
+                "prefToken": self._pref_token,
                 "syncToken": self.sync_token,
             }
         )
@@ -79,7 +83,7 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         params.update(
             {
                 "method": "PUT",
-                "prefToken": self.pref_token,
+                "prefToken": self._pref_token,
                 "syncToken": self.sync_token,
             }
         )
@@ -101,7 +105,7 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         params = dict(self._params)
         params.update(
             {
-                "prefToken": self.pref_token,
+                "prefToken": self._pref_token,
                 "syncToken": self.sync_token,
             }
         )
@@ -124,7 +128,7 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         params.update(
             {
                 "method": "DELETE",
-                "prefToken": self.pref_token,
+                "prefToken": self._pref_token,
                 "syncToken": self.sync_token,
             }
         )
@@ -152,14 +156,14 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         resp = self._session.get(
             self._contacts_refresh_url, params=params_contacts
         ).json()
-        self.pref_token = resp["prefToken"]
+        self._pref_token = resp["prefToken"]
         self._update_sync_token(resp["syncToken"])
         raw_groups = resp["groups"]
 
         params_contacts = dict(self._params)
         params_contacts.update(
             {
-                "prefToken": self.pref_token,
+                "prefToken": self._pref_token,
                 "syncToken": self.sync_token,
                 "limit": "0",
                 "offset": "0",
@@ -174,14 +178,14 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         return contacts, groups
 
     def _update_sync_token(self, sync_token: str) -> None:
-        self.sync_token_prefix = re.search(r"^.*S=", sync_token)[0]
-        self.sync_token_number = int(re.search(r"\d+$", sync_token)[0])
+        self._sync_token_prefix = re.search(r"^.*S=", sync_token)[0]
+        self._sync_token_number = int(re.search(r"\d+$", sync_token)[0])
 
     def _update_etag(self, obj: dict) -> None:
         etag = obj["etag"]
         last_sync_number = int(re.search(r"(?<=^C=)\d+", etag)[0])
-        if last_sync_number >= self.sync_token_number:
-            etag = re.sub(r"^C=\d+", f"C={self.sync_token_number}", etag)
+        if last_sync_number >= self._sync_token_number:
+            etag = re.sub(r"^C=\d+", f"C={self._sync_token_number}", etag)
             obj.update({"etag": etag})
 
     @staticmethod
