@@ -16,5 +16,5 @@ def icloud_contact_to_contact(icloud_contact: icloud.ICloudContact) -> model.Con
             first_name=icloud_contact.firstName,
             nickname=icloud_contact.nickName,
             last_name=icloud_contact.lastName,
-        )
+        ),
     )

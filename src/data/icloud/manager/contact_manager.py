@@ -1,7 +1,6 @@
 """iCloud contacts api wrapper."""
 from __future__ import annotations
 
-import functools
 import json
 import re
 import uuid
