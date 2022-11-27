@@ -3,20 +3,36 @@ import os
 
 
 def parse_arguments_with_init() -> argparse.Namespace:
-    args = _parser.parse_args()
-    _create_dir_if_not_exists(args.cache)
-    _create_dir_if_not_exists(args.data)
-    return args
+    cl_args = _create_parser().parse_args()
+    return cl_args
 
 
-_parser = argparse.ArgumentParser()
-_parser.add_argument("--cache", default="cache", help="path to cache directory")
-_parser.add_argument(
-    "--config", default="config.ini", help="path to configuration file"
-)
-_parser.add_argument("--data", default="data", help="path to contacts data")
+def _create_parser():
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
 
+    command_parser = parser.add_subparsers(
+        dest="command",
+        required=True,
+        help="commands",
+    )
 
-def _create_dir_if_not_exists(path):
-    if not os.path.exists(path=path):
-        os.mkdir(path=path)
+    pull_parser = command_parser.add_parser(
+        "pull",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        help="pull contacts from remote source",
+    )
+
+    pull_parser.add_argument("--cache", default="cache", help="path to cache directory")
+    pull_parser.add_argument(
+        "--config", default="config.ini", help="path to configuration file"
+    )
+    pull_parser.add_argument(
+        "--data", default="data", help="path to contacts data directory"
+    )
+    pull_parser.add_argument(
+        "--source", default="icloud", help="source to pull contacts from"
+    )
+
+    return parser

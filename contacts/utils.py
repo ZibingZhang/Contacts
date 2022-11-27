@@ -1,12 +1,9 @@
 import configparser
 import os
 
+import constant
 from common.utils import file_io_utils
 from data import icloud
-
-
-ICLOUD_CONTACTS_FILE_NAME = "icloud-contacts.json"
-ICLOUD_GROUPS_FILE_NAME = "icloud-groups.json"
 
 
 def icloud_manager_login(config_path: str = None):
@@ -25,10 +22,12 @@ def get_icloud_contacts_and_groups(
             raise ValueError
 
         contacts = file_io_utils.read_json_array_as_dataclass_objects(
-            os.path.join(cache_path, ICLOUD_CONTACTS_FILE_NAME), icloud.ICloudContact
+            os.path.join(cache_path, constant.ICLOUD_CONTACTS_FILE_NAME),
+            icloud.ICloudContact,
         )
         groups = file_io_utils.read_json_array_as_dataclass_objects(
-            os.path.join(cache_path, ICLOUD_GROUPS_FILE_NAME), icloud.ICloudGroup
+            os.path.join(cache_path, constant.ICLOUD_GROUPS_FILE_NAME),
+            icloud.ICloudGroup,
         )
         return contacts, groups
 
@@ -40,10 +39,10 @@ def get_icloud_contacts_and_groups(
     contacts, groups = contact_manager.get_contacts_and_groups()
 
     file_io_utils.write_dataclass_objects_as_json_array(
-        os.path.join(cache_path, ICLOUD_CONTACTS_FILE_NAME), contacts
+        os.path.join(cache_path, constant.ICLOUD_CONTACTS_FILE_NAME), contacts
     )
     file_io_utils.write_dataclass_objects_as_json_array(
-        os.path.join(cache_path, ICLOUD_GROUPS_FILE_NAME), groups
+        os.path.join(cache_path, constant.ICLOUD_GROUPS_FILE_NAME), groups
     )
 
     return contacts, groups
