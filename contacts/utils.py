@@ -33,6 +33,7 @@ def get_icloud_contacts_and_groups(
 
     if not config_path:
         raise ValueError
+
     icloud_manager_login(config_path=config_path)
 
     contact_manager = icloud.ICloudManager().contact_manager
