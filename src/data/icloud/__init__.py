@@ -15,7 +15,8 @@ OTHER_UUIDS = [
 IGNORED_UUIDS = ALERT_UUIDS + TEST_CONTACT_UUIDS + OTHER_UUIDS
 
 ICloudContactManager = manager.ICloudContactManager
-ICloudSessionManager = manager.ICloudSessionManager
+ICloudManager = manager.ICloudManager
+ICloudSession = manager.ICloudSession
 
 ICloudContact = model.ICloudContact
 ICloudGroup = model.ICloudGroup

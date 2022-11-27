@@ -11,12 +11,12 @@ CONTACTS_FILE_NAME = "contacts.json"
 # GROUPS_FILE_NAME = "groups.json"
 
 
-def get_icloud_contact_manager() -> icloud.ICloudContactManager:
+def icloud_manager_login():
     config = configparser.ConfigParser()
     config.read("config.ini")
     username = config["login"]["username"]
     password = config["login"]["password"]
-    return icloud.ICloudContactManager(username, password)
+    return icloud.ICloudManager(username, password).login()
 
 
 def get_icloud_contacts_and_groups(
@@ -31,7 +31,7 @@ def get_icloud_contacts_and_groups(
         )
         return contacts, groups
 
-    contact_manager = get_icloud_contact_manager()
+    contact_manager = icloud.ICloudManager().contact_manager
     contacts, groups = contact_manager.get_contacts_and_groups()
 
     file_io_utils.write_dataclass_objects_as_json_array(
@@ -53,9 +53,11 @@ def get_test_contact(
 
 
 if __name__ == "__main__":
+    icloud_manager_login()
+
     icloud_contacts, icloud_groups = get_icloud_contacts_and_groups(cached=True)
 
-    # icloud_contact_manager = get_icloud_contact_manager()
+    # icloud_contact_manager = icloud.ICloudManager().contact_manager
     # updated_contacts = []
     # for icloud_contact in icloud_contacts:
     #     if icloud_contact.contactId in icloud.IGNORED_UUIDS:
