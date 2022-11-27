@@ -3,7 +3,7 @@ then
     ARGS="-v"
 fi
 
-python3 -m black $ARGS src
-python3 -m isort $ARGS src
-python3 -m pflake8 $ARGS src
-python3 -m pytest $ARGS src -v
+python3 -m black $ARGS contacts
+python3 -m isort $ARGS contacts
+python3 -m pflake8 $ARGS contacts
+python3 -m pytest $ARGS contacts

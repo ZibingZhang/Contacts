@@ -7,7 +7,6 @@ import logging
 from typing import Text
 
 import requests
-
 from data import icloud
 from data.icloud import exception
 

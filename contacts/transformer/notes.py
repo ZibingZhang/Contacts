@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import dataclasses
 
-import yaml
-
 import model
+import yaml
 from common.utils import dataclasses_utils
 
 
