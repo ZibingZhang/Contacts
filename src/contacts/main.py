@@ -20,7 +20,7 @@ def get_icloud_contact_manager() -> icloud.ICloudContactManager:
 
 
 def get_icloud_contacts_and_groups(
-    cached: bool,
+    cached: bool = False,
 ) -> tuple[list[icloud.ICloudContact], list[icloud.ICloudGroup]]:
     if cached:
         contacts = file_io_utils.read_json_array_as_dataclass_objects(
@@ -53,21 +53,26 @@ def get_test_contact(
 
 
 if __name__ == "__main__":
-    from common import patch
+    icloud_contacts, icloud_groups = get_icloud_contacts_and_groups(cached=True)
 
-    patch.json_encode_uuid()
-
-    icloud_contacts, icloud_groups = get_icloud_contacts_and_groups(cached=False)
-
-    test_contact = get_test_contact(icloud_contacts)
-
-    test_contact.firstName = "New First Name"
-
-    get_icloud_contact_manager().update_contact(test_contact)
+    # icloud_contact_manager = get_icloud_contact_manager()
+    # updated_contacts = []
+    # for icloud_contact in icloud_contacts:
+    #     if icloud_contact.contactId in icloud.IGNORED_UUIDS:
+    #         continue
+    #
+    #     updated = False
+    #
+    #     if updated:
+    #         updated_contacts.append(icloud_contact)
+    #
+    # if updated_contacts:
+    #     icloud_contact_manager.update_contacts(updated_contacts)
 
     contacts = [
         transformer.icloud_contact_to_contact(icloud_contact)
         for icloud_contact in icloud_contacts
+        if icloud_contact.contactId not in icloud.IGNORED_UUIDS
     ]
 
     file_io_utils.write_dataclass_objects_as_json_array(CONTACTS_FILE_NAME, contacts)

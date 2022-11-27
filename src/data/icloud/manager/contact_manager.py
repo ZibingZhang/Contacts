@@ -49,13 +49,13 @@ class ICloudContactManager(metaclass=singleton.Singleton):
     def sync_token(self) -> str:
         return f"{self._sync_token_prefix}{self._sync_token_number}"
 
-    def create_contact(self, new_contact: dict) -> None:
+    def create_contact(self, new_contact: icloud.ICloudContact) -> None:
         """Create a contact.
 
         Args:
-            new_contact: the new contact
+            new_contact: The new contact.
         """
-        body = self._singleton_contact_body(new_contact)
+        body = self._build_contacts_request_body(new_contact)
         params = dict(self._params)
         params.update(
             {
@@ -74,10 +74,19 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         """Update a contact.
 
         Args:
-            updated_contact: the updated contact
+            updated_contact: The updated contact.
         """
-        self._update_etag(updated_contact)
-        body = self._singleton_contact_body(updated_contact)
+        self.update_contacts([updated_contact])
+
+    def update_contacts(self, updated_contacts: list[icloud.ICloudContact]) -> None:
+        """Update multiple contacts.
+
+        Args:
+            updated_contacts: The updated contacts.
+        """
+        for updated_contact in updated_contacts:
+            self._update_etag(updated_contact)
+        body = self._build_contacts_request_body(updated_contacts)
         params = dict(self._params)
         params.update(
             {
@@ -97,7 +106,7 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         """Create a contact group.
 
         Args:
-            contact_group: the new contact group
+            contact_group: The new contact group.
         """
         contact_group["groupId"] = str(uuid.uuid4())
         body = self._singleton_group_body(contact_group)
@@ -119,7 +128,7 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         """Delete a contact group.
 
         Args:
-            contact_group: the deleted contact group
+            contact_group: The deleted contact group.
         """
         self._update_etag(contact_group)
         body = self._singleton_group_body(contact_group)
@@ -183,13 +192,13 @@ class ICloudContactManager(metaclass=singleton.Singleton):
     def _update_etag(self, contact: icloud.ICloudContact) -> None:
         etag = contact.etag
         last_sync_number = int(re.search(r"(?<=^C=)\d+", etag)[0])
-        if self._sync_token_number >= last_sync_number:
+        if last_sync_number >= self._sync_token_number:
             etag = re.sub(r"^C=\d+", f"C={self._sync_token_number}", etag)
             contact.etag = etag
 
     @staticmethod
-    def _singleton_contact_body(contact: icloud.ICloudContact) -> dict:
-        return {"contacts": [contact.to_dict()]}
+    def _build_contacts_request_body(contacts: list[icloud.ICloudContact]) -> dict:
+        return {"contacts": [contact.to_dict() for contact in contacts]}
 
     @staticmethod
     def _singleton_group_body(contact_group: dict) -> dict:
