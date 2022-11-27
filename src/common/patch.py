@@ -1,13 +1,14 @@
-def json_encode_uuid():
-    # https://github.com/jazzband/django-push-notifications/issues/586#issuecomment-963930371
-    from json import JSONEncoder
-    from uuid import UUID
+import json
+import uuid
 
-    old_default = JSONEncoder.default
+
+# https://github.com/jazzband/django-push-notifications/issues/586#issuecomment-963930371
+def json_encode_uuid():
+    old_default = json.JSONEncoder.default
 
     def new_default(self, obj):
-        if isinstance(obj, UUID):
+        if isinstance(obj, uuid.UUID):
             return str(obj).upper()
         return old_default(self, obj)
 
-    JSONEncoder.default = new_default
+    json.JSONEncoder.default = new_default

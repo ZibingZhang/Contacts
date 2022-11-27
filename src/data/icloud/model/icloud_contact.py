@@ -1,33 +1,16 @@
 import dataclasses
-import enum
-import uuid
-
-import dataclasses_json
 
 import model
 from common.utils import dataclasses_utils
+from data.icloud.model import date_field
 
 NO_YEAR = 1604
-
-
-def date_field(required: bool = False) -> dataclasses.Field:
-    kwargs = {
-        "metadata": dataclasses_json.config(
-            encoder=dataclasses_utils.date_encoder(NO_YEAR),
-            decoder=dataclasses_utils.date_decoder(NO_YEAR),
-        )
-    }
-
-    if not required:
-        kwargs["default"] = None
-
-    return dataclasses.field(**kwargs)
 
 
 @dataclasses.dataclass
 class Date(dataclasses_utils.DataClassJsonMixin):
     label: str
-    field: model.Date = date_field(required=True)
+    field: model.Date = date_field.new_field(required=True)
 
 
 @dataclasses.dataclass
@@ -42,17 +25,10 @@ class IMField(dataclasses_utils.DataClassJsonMixin):
     userName: str
 
 
-class IMLabel(str, enum.Enum):
-    CUSTOM = "custom"
-    HOME = "HOME"
-    OTHER = "OTHER"
-    WORK = "WORK"
-
-
 @dataclasses.dataclass
 class IM(dataclasses_utils.DataClassJsonMixin):
     field: IMField
-    label: IMLabel
+    label: str
 
 
 @dataclasses.dataclass
@@ -62,10 +38,26 @@ class Phone(dataclasses_utils.DataClassJsonMixin):
 
 
 @dataclasses.dataclass
+class PhotoCrop(dataclasses_utils.DataClassJsonMixin):
+    height: int
+    width: int
+    x: int
+    y: int
+
+
+@dataclasses.dataclass
+class Photo(dataclasses_utils.DataClassJsonMixin):
+    crop: PhotoCrop
+    signature: str
+    url: str
+    whitelisted: bool | None = None
+
+
+@dataclasses.dataclass
 class Profile(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str | None = None
-    displayName: str | None = None
+    displayname: str | None = None
     user: str | None = None
     userId: str | None = None
 
@@ -101,19 +93,20 @@ class Url(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class ICloudContact(dataclasses_utils.DataClassJsonMixin):
-    contactId: uuid.UUID
+    contactId: str
     etag: str
     isCompany: bool
     isGuardianApproved: bool
     normalized: str
     whitelisted: bool
-    birthday: model.Date | None = date_field()
+    birthday: model.Date | None = date_field.new_field(required=False)
     IMs: list[IM] | None = None
     companyName: str | None = None
     dates: list[Date] | None = None
     department: str | None = None
     emailAddresses: list[EmailAddress] | None = None
     firstName: str | None = None
+    jobTitle: str | None = None
     lastName: str | None = None
     middleName: str | None = None
     nickName: str | None = None
@@ -122,6 +115,7 @@ class ICloudContact(dataclasses_utils.DataClassJsonMixin):
     phoneticCompanyName: str | None = None
     phoneticFirstName: str | None = None
     phoneticLastName: str | None = None
+    photo: Photo | None = None
     prefix: str | None = None
     profiles: list[Profile] | None = None
     relatedNames: list[RelatedName] | None = None
