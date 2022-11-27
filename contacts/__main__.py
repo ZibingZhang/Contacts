@@ -16,7 +16,7 @@ if __name__ == "__main__":
     args = parser.parse_arguments_with_init()
 
     icloud_contacts, icloud_groups = utils.get_icloud_contacts_and_groups(
-        cached=False, cache_path=args.cache, config_path=args.config
+        cached=True, cache_path=args.cache, config_path=args.config
     )
 
     # utils.icloud_manager_login(config_path=args.config)
