@@ -1,4 +1,5 @@
-from data.icloud.manager import contact_manager, session_manager
+from data.icloud.manager import contact_manager, icloud_manager, session_manager
 
 ICloudContactManager = contact_manager.ICloudContactManager
-ICloudSessionManager = session_manager.ICloudSessionManager
+ICloudManager = icloud_manager.ICloudManager
+ICloudSession = session_manager.ICloudSession

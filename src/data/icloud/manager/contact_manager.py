@@ -14,18 +14,10 @@ class ICloudContactManager(metaclass=singleton.Singleton):
     The 'Contacts' iCloud manager, connects to iCloud and returns contacts.
     """
 
-    def __init__(
-        self, apple_id: str | None = None, password: str | None = None
-    ) -> None:
-        if apple_id is None or password is None:
-            raise ValueError
-
-        session_manager = icloud.ICloudSessionManager(apple_id, password)
-        session_manager.login()
-
-        self._session = session_manager.session
-        self._params = session_manager.params
-        self._service_root = session_manager.get_webservice_url("contacts")
+    def __init__(self, manager: icloud.ICloudManager) -> None:
+        self._session = manager.session
+        self._params = manager.params
+        self._service_root = manager.get_webservice_url("contacts")
         self._contacts_endpoint = "%s/co" % self._service_root
         self._contacts_refresh_url = "%s/startup" % self._contacts_endpoint
         self._contacts_next_url = "%s/contacts" % self._contacts_endpoint
