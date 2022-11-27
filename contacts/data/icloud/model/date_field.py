@@ -5,7 +5,6 @@ import re
 import typing
 
 import dataclasses_json
-
 from common import error
 
 if typing.TYPE_CHECKING:

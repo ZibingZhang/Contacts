@@ -1,4 +1,4 @@
-from src.common.decorator import run_once
+from common.decorator import run_once
 
 times_run = 0
 
