@@ -67,6 +67,9 @@ def icloud_contact_to_contact(icloud_contact: icloud.ICloudContact) -> model.Con
     if icloud_contact.notes:
         _extract_from_notes(contact, nt.from_string(icloud_contact.notes))
 
+    if contact.tags:
+        contact.tags = sorted(set(contact.tags))
+
     return contact
 
 
@@ -157,8 +160,6 @@ def _extract_from_notes(contact: model.Contact, notes: nt.Notes) -> None:
         contact.favorite = notes.favorite
     if notes.friends_friend:
         contact.friends_friend = notes.friends_friend
-    if notes.meta:
-        contact.icloud.meta = notes.meta
     if notes.partner:
         contact.dated = notes.partner
 
@@ -166,28 +167,34 @@ def _extract_from_notes(contact: model.Contact, notes: nt.Notes) -> None:
         education = model.Education()
 
         if notes.education.bachelor:
-            education.bachelor = model.School(name=notes.education.bachelor.name)
+            education.bachelor = model.University(
+                name=model.UniversityName(notes.education.bachelor.name)
+            )
             if notes.education.bachelor.grad_year:
                 education.bachelor.graduation_year = notes.education.bachelor.grad_year
-            if notes.education.bachelor.major:
-                education.bachelor.majors = [notes.education.bachelor.major]
-            if notes.education.bachelor.minor:
-                education.bachelor.minors = [notes.education.bachelor.minor]
+            if notes.education.bachelor.majors:
+                education.bachelor.majors = notes.education.bachelor.majors.split(", ")
+            if notes.education.bachelor.minors:
+                education.bachelor.minors = notes.education.bachelor.minors.split(", ")
 
         if notes.education.high_school:
-            education.high_school = model.School(name=notes.education.high_school.name)
+            education.high_school = model.HighSchool(
+                name=model.HighSchoolName(notes.education.high_school.name)
+            )
             if notes.education.high_school.grad_year:
                 education.high_school.graduation_year = (
                     notes.education.high_school.grad_year
                 )
 
         if notes.education.master:
-            education.master = model.School(name=notes.education.master.name)
+            education.master = model.University(
+                name=model.UniversityName(notes.education.master.name)
+            )
             if notes.education.master.grad_year:
                 education.master.graduation_year = notes.education.master.grad_year
-            if notes.education.master.major:
-                education.master.majors = [notes.education.master.major]
-            if notes.education.master.minor:
-                education.master.minors = [notes.education.master.minor]
+            if notes.education.master.majors:
+                education.master.majors = notes.education.master.majors.split(", ")
+            if notes.education.master.minors:
+                education.master.minors = notes.education.master.minors.split(", ")
 
         contact.education = education

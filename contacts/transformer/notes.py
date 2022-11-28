@@ -18,8 +18,8 @@ def to_string(notes: Notes) -> str:
 class School(dataclasses_utils.DataClassJsonMixin):
     name: str
     grad_year: int | None = None
-    major: str | None = None
-    minor: str | None = None
+    majors: str | None = None
+    minors: str | None = None
 
 
 @dataclasses.dataclass
@@ -42,12 +42,6 @@ class FriendsFriend(dataclasses_utils.DataClassJsonMixin):
 
 
 @dataclasses.dataclass
-class Meta(dataclasses_utils.DataClassJsonMixin):
-    tags: list[str] | None = None
-    uuid: str | None = None
-
-
-@dataclasses.dataclass
 class Notes(dataclasses_utils.DataClassJsonMixin):
     chinese_name: str | None = None
     comment: str | None = None
@@ -55,5 +49,4 @@ class Notes(dataclasses_utils.DataClassJsonMixin):
     favorite: Favorites | None = None
     family: dict | None = None
     friends_friend: FriendsFriend | None = None
-    meta: Meta | None = None
     partner: model.DateRange | None = None

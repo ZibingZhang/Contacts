@@ -44,12 +44,17 @@ def pull(cl_args) -> None:
 
         diff = dataclasses_utils.diff(current_contact, pulled_contact)
         if diff:
+            if _only_etag_updated(diff):
+                icloud_id_to_current_contact_map[icloud_id] = pulled_contact
+                continue
+
             current_contact_display = pretty_print_utils.bordered(
                 json.dumps(current_contact.to_dict(), indent=2)
             )
             diff_display = pretty_print_utils.bordered(json.dumps(diff, indent=2))
             print(pretty_print_utils.besides(current_contact_display, diff_display))
 
+            # if True:
             accept_update = input("Accept update? [Y/N]: ")
             if accept_update.lower() == "y":
                 icloud_id_to_current_contact_map[icloud_id] = pulled_contact
@@ -58,3 +63,16 @@ def pull(cl_args) -> None:
         os.path.join(cl_args.data, constant.CONTACTS_FILE_NAME),
         list(icloud_id_to_current_contact_map.values()),
     )
+
+
+def _only_etag_updated(diff: dict) -> bool:
+    if set(diff.keys()) != {"$update"}:
+        return False
+    update = diff.get("$update")
+    if set(update.keys()) != {"icloud"}:
+        return False
+    icloud_diff = update.get("icloud")
+    if set(icloud_diff.keys()) != {"$update"}:
+        return False
+    icloud_update = icloud_diff.get("$update")
+    return set(icloud_update.keys()) == {"etag"}

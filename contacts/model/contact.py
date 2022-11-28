@@ -9,8 +9,14 @@ from data import icloud
 
 
 @dataclasses.dataclass
-class School(dataclasses_utils.DataClassJsonMixin):
-    name: str
+class HighSchool(dataclasses_utils.DataClassJsonMixin):
+    name: common.HighSchoolName
+    graduation_year: int | None = None
+
+
+@dataclasses.dataclass
+class University(dataclasses_utils.DataClassJsonMixin):
+    name: common.UniversityName
     graduation_year: int | None = None
     majors: list[str] | None = None
     minors: list[str] | None = None
@@ -18,9 +24,9 @@ class School(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class Education(dataclasses_utils.DataClassJsonMixin):
-    bachelor: School | None = None
-    high_school: School | None = None
-    master: School | None = None
+    bachelor: University | None = None
+    high_school: HighSchool | None = None
+    master: University | None = None
 
 
 @dataclasses.dataclass

@@ -55,7 +55,6 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud.ICloudContact:
         or contact.education
         or contact.family
         or contact.friends_friend
-        or contact.icloud.meta
         or contact.name.chinese_name
         or contact.notes
     ):
@@ -156,8 +155,6 @@ def _extract_notes(contact: model.Contact) -> nt.Notes:
         notes.favorite = contact.favorite
     if contact.friends_friend:
         notes.friends_friend = contact.friends_friend
-    if contact.icloud.meta:
-        notes.meta = contact.icloud.meta
     if contact.dated:
         notes.partner = contact.dated
 
@@ -165,33 +162,35 @@ def _extract_notes(contact: model.Contact) -> nt.Notes:
         education = nt.Education()
 
         if contact.education.bachelor:
-            education.bachelor = nt.School(name=contact.education.bachelor.name)
+            education.bachelor = nt.School(name=contact.education.bachelor.name.value)
             if contact.education.bachelor.graduation_year:
                 education.bachelor.grad_year = (
                     contact.education.bachelor.graduation_year
                 )
             if contact.education.bachelor.majors:
-                education.bachelor.major = contact.education.bachelor.majors[0]
+                education.bachelor.majors = ", ".join(contact.education.bachelor.majors)
             if contact.education.bachelor.minors:
-                education.bachelor.minor = contact.education.bachelor.minors[0]
+                education.bachelor.minors = ", ".join(contact.education.bachelor.minors)
 
         if contact.education.high_school:
-            education.high_school = nt.School(name=contact.education.high_school.name)
+            education.high_school = nt.School(
+                name=contact.education.high_school.name.value
+            )
             if contact.education.high_school.graduation_year:
                 education.high_school.grad_year = (
                     contact.education.high_school.graduation_year
                 )
 
         if contact.education.master:
-            education.master = nt.School(name=contact.education.master.name)
+            education.master = nt.School(name=contact.education.master.name.value)
             if contact.education.master.graduation_year:
                 education.master.graduation_year = (
                     contact.education.master.graduation_year
                 )
             if contact.education.master.majors:
-                education.master.major = contact.education.master.majors[0]
+                education.master.majors = ", ".join(contact.education.master.majors)
             if contact.education.master.minors:
-                education.master.minor = contact.education.master.minors[0]
+                education.master.minors = ", ".join(contact.education.master.minors)
 
         notes.education = education
 

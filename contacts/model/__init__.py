@@ -4,10 +4,13 @@ Country = common.Country
 CountryCode = common.CountryCode
 Date = common.Date
 DateRange = common.DateRange
+HighSchoolName = common.HighSchoolName
+UniversityName = common.UniversityName
 
 FacebookProfile = contact.FacebookProfile
 GameCenterProfile = contact.GameCenterProfile
-School = contact.School
+HighSchool = contact.HighSchool
+University = contact.University
 
 Education = contact.Education
 EmailAddresss = contact.EmailAddress
