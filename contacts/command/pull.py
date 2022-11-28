@@ -4,7 +4,12 @@ import os
 import constant
 import model
 import transformer
-from common.utils import file_io_utils, icloud_utils, json_utils, pretty_print_utils
+from common.utils import (
+    dataclasses_utils,
+    file_io_utils,
+    icloud_utils,
+    pretty_print_utils,
+)
 
 from data import icloud
 
@@ -37,7 +42,7 @@ def pull(cl_args) -> None:
         pulled_contact = icloud_id_to_pulled_contact_map.get(icloud_id)
         current_contact = icloud_id_to_current_contact_map.get(icloud_id)
 
-        diff = json_utils.diff(pulled_contact.to_dict(), current_contact.to_dict())
+        diff = dataclasses_utils.diff(pulled_contact, current_contact)
         if diff:
             current_contact_display = pretty_print_utils.bordered(
                 json.dumps(current_contact.to_dict(), indent=2)

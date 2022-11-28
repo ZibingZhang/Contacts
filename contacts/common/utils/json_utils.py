@@ -1,14 +1,10 @@
 import jsondiff
-from common.utils import dataclasses_utils
 
 
-def diff(
-    dict_1: dataclasses_utils.DataClassJsonMixin,
-    dict_2: dataclasses_utils.DataClassJsonMixin,
-) -> dict:
+def diff(dict_1: dict, dict_2: dict) -> dict:
     return jsondiff.diff(
-        dict_1.to_dict(),
-        dict_2.to_dict(),
+        dict_1,
+        dict_2,
         marshal=True,
         syntax="explicit",
     )
