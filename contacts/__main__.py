@@ -10,7 +10,7 @@ def _create_dir_if_not_exists(path):
 
 
 if __name__ == "__main__":
-    cl_args = parser.parse_arguments_with_init()
+    cl_args = parser.parse_arguments()
 
     match cl_args.command:
         case "pull":
