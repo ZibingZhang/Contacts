@@ -63,16 +63,19 @@ def push(cl_args) -> None:
                         pretty_print_utils.bordered(pushed_contact.notes),
                     )
                 )
+
+            # if True:
             accept_update = input("Accept update? [Y/N]: ")
             if accept_update.lower() == "y":
                 icloud_id_to_current_contact_map[icloud_id] = pushed_contact
                 updated_contacts.append(pushed_contact)
 
     if cl_args.write:
+        print(f"Updating {len(updated_contacts)} contact(s)")
         contacts_manager = icloud.ICloudManager().contact_manager
         contacts_manager.update_contacts(updated_contacts)
     else:
-        print(f"Would've written {len(updated_contacts)} contacts")
+        print(f"Would have updated {len(updated_contacts)} contact(s)")
 
     file_io_utils.write_dataclass_objects_as_json_array(
         os.path.join(cl_args.cache, constant.ICLOUD_CONTACTS_FILE_NAME),
