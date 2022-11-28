@@ -4,7 +4,7 @@ import re
 import typing
 
 import model
-from transformer import notes
+from transformer import notes as nt
 
 if typing.TYPE_CHECKING:
     from data import icloud
@@ -59,8 +59,13 @@ def icloud_contact_to_contact(icloud_contact: icloud.ICloudContact) -> model.Con
     if icloud_contact.profiles:
         contact.social_profiles = _transform_social_profiles(icloud_contact.profiles)
 
+    if icloud_contact.streetAddresses:
+        contact.street_addresses = _transform_street_addresses(
+            icloud_contact.streetAddresses
+        )
+
     if icloud_contact.notes:
-        _transform_notes(contact, notes.from_string(icloud_contact.notes))
+        _extract_from_notes(contact, nt.from_string(icloud_contact.notes))
 
     return contact
 
@@ -93,9 +98,9 @@ def _transform_phone_numbers(
                 continue
             phone_numbers.append(
                 model.PhoneNumber(
-                    countryCode=country_code,
+                    country_code=country_code,
                     label=icloud_phone.label,
-                    number=int(icloud_phone.field.split(f"+{country_code}")[1]),
+                    number=icloud_phone.field.split(f"+{country_code}")[1],
                 )
             )
             break
@@ -123,12 +128,66 @@ def _transform_social_profiles(
     return social_profiles
 
 
-def _transform_notes(contact: model.Contact, notes: notes.Notes) -> None:
+def _transform_street_addresses(
+    icloud_street_addresses: list[icloud.model.StreetAddress],
+) -> list[model.StreetAddress]:
+    street_addresses = []
+    for icloud_street_address in icloud_street_addresses:
+        street_addresses.append(
+            model.StreetAddress(
+                city=icloud_street_address.field.city,
+                country=icloud_street_address.field.country,
+                label=icloud_street_address.label,
+                postal_code=icloud_street_address.field.postalCode,
+                state=icloud_street_address.field.state,
+                street=icloud_street_address.field.street.splitlines(),
+            )
+        )
+    return street_addresses
+
+
+def _extract_from_notes(contact: model.Contact, notes: nt.Notes) -> None:
     if notes.chinese_name:
         contact.name.chinese_name = notes.chinese_name
     if notes.comment:
         contact.notes = notes.comment
     if notes.family:
         contact.family = notes.family
+    if notes.favorite:
+        contact.favorite = notes.favorite
+    if notes.friends_friend:
+        contact.friends_friend = notes.friends_friend
+    if notes.meta:
+        contact.icloud.meta = notes.meta
     if notes.partner:
         contact.dated = notes.partner
+
+    if notes.education:
+        education = model.Education()
+
+        if notes.education.bachelor:
+            education.bachelor = model.School(name=notes.education.bachelor.name)
+            if notes.education.bachelor.grad_year:
+                education.bachelor.graduation_year = notes.education.bachelor.grad_year
+            if notes.education.bachelor.major:
+                education.bachelor.majors = [notes.education.bachelor.major]
+            if notes.education.bachelor.minor:
+                education.bachelor.minors = [notes.education.bachelor.minor]
+
+        if notes.education.high_school:
+            education.high_school = model.School(name=notes.education.high_school.name)
+            if notes.education.high_school.grad_year:
+                education.high_school.graduation_year = (
+                    notes.education.high_school.grad_year
+                )
+
+        if notes.education.master:
+            education.master = model.School(name=notes.education.master.name)
+            if notes.education.master.grad_year:
+                education.master.graduation_year = notes.education.master.grad_year
+            if notes.education.master.major:
+                education.master.majors = [notes.education.master.major]
+            if notes.education.master.minor:
+                education.master.minors = [notes.education.master.minor]
+
+        contact.education = education

@@ -1,3 +1,6 @@
+import textwrap
+
+
 def besides(a: str, b: str) -> str:
     split_a = a.splitlines()
     split_b = b.splitlines()
@@ -21,11 +24,18 @@ def besides(a: str, b: str) -> str:
 
 
 # https://stackoverflow.com/a/20757491
-def bordered(text: str) -> str:
+def bordered(text: str, width: int | None = 88) -> str:
+    if width:
+        text = "\n".join(
+            wrapped_line
+            for line in text.splitlines()
+            for wrapped_line in textwrap.wrap(line, width)
+        )
+
     lines = text.splitlines()
     width = max(len(s) for s in lines)
-    res = ["┌" + "─" * width + "┐"]
+    res = ["┌" + "─" * (width + 2) + "┐"]
     for s in lines:
-        res.append("│" + (s + " " * width)[:width] + "│")
-    res.append("└" + "─" * width + "┘")
+        res.append("│ " + (s + " " * width)[:width] + " │")
+    res.append("└" + "─" * (width + 2) + "┘")
     return "\n".join(res)

@@ -17,3 +17,7 @@ if __name__ == "__main__":
             _create_dir_if_not_exists(cl_args.cache)
             _create_dir_if_not_exists(cl_args.data)
             command.pull(cl_args)
+        case "push":
+            _create_dir_if_not_exists(cl_args.cache)
+            _create_dir_if_not_exists(cl_args.data)
+            command.push(cl_args)

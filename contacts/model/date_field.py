@@ -51,8 +51,7 @@ def date_decoder(date: str | None) -> model.Date | None:
     if date is None:
         return
     if not re.match(r"^[0-9X]{4}-[0-9X]{2}-[0-9X]{2}$", date):
-        print(date)
-        raise error.DecodingError
+        raise error.DecodingError(date)
 
     year = date[:4]
     month = date[5:7]

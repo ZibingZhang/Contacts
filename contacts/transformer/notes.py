@@ -3,12 +3,15 @@ from __future__ import annotations
 import dataclasses
 
 import model
-import yaml
-from common.utils import dataclasses_utils
+from common.utils import dataclasses_utils, yaml_utils
 
 
 def from_string(notes: str) -> Notes:
-    return Notes.from_dict(yaml.load(notes, Loader=yaml.Loader))
+    return Notes.from_dict(yaml_utils.load(notes))
+
+
+def to_string(notes: Notes) -> str:
+    return yaml_utils.dump(notes)
 
 
 @dataclasses.dataclass

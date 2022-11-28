@@ -16,7 +16,7 @@ from data import icloud
 
 def pull(cl_args) -> None:
     icloud_contacts, icloud_groups = icloud_utils.get_contacts_and_groups(
-        cached=False, cache_path=cl_args.cache, config_path=cl_args.config
+        cached=cl_args.cached, cache_path=cl_args.cache, config_path=cl_args.config
     )
 
     pulled_contacts = [
@@ -42,7 +42,7 @@ def pull(cl_args) -> None:
         pulled_contact = icloud_id_to_pulled_contact_map.get(icloud_id)
         current_contact = icloud_id_to_current_contact_map.get(icloud_id)
 
-        diff = dataclasses_utils.diff(pulled_contact, current_contact)
+        diff = dataclasses_utils.diff(current_contact, pulled_contact)
         if diff:
             current_contact_display = pretty_print_utils.bordered(
                 json.dumps(current_contact.to_dict(), indent=2)

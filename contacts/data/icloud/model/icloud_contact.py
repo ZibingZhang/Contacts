@@ -6,8 +6,6 @@ import model
 from common.utils import dataclasses_utils
 from data.icloud.model import date_field
 
-NO_YEAR = 1604
-
 
 @dataclasses.dataclass
 class Date(dataclasses_utils.DataClassJsonMixin):
@@ -99,7 +97,6 @@ class ICloudContact(dataclasses_utils.DataClassJsonMixin):
     etag: str
     isCompany: bool
     isGuardianApproved: bool
-    normalized: str
     whitelisted: bool
     birthday: model.Date | None = date_field.new_field(required=False)
     IMs: list[IM] | None = None
@@ -113,6 +110,7 @@ class ICloudContact(dataclasses_utils.DataClassJsonMixin):
     middleName: str | None = None
     nickName: str | None = None
     notes: str | None = None
+    normalized: str | None = None
     phones: list[Phone] | None = None
     phoneticCompanyName: str | None = None
     phoneticFirstName: str | None = None

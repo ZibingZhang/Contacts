@@ -1,3 +1,4 @@
-from command import pull
+from command import pull, push
 
 pull = pull.pull
+push = push.push
