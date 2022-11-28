@@ -11,8 +11,9 @@ import tempfile
 import uuid
 
 from common import decorator, singleton
-from data import icloud
 from data.icloud import exception
+
+from data import icloud
 
 LOGGER = logging.getLogger(__name__)
 

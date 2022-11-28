@@ -4,8 +4,9 @@ import dataclasses
 import enum
 
 from common.utils import dataclasses_utils
-from data import icloud
 from model import date_field
+
+from data import icloud
 
 NO_YEAR = 0
 

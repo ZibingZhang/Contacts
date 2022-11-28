@@ -1,19 +1,17 @@
+import json
 import os
 
-import jsondiff
-
 import constant
-import json
 import model
 import transformer
-import utils
+from common.utils import file_io_utils, icloud_utils, json_utils, pretty_print_utils
+
 from data import icloud
-from common.utils import file_io_utils, pretty_print_utils
 
 
-def pull(cl_args):
-    icloud_contacts, icloud_groups = utils.get_icloud_contacts_and_groups(
-        cached=True, cache_path=cl_args.cache, config_path=cl_args.config
+def pull(cl_args) -> None:
+    icloud_contacts, icloud_groups = icloud_utils.get_contacts_and_groups(
+        cached=False, cache_path=cl_args.cache, config_path=cl_args.config
     )
 
     pulled_contacts = [
@@ -39,12 +37,7 @@ def pull(cl_args):
         pulled_contact = icloud_id_to_pulled_contact_map.get(icloud_id)
         current_contact = icloud_id_to_current_contact_map.get(icloud_id)
 
-        diff = jsondiff.diff(
-            pulled_contact.to_dict(),
-            current_contact.to_dict(),
-            marshal=True,
-            syntax="explicit",
-        )
+        diff = json_utils.diff(pulled_contact.to_dict(), current_contact.to_dict())
         if diff:
             current_contact_display = pretty_print_utils.bordered(
                 json.dumps(current_contact.to_dict(), indent=2)
