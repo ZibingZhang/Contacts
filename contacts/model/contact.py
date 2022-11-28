@@ -1,27 +1,26 @@
 from __future__ import annotations
 
 import dataclasses
-import enum
 
 from common.utils import dataclasses_utils
-from model import date_field
+from model import common, date_field
 
 from data import icloud
 
-NO_YEAR = 0
+
+@dataclasses.dataclass
+class School(dataclasses_utils.DataClassJsonMixin):
+    name: str
+    graduation_year: int | None = None
+    majors: list[str] | None = None
+    minors: list[str] | None = None
 
 
 @dataclasses.dataclass
-class Date(dataclasses_utils.DataClassJsonMixin):
-    day: int | None = None
-    month: int | None = None
-    year: int | None = None
-
-
-@dataclasses.dataclass
-class DateRange(dataclasses_utils.DataClassJsonMixin):
-    start: Date | None = date_field.new_field(required=False)
-    end: Date | None = date_field.new_field(required=False)
+class Education(dataclasses_utils.DataClassJsonMixin):
+    bachelor: School | None = None
+    high_school: School | None = None
+    master: School | None = None
 
 
 @dataclasses.dataclass
@@ -35,6 +34,7 @@ class EmailAddress(dataclasses_utils.DataClassJsonMixin):
 class ICloud(dataclasses_utils.DataClassJsonMixin):
     etag: str
     uuid: str
+    meta: dict | None = None
     photo: icloud.model.Photo | None = None
 
 
@@ -49,21 +49,10 @@ class Name(dataclasses_utils.DataClassJsonMixin):
     chinese_name: str | None = None
 
 
-class CountryCode(enum.IntEnum):
-    NANP = 1
-    IRELAND = 353
-    UNITED_KINGDOM = 44
-    BRAZIL = 55
-    CHILE = 56
-    HONG_KONG = 852
-    CHINA = 86
-    TAIWAN = 886
-
-
 @dataclasses.dataclass
 class PhoneNumber(dataclasses_utils.DataClassJsonMixin):
-    countryCode: CountryCode
-    number: int
+    country_code: common.CountryCode
+    number: str
     label: str | None = None
 
 
@@ -87,14 +76,28 @@ class SocialProfiles(dataclasses_utils.DataClassJsonMixin):
 
 
 @dataclasses.dataclass
+class StreetAddress(dataclasses_utils.DataClassJsonMixin):
+    country: common.Country | None = None
+    city: str | None = None
+    label: str | None = None
+    postal_code: int | None = None
+    state: str | None = None
+    street: list[str] | None = None
+
+
+@dataclasses.dataclass
 class Contact(dataclasses_utils.DataClassJsonMixin):
-    birthday: Date | None = date_field.new_field(required=False)
-    dated: DateRange | None = None
+    birthday: common.Date | None = date_field.new_field(required=False)
+    dated: common.DateRange | None = None
+    education: Education | None = None
     email_addresses: list[EmailAddress] | None = None
     family: dict | None = None
+    favorite: dict | None = None
+    friends_friend: dict | None = None
     icloud: ICloud | None = None
     name: Name | None = None
     notes: str | None = None
     phone_numbers: list[PhoneNumber] | None = None
     social_profiles: SocialProfiles | None = None
+    street_addresses: list[StreetAddress] | None = None
     tags: list[str] | None = None
