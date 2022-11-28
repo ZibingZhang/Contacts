@@ -1,3 +1,3 @@
 # Contacts
 
-A project to help me to store and track my contacts.
+A project to help me store and track my contacts.
