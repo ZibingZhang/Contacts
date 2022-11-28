@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import dataclasses
 import enum
-import typing
 
 from common.utils import dataclasses_utils
 from model import date_field
 
-if typing.TYPE_CHECKING:
-    from data import icloud
+from data import icloud
 
 NO_YEAR = 0
 
@@ -36,8 +34,8 @@ class EmailAddress(dataclasses_utils.DataClassJsonMixin):
 @dataclasses.dataclass
 class ICloud(dataclasses_utils.DataClassJsonMixin):
     etag: str
-    photo: icloud.model.Photo | None
     uuid: str
+    photo: icloud.model.Photo | None = None
 
 
 @dataclasses.dataclass
@@ -65,8 +63,8 @@ class CountryCode(enum.IntEnum):
 @dataclasses.dataclass
 class PhoneNumber(dataclasses_utils.DataClassJsonMixin):
     countryCode: CountryCode
-    label: str
     number: int
+    label: str | None = None
 
 
 # https://www.facebook.com/help/211813265517027
@@ -92,7 +90,7 @@ class SocialProfiles(dataclasses_utils.DataClassJsonMixin):
 class Contact(dataclasses_utils.DataClassJsonMixin):
     birthday: Date | None = date_field.new_field(required=False)
     dated: DateRange | None = None
-    email_addresses: list[EmailAddress] = None
+    email_addresses: list[EmailAddress] | None = None
     family: dict | None = None
     icloud: ICloud | None = None
     name: Name | None = None

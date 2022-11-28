@@ -1,10 +1,8 @@
 import argparse
-import os
 
 
-def parse_arguments_with_init() -> argparse.Namespace:
-    cl_args = _create_parser().parse_args()
-    return cl_args
+def parse_arguments() -> argparse.Namespace:
+    return _create_parser().parse_args()
 
 
 def _create_parser():

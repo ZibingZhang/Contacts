@@ -3,10 +3,11 @@ import os
 
 import constant
 from common.utils import file_io_utils
+
 from data import icloud
 
 
-def icloud_manager_login(config_path: str = None):
+def login(config_path: str = None):
     config = configparser.ConfigParser()
     config.read(config_path)
     username = config["login"]["username"]
@@ -14,7 +15,7 @@ def icloud_manager_login(config_path: str = None):
     icloud.ICloudManager(username, password).login()
 
 
-def get_icloud_contacts_and_groups(
+def get_contacts_and_groups(
     cached: bool, cache_path: str | None = None, config_path: str | None = None
 ) -> tuple[list[icloud.ICloudContact], list[icloud.ICloudGroup]]:
     if cached:
@@ -33,7 +34,8 @@ def get_icloud_contacts_and_groups(
 
     if not config_path:
         raise ValueError
-    icloud_manager_login(config_path=config_path)
+
+    login(config_path=config_path)
 
     contact_manager = icloud.ICloudManager().contact_manager
     contacts, groups = contact_manager.get_contacts_and_groups()
