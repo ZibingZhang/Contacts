@@ -72,7 +72,7 @@ def push(cl_args) -> None:
         contacts_manager = icloud.ICloudManager().contact_manager
         contacts_manager.update_contacts(updated_contacts)
     else:
-        print("Would've written " + str(len(updated_contacts)) + " contacts")
+        print(f"Would've written {len(updated_contacts)} contacts")
 
     file_io_utils.write_dataclass_objects_as_json_array(
         os.path.join(cl_args.cache, constant.ICLOUD_CONTACTS_FILE_NAME),
