@@ -38,7 +38,9 @@ class ICloudManager(metaclass=singleton.Singleton):
         with_family: bool = True,
     ) -> None:
         if apple_id is None or password is None:
-            raise ValueError
+            raise ValueError(
+                "'apple_id' and 'password' required for initial instantiation"
+            )
 
         self.user = {"accountName": apple_id, "password": password}
         self.data = {}

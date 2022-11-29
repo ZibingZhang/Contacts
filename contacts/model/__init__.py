@@ -1,11 +1,12 @@
-from model import common, contact
+from model import contact, date, enumeration
 
-Country = common.Country
-CountryCode = common.CountryCode
-Date = common.Date
-DateRange = common.DateRange
-HighSchoolName = common.HighSchoolName
-UniversityName = common.UniversityName
+Date = date.Date
+DateRange = date.DateRange
+
+Country = enumeration.Country
+CountryCode = enumeration.CountryCode
+HighSchoolName = enumeration.HighSchoolName
+UniversityName = enumeration.UniversityName
 
 FacebookProfile = contact.FacebookProfile
 GameCenterProfile = contact.GameCenterProfile

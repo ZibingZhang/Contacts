@@ -1,22 +1,12 @@
-import json
-import os
-
-import constant
-import model
 import transformer
-from common.utils import (
-    dataclasses_utils,
-    file_io_utils,
-    icloud_utils,
-    pretty_print_utils,
-)
+from utils import command_utils, dataclasses_utils, json_utils, pretty_print_utils
 
 from data import icloud
 
 
-def pull(cl_args) -> None:
-    icloud_contacts, icloud_groups = icloud_utils.get_contacts_and_groups(
-        cached=cl_args.cached, cache_path=cl_args.cache, config_path=cl_args.config
+def pull(cache_path: str, cached: bool, data_path: str) -> None:
+    icloud_contacts = command_utils.read_contacts_from_icloud(
+        cache_path=cache_path, cached=cached
     )
 
     pulled_contacts = [
@@ -24,9 +14,7 @@ def pull(cl_args) -> None:
         for icloud_contact in icloud_contacts
         if icloud_contact.contactId not in icloud.IGNORED_UUIDS
     ]
-    current_contacts = file_io_utils.read_json_array_as_dataclass_objects(
-        os.path.join(cl_args.data, constant.CONTACTS_FILE_NAME), model.Contact
-    )
+    current_contacts = command_utils.read_contacts_from_disk(data_path=data_path)
 
     icloud_id_to_pulled_contact_map = {
         contact.icloud.uuid: contact for contact in pulled_contacts
@@ -35,10 +23,9 @@ def pull(cl_args) -> None:
         contact.icloud.uuid: contact for contact in current_contacts
     }
 
-    for icloud_id in icloud_id_to_current_contact_map.keys():
-        if icloud_id not in icloud_id_to_pulled_contact_map:
-            continue
-
+    for icloud_id in (
+        icloud_id_to_current_contact_map.keys() & icloud_id_to_pulled_contact_map.keys()
+    ):
         pulled_contact = icloud_id_to_pulled_contact_map.get(icloud_id)
         current_contact = icloud_id_to_current_contact_map.get(icloud_id)
 
@@ -49,19 +36,17 @@ def pull(cl_args) -> None:
                 continue
 
             current_contact_display = pretty_print_utils.bordered(
-                json.dumps(current_contact.to_dict(), indent=2)
+                json_utils.dumps(current_contact.to_dict())
             )
-            diff_display = pretty_print_utils.bordered(json.dumps(diff, indent=2))
+            diff_display = pretty_print_utils.bordered(json_utils.dumps(diff))
             print(pretty_print_utils.besides(current_contact_display, diff_display))
 
-            # if True:
             accept_update = input("Accept update? [Y/N]: ")
             if accept_update.lower() == "y":
                 icloud_id_to_current_contact_map[icloud_id] = pulled_contact
 
-    file_io_utils.write_dataclass_objects_as_json_array(
-        os.path.join(cl_args.data, constant.CONTACTS_FILE_NAME),
-        list(icloud_id_to_current_contact_map.values()),
+    command_utils.write_contacts_to_disk(
+        data_path=data_path, contacts=list(icloud_id_to_current_contact_map.values())
     )
 
 

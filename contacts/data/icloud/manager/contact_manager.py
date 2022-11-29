@@ -48,7 +48,15 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         Args:
             new_contact: The new contact.
         """
-        body = self._build_contacts_request_body(new_contact)
+        self.create_contacts([new_contact])
+
+    def create_contacts(self, new_contacts: list[icloud.ICloudContact]) -> None:
+        """Create multiple contacts.
+
+        Args:
+            new_contacts: The new contacts.
+        """
+        body = self._build_contacts_request_body(new_contacts)
         params = dict(self._params)
         params.update(
             {

@@ -1,7 +1,7 @@
 import dataclasses
 import uuid
 
-from common.utils import dataclasses_utils
+from utils import dataclasses_utils
 
 
 @dataclasses.dataclass

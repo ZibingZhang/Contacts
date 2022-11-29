@@ -6,7 +6,7 @@ from typing import Any
 import yaml
 
 if typing.TYPE_CHECKING:
-    from common.utils import dataclasses_utils
+    from utils import dataclasses_utils
 
 
 def load(obj: str) -> Any:
