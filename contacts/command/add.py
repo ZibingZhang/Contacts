@@ -5,7 +5,7 @@ import model
 from utils import command_utils
 
 
-def add(data_path) -> None:
+def add(*, data_path) -> None:
     new_contact = command_utils.read_contact_from_disk(
         data_path=data_path, file_name=constant.NEW_CONTACT_FILE_NAME
     )

@@ -4,7 +4,7 @@ from utils import command_utils, dataclasses_utils, json_utils, pretty_print_uti
 from data import icloud
 
 
-def pull(cache_path: str, cached: bool, data_path: str) -> None:
+def pull(*, cached: bool, data_path: str, cache_path: str | None = None) -> None:
     icloud_contacts = command_utils.read_contacts_from_icloud(
         cache_path=cache_path, cached=cached
     )

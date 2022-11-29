@@ -29,7 +29,7 @@ if __name__ == "__main__":
         case "push":
             _create_dir_if_not_exists(cl_args.cache)
             _create_dir_if_not_exists(cl_args.data)
-            icloud_utils.login()
+            icloud_utils.login(config_path=cl_args.config)
             command.push(
                 cache_path=cl_args.cache,
                 data_path=cl_args.data,

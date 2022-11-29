@@ -31,7 +31,7 @@ def read_contacts_from_icloud(
     cache_path: str, cached: bool
 ) -> list[icloud.ICloudContact]:
     icloud_contacts, _ = icloud_utils.get_contacts_and_groups(
-        cache_path=cache_path, cached=cached
+        cached=cached, cache_path=cache_path
     )
     progress_utils.message(f"Read {len(icloud_contacts)} contact(s)")
     return icloud_contacts

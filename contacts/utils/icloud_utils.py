@@ -18,7 +18,7 @@ def login(config_path: str = None):
 
 
 def get_contacts_and_groups(
-    cached: bool, cache_path: str | None = None
+    cache_path: str, cached: bool
 ) -> tuple[list[icloud.ICloudContact], list[icloud.ICloudGroup]]:
     if cached:
         if cache_path is None:

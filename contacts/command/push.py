@@ -9,7 +9,7 @@ from utils import (
 )
 
 
-def push(cache_path: str, data_path: str, write: bool) -> None:
+def push(*, cache_path: str, data_path: str, write: bool) -> None:
     contacts = command_utils.read_contacts_from_disk(data_path=data_path)
 
     pushed_contacts = [
@@ -81,13 +81,12 @@ def push(cache_path: str, data_path: str, write: bool) -> None:
         print(f"Would have updated {len(updated_contacts)} contact(s)")
 
     if write and (len(new_contacts) > 0 or len(updated_contacts) > 0):
-        pull_contacts_to_sync_etag(cache_path=cache_path, data_path=data_path)
+        _pull_contacts_to_sync_etag(data_path)
 
 
-@progress_utils.annotate("Pull contacts to sync etag")
-def pull_contacts_to_sync_etag(cache_path: str, data_path: str) -> None:
+@progress_utils.annotate("Pull contact(s) to sync etag(s)")
+def _pull_contacts_to_sync_etag(data_path: str) -> None:
     command.pull(
-        cache_path=cache_path,
         cached=False,
         data_path=data_path,
     )
