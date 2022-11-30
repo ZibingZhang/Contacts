@@ -1,7 +1,8 @@
+"""A dataclass representation of the json object response for an iCloud group."""
 import dataclasses
 import uuid
 
-from common.utils import dataclasses_utils
+from utils import dataclasses_utils
 
 
 @dataclasses.dataclass

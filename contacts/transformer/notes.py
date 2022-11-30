@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 
 import model
-from common.utils import dataclasses_utils, yaml_utils
+from utils import dataclasses_utils, yaml_utils
 
 
 def from_string(notes: str) -> Notes:

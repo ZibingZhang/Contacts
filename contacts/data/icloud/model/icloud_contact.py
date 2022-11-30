@@ -1,10 +1,11 @@
+"""A dataclass representation of the json object response for an iCloud contact."""
 from __future__ import annotations
 
 import dataclasses
 
 import model
-from common.utils import dataclasses_utils
 from data.icloud.model import date_field
+from utils import dataclasses_utils
 
 
 @dataclasses.dataclass
@@ -94,17 +95,16 @@ class Url(dataclasses_utils.DataClassJsonMixin):
 @dataclasses.dataclass
 class ICloudContact(dataclasses_utils.DataClassJsonMixin):
     contactId: str
-    etag: str
     isCompany: bool
-    isGuardianApproved: bool
-    whitelisted: bool
     birthday: model.Date | None = date_field.new_field(required=False)
-    IMs: list[IM] | None = None
     companyName: str | None = None
     dates: list[Date] | None = None
     department: str | None = None
     emailAddresses: list[EmailAddress] | None = None
+    etag: str | None = None
     firstName: str | None = None
+    IMs: list[IM] | None = None
+    isGuardianApproved: bool | None = None
     jobTitle: str | None = None
     lastName: str | None = None
     middleName: str | None = None
@@ -122,3 +122,4 @@ class ICloudContact(dataclasses_utils.DataClassJsonMixin):
     streetAddresses: list[StreetAddress] | None = None
     suffix: str | None = None
     urls: list[Url] | None = None
+    whitelisted: bool | None = None

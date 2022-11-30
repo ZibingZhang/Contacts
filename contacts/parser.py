@@ -25,13 +25,25 @@ def _create_parser():
         "--data", default="data", help="path to contacts data directory"
     )
     base_parser.add_argument(
+        "--force", default=False, help="perform the action user validation"
+    )
+
+    sync_parser = argparse.ArgumentParser(add_help=False)
+    sync_parser.add_argument(
         "--source", default="icloud", help="source to pull contacts from"
+    )
+
+    pull_parser = command_parser.add_parser(
+        "add",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        parents=[base_parser, sync_parser],
+        help="add a contact",
     )
 
     pull_parser = command_parser.add_parser(
         "pull",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        parents=[base_parser],
+        parents=[base_parser, sync_parser],
         help="pull contacts from remote source",
     )
     pull_parser.add_argument(

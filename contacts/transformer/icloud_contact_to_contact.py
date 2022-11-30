@@ -79,7 +79,10 @@ def _transform_email_addresses(
     email_addresses = []
     for icloud_email_address in icloud_email_addresses:
         if icloud_email_address.field.count("@") != 1:
-            raise ValueError
+            raise ValueError(
+                f"Email address does not contain exactly 1 '@': "
+                f"{icloud_email_address.field}"
+            )
         local_part, domain = icloud_email_address.field.split("@")
         email_addresses.append(
             model.EmailAddresss(
@@ -95,7 +98,7 @@ def _transform_phone_numbers(
     phone_numbers = []
     for icloud_phone in icloud_phones:
         if not PHONE_NUMBER_REGEX.match(icloud_phone.field):
-            raise ValueError
+            raise ValueError(f"Invalid phone number format: {icloud_phone.field}")
         for country_code in model.CountryCode:
             if not icloud_phone.field.startswith(f"+{country_code}"):
                 continue
@@ -108,7 +111,7 @@ def _transform_phone_numbers(
             )
             break
         else:
-            raise ValueError
+            raise ValueError(f"Unsupported country code: {icloud_phone.field}")
     return phone_numbers
 
 
@@ -127,7 +130,9 @@ def _transform_social_profiles(
                     link=icloud_profile.field, username=icloud_profile.user
                 )
             case _:
-                raise ValueError
+                raise ValueError(
+                    f"Unsupported social profile label: {icloud_profile.label}"
+                )
     return social_profiles
 
 

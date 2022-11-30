@@ -1,3 +1,4 @@
+"""General iCloud api wrapper."""
 from __future__ import annotations
 
 import functools
@@ -38,7 +39,9 @@ class ICloudManager(metaclass=singleton.Singleton):
         with_family: bool = True,
     ) -> None:
         if apple_id is None or password is None:
-            raise ValueError
+            raise ValueError(
+                "'apple_id' and 'password' required for initial instantiation"
+            )
 
         self.user = {"accountName": apple_id, "password": password}
         self.data = {}
@@ -70,7 +73,7 @@ class ICloudManager(metaclass=singleton.Singleton):
             with open(self.session_path) as session_f:
                 self.session_data = json.load(session_f)
         except FileNotFoundError:
-            LOGGER.info("Session file does not exist")
+            LOGGER.debug("Session file does not exist")
         if self.session_data.get("client_id"):
             self.client_id = self.session_data.get("client_id")
         else:

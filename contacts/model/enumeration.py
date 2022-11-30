@@ -1,21 +1,4 @@
-import dataclasses
 import enum
-
-from common.utils import dataclasses_utils
-from model import date_field
-
-
-@dataclasses.dataclass
-class Date(dataclasses_utils.DataClassJsonMixin):
-    day: int | None = None
-    month: int | None = None
-    year: int | None = None
-
-
-@dataclasses.dataclass
-class DateRange(dataclasses_utils.DataClassJsonMixin):
-    start: Date | None = date_field.new_field(required=False)
-    end: Date | None = date_field.new_field(required=False)
 
 
 class Country(str, enum.Enum):

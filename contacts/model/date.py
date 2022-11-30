@@ -6,6 +6,7 @@ import typing
 
 import dataclasses_json
 from common import error
+from utils import dataclasses_utils
 
 if typing.TYPE_CHECKING:
     import model
@@ -62,3 +63,16 @@ def date_decoder(date: str | None) -> model.Date | None:
     day = int(day) if day != "XX" else None
 
     return model.Date(year=year, month=month, day=day)
+
+
+@dataclasses.dataclass
+class Date(dataclasses_utils.DataClassJsonMixin):
+    day: int | None = None
+    month: int | None = None
+    year: int | None = None
+
+
+@dataclasses.dataclass
+class DateRange(dataclasses_utils.DataClassJsonMixin):
+    start: Date | None = new_field(required=False)
+    end: Date | None = new_field(required=False)

@@ -2,21 +2,21 @@ from __future__ import annotations
 
 import dataclasses
 
-from common.utils import dataclasses_utils
-from model import common, date_field
+from model import date, enumeration
+from utils import dataclasses_utils
 
 from data import icloud
 
 
 @dataclasses.dataclass
 class HighSchool(dataclasses_utils.DataClassJsonMixin):
-    name: common.HighSchoolName
+    name: enumeration.HighSchoolName
     graduation_year: int | None = None
 
 
 @dataclasses.dataclass
 class University(dataclasses_utils.DataClassJsonMixin):
-    name: common.UniversityName
+    name: enumeration.UniversityName
     graduation_year: int | None = None
     majors: list[str] | None = None
     minors: list[str] | None = None
@@ -38,9 +38,8 @@ class EmailAddress(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class ICloud(dataclasses_utils.DataClassJsonMixin):
-    etag: str
     uuid: str
-    meta: dict | None = None
+    etag: str | None = None
     photo: icloud.model.Photo | None = None
 
 
@@ -57,7 +56,7 @@ class Name(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class PhoneNumber(dataclasses_utils.DataClassJsonMixin):
-    country_code: common.CountryCode
+    country_code: enumeration.CountryCode
     number: str
     label: str | None = None
 
@@ -83,7 +82,7 @@ class SocialProfiles(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class StreetAddress(dataclasses_utils.DataClassJsonMixin):
-    country: common.Country | None = None
+    country: enumeration.Country | None = None
     city: str | None = None
     label: str | None = None
     postal_code: int | None = None
@@ -93,8 +92,8 @@ class StreetAddress(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class Contact(dataclasses_utils.DataClassJsonMixin):
-    birthday: common.Date | None = date_field.new_field(required=False)
-    dated: common.DateRange | None = None
+    birthday: date.Date | None = date.new_field(required=False)
+    dated: date.DateRange | None = None
     education: Education | None = None
     email_addresses: list[EmailAddress] | None = None
     family: dict | None = None

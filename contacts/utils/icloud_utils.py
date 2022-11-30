@@ -2,11 +2,13 @@ import configparser
 import os
 
 import constant
-from common.utils import file_io_utils
+from common import decorator
+from utils import file_io_utils
 
 from data import icloud
 
 
+@decorator.run_once
 def login(config_path: str = None):
     config = configparser.ConfigParser()
     config.read(config_path)
@@ -16,11 +18,11 @@ def login(config_path: str = None):
 
 
 def get_contacts_and_groups(
-    cached: bool, cache_path: str | None = None, config_path: str | None = None
+    cache_path: str, cached: bool
 ) -> tuple[list[icloud.ICloudContact], list[icloud.ICloudGroup]]:
     if cached:
         if cache_path is None:
-            raise ValueError
+            raise ValueError("Cache path not set")
 
         contacts = file_io_utils.read_json_array_as_dataclass_objects(
             os.path.join(cache_path, constant.ICLOUD_CONTACTS_FILE_NAME),
@@ -31,11 +33,6 @@ def get_contacts_and_groups(
             icloud.ICloudGroup,
         )
         return contacts, groups
-
-    if not config_path:
-        raise ValueError
-
-    login(config_path=config_path)
 
     contact_manager = icloud.ICloudManager().contact_manager
     contacts, groups = contact_manager.get_contacts_and_groups()

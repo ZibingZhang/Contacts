@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Callable, Tuple, Union
 
 import dataclasses_json
-from common.utils import json_utils
+from utils import json_utils
 
 
 # https://github.com/lidatong/dataclasses-json/issues/187#issuecomment-919992503
