@@ -72,7 +72,7 @@ class ICloudManager(metaclass=singleton.Singleton):
             with open(self.session_path) as session_f:
                 self.session_data = json.load(session_f)
         except FileNotFoundError:
-            LOGGER.info("Session file does not exist")
+            LOGGER.debug("Session file does not exist")
         if self.session_data.get("client_id"):
             self.client_id = self.session_data.get("client_id")
         else:
