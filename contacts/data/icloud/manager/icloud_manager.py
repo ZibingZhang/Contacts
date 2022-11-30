@@ -1,3 +1,4 @@
+"""General iCloud api wrapper."""
 from __future__ import annotations
 
 import functools

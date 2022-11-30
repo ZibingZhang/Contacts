@@ -5,6 +5,15 @@ T = TypeVar("T", bound=Callable[..., Any])
 
 # https://stackoverflow.com/a/4104188
 def run_once(fn: T) -> T:
+    """Ensures the function is only run once.
+
+    Args:
+        fn: The function to run only once.
+
+    Returns:
+        The wrapped function.
+    """
+
     def wrapper(*args, **kwargs) -> T:
         if not wrapper.has_run:
             wrapper.has_run = True

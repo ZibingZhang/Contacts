@@ -11,9 +11,7 @@ from data import icloud
 
 
 class ICloudContactManager(metaclass=singleton.Singleton):
-    """
-    The 'Contacts' iCloud manager, connects to iCloud and returns contacts.
-    """
+    """Manages CRUD operations on iCloud contacts and groups."""
 
     def __init__(self, manager: icloud.ICloudManager) -> None:
         self._session = manager.session

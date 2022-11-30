@@ -1,6 +1,6 @@
 class EncodingError(RuntimeError):
-    pass
+    """Raised when unable to encode a dataclass field."""
 
 
 class DecodingError(RuntimeError):
-    pass
+    """Raised when unable to decode a dataclass field."""

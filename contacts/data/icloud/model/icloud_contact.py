@@ -1,3 +1,4 @@
+"""A dataclass representation of the json object response for an iCloud contact."""
 from __future__ import annotations
 
 import dataclasses

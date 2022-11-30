@@ -1,3 +1,4 @@
+"""The iCloud data source."""
 from data.icloud import manager, model
 
 ALERT_UUIDS = [

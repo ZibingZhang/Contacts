@@ -18,4 +18,4 @@ tmp
 *.json
 !new-contact-template.json
 cache/
-data/
+./data/

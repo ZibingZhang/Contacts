@@ -1,5 +1,7 @@
 # https://stackoverflow.com/a/6798042
 class Singleton(type):
+    """Ensures the class is only instantiated once."""
+
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
