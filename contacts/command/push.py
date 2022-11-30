@@ -44,7 +44,7 @@ def push(*, cache_path: str, data_path: str, write: bool) -> None:
             new_contacts.append(new_contact)
 
     if write:
-        command_utils.write_new_contacts_to_icloud(new_contacts)
+        command_utils.write_new_contacts_to_icloud(icloud_contacts=new_contacts)
     else:
         print(f"Would have created {len(new_contacts)} contact(s)")
 
@@ -76,7 +76,7 @@ def push(*, cache_path: str, data_path: str, write: bool) -> None:
                 updated_contacts.append(pushed_contact)
 
     if write:
-        command_utils.write_updated_contacts_to_icloud(updated_contacts)
+        command_utils.write_updated_contacts_to_icloud(icloud_contacts=updated_contacts)
     else:
         print(f"Would have updated {len(updated_contacts)} contact(s)")
 
@@ -85,8 +85,9 @@ def push(*, cache_path: str, data_path: str, write: bool) -> None:
 
 
 @progress_utils.annotate("Pull contact(s) to sync etag(s)")
-def _pull_contacts_to_sync_etag(data_path: str) -> None:
+def _pull_contacts_to_sync_etag(cache_path: str, data_path: str) -> None:
     command.pull(
+        cache_path=cache_path,
         cached=False,
         data_path=data_path,
     )
