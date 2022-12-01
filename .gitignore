@@ -16,6 +16,7 @@ tmp
 
 # Project specific files
 *.json
-!new-contact-template.json
+*.tsv
+!new-contacts-template.json
 cache/
 ./data/

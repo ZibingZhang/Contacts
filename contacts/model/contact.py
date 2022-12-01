@@ -96,9 +96,8 @@ class Contact(dataclasses_utils.DataClassJsonMixin):
     dated: date.DateRange | None = None
     education: Education | None = None
     email_addresses: list[EmailAddress] | None = None
-    family: dict | None = None
     favorite: dict | None = None
-    friends_friend: dict | None = None
+    friends_friend: str | None = None
     icloud: ICloud | None = None
     name: Name | None = None
     notes: str | None = None

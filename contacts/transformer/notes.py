@@ -36,17 +36,10 @@ class Favorites(dataclasses_utils.DataClassJsonMixin):
 
 
 @dataclasses.dataclass
-class FriendsFriend(dataclasses_utils.DataClassJsonMixin):
-    name: str
-    uuid: str
-
-
-@dataclasses.dataclass
 class Notes(dataclasses_utils.DataClassJsonMixin):
     chinese_name: str | None = None
     comment: str | None = None
     education: Education | None = None
     favorite: Favorites | None = None
-    family: dict | None = None
-    friends_friend: FriendsFriend | None = None
+    friends_friend: str | None = None
     partner: model.DateRange | None = None

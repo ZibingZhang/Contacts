@@ -9,8 +9,10 @@ class CountryCode(int, enum.Enum):
     NANP = 1
     IRELAND = 353
     UNITED_KINGDOM = 44
+    BELGIUM = 32
     BRAZIL = 55
     CHILE = 56
+    MALAYSIA = 60
     HONG_KONG = 852
     CHINA = 86
     TAIWAN = 886
@@ -118,6 +120,9 @@ class UniversityName(str, enum.Enum):
     NEW_YORK_UNIVERSITY = "New York University"
     NORTH_CAROLINA_STATE_UNIVERSITY = "North Carolina State University"
     NORTHEASTERN_UNIVERSITY = "Northeastern University"
+    NORTHEASTERN_UNIVERSITY_AND_CORNELL_UNIVERSITY = (
+        "Northeastern University / Cornell University"
+    )
     NORTHWESTERN_UNIVERSITY = "Northwestern University"
     OHIO_STATE_UNIVERSITY = "Ohio State University"
     POMONA_COLLEGE = "Pomona College"

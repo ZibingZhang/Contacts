@@ -78,11 +78,7 @@ def _transform_email_addresses(
 ) -> list[model.EmailAddresss]:
     email_addresses = []
     for icloud_email_address in icloud_email_addresses:
-        if icloud_email_address.field.count("@") != 1:
-            raise ValueError(
-                f"Email address does not contain exactly 1 '@': "
-                f"{icloud_email_address.field}"
-            )
+        assert icloud_email_address.field.count("@") == 1
         local_part, domain = icloud_email_address.field.split("@")
         email_addresses.append(
             model.EmailAddresss(
@@ -159,8 +155,6 @@ def _extract_from_notes(contact: model.Contact, notes: nt.Notes) -> None:
         contact.name.chinese_name = notes.chinese_name
     if notes.comment:
         contact.notes = notes.comment
-    if notes.family:
-        contact.family = notes.family
     if notes.favorite:
         contact.favorite = notes.favorite
     if notes.friends_friend:
