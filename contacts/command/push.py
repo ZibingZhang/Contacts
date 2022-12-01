@@ -3,13 +3,13 @@ import transformer
 from utils import (
     command_utils,
     dataclasses_utils,
+    input_utils,
     json_utils,
     pretty_print_utils,
-    progress_utils,
 )
 
 
-def push(*, cache_path: str, data_path: str, write: bool) -> None:
+def push(*, cache_path: str, data_path: str, force: bool, write: bool) -> None:
     contacts = command_utils.read_contacts_from_disk(data_path=data_path)
 
     pushed_contacts = [
@@ -37,9 +37,8 @@ def push(*, cache_path: str, data_path: str, write: bool) -> None:
         new_contact = icloud_id_to_pushed_contact_map.get(icloud_id)
 
         print(pretty_print_utils.bordered(json_utils.dumps(new_contact.to_dict())))
-        accept_creation = input("Accept creation? [Y/N]: ")
 
-        if accept_creation.lower() == "y":
+        if input_utils.yes_no_input("Accept creation?"):
             icloud_id_to_icloud_contact_map[icloud_id] = new_contact
             new_contacts.append(new_contact)
 
@@ -70,8 +69,7 @@ def push(*, cache_path: str, data_path: str, write: bool) -> None:
                     )
                 )
 
-            accept_update = input("Accept update? [Y/N]: ")
-            if accept_update.lower() == "y":
+            if force or input_utils.yes_no_input("Accept update?"):
                 icloud_id_to_icloud_contact_map[icloud_id] = pushed_contact
                 updated_contacts.append(pushed_contact)
 
@@ -81,10 +79,10 @@ def push(*, cache_path: str, data_path: str, write: bool) -> None:
         print(f"Would have updated {len(updated_contacts)} contact(s)")
 
     if write and (len(new_contacts) > 0 or len(updated_contacts) > 0):
-        _pull_contacts_to_sync_etag(data_path)
+        print("Pulling contact(s) to sync etag(s)...")
+        _pull_contacts_to_sync_etag(cache_path, data_path)
 
 
-@progress_utils.annotate("Pull contact(s) to sync etag(s)")
 def _pull_contacts_to_sync_etag(cache_path: str, data_path: str) -> None:
     command.pull(
         cache_path=cache_path,

@@ -1,9 +1,11 @@
-from typing import Any, Callable
+from typing import Callable, TypeVar
+
+T = TypeVar("T")
 
 
-def annotate(action: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-    def wrap(fn: Callable[..., Any]) -> Callable[..., Any]:
-        def wrapped_fn(*args, **kwargs) -> Any:
+def annotate(action: str) -> Callable[[Callable[..., T]], Callable[..., T]]:
+    def wrap(fn: Callable[..., T]) -> Callable[..., T]:
+        def wrapped_fn(*args, **kwargs) -> T:
             starting(action)
             result = fn(*args, **kwargs)
             finished()

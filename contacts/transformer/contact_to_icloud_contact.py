@@ -1,21 +1,21 @@
 from __future__ import annotations
 
 import re
-import typing
+import uuid
 
 import constant
+import model
 from transformer import notes as nt
 
 from data import icloud
-
-if typing.TYPE_CHECKING:
-    import model
-
 
 PHONE_NUMBER_REGEX = re.compile(r"^\+\d+$")
 
 
 def contact_to_icloud_contact(contact: model.Contact) -> icloud.ICloudContact:
+    if not contact.icloud:
+        contact.icloud = model.ICloud(uuid=str(uuid.uuid4()).upper())
+
     icloud_contact = icloud.ICloudContact(
         birthday=contact.birthday,
         contactId=contact.icloud.uuid,
@@ -53,7 +53,6 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud.ICloudContact:
     if (
         contact.dated
         or contact.education
-        or contact.family
         or contact.friends_friend
         or contact.name.chinese_name
         or contact.notes
@@ -149,8 +148,6 @@ def _extract_notes(contact: model.Contact) -> nt.Notes:
         notes.chinese_name = contact.name.chinese_name
     if contact.notes:
         notes.comment = contact.notes
-    if contact.family:
-        notes.family = contact.family
     if contact.favorite:
         notes.favorite = contact.favorite
     if contact.friends_friend:
