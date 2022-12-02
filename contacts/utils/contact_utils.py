@@ -8,7 +8,7 @@ def name_string(contact: model.Contact) -> str:
 
 
 def add_tag(contact: model.Contact, tag: str) -> None:
-    contact.tags = list(sorted(set((contact.tags or []) + [tag])))
+    contact.tags = contact.tags + [tag]
 
 
 def add_email_if_not_exists(contact: model.Contact, email: str, label: str) -> None:

@@ -1,6 +1,6 @@
 import enum
 
-from command import add, pull, push, tag
+from command import add, pull, push, tag, validate
 
 
 class Command(str, enum.Enum):
@@ -8,9 +8,11 @@ class Command(str, enum.Enum):
     PULL = "pull"
     PUSH = "push"
     TAG = "tag"
+    VALIDATE = "validate"
 
 
-add = add.add
-pull = pull.pull
-push = push.push
-tags = tag.tag
+add = add
+pull = pull
+push = push
+tag = tag
+validate = validate

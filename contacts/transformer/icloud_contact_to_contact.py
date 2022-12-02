@@ -67,9 +67,6 @@ def icloud_contact_to_contact(icloud_contact: icloud.ICloudContact) -> model.Con
     if icloud_contact.notes:
         _extract_from_notes(contact, nt.from_string(icloud_contact.notes))
 
-    if contact.tags:
-        contact.tags = sorted(set(contact.tags))
-
     return contact
 
 

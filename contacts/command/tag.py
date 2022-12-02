@@ -16,10 +16,9 @@ class TagAction(str, enum.Enum):
     LS = "ls"
     MV = "mv"
     REPL = "repl"
-    VALIDATE = "validate"
 
 
-def tag(
+def run(
     *, data_path: str, tag_action: TagAction, action_specific_args: argparse.Namespace
 ) -> None:
     contacts = command_utils.read_contacts_from_disk(data_path=data_path)
@@ -33,14 +32,12 @@ def tag(
             )
         case TagAction.REPL:
             _tag_repl(data_path, contacts)
-        case TagAction.VALIDATE:
-            _tag_validate(contacts)
 
 
 def _tag_ls(contacts: list[model.Contact]) -> None:
-    tags = sorted(set(tag for contact in contacts for tag in contact.tags or []))
-    tags_by_row = [tags[i : i + 5] for i in range(0, len(tags), 5)]
-    for row in tags_by_row:
+    all_tags = _get_all_tags(contacts)
+    all_tags_by_row = [all_tags[i : i + 5] for i in range(0, len(all_tags), 5)]
+    for row in all_tags_by_row:
         for tag in row:
             print(tag.ljust(20), end="")
         print("")
@@ -49,7 +46,7 @@ def _tag_ls(contacts: list[model.Contact]) -> None:
 def _tag_mv(data_path: str, contacts: list[model.Contact], old: str, new: str) -> None:
     print(f"Changing tag from {old} to {new}.")
 
-    all_tags = set(tag for contact in contacts for tag in (contact.tags or []))
+    all_tags = _get_all_tags(contacts)
     if new in all_tags:
         if not input_utils.yes_no_input("Tag already exists. Do you wish to continue?"):
             return
@@ -59,7 +56,7 @@ def _tag_mv(data_path: str, contacts: list[model.Contact], old: str, new: str) -
         if old in (contact.tags or []):
             contact.tags.remove(old)
             contact.tags.append(new)
-            contact.tags = sorted(set(contact.tags))
+            contact.tags.sort()
             count += 1
 
     if input_utils.yes_no_input(f"Update {count} contact(s)?"):
@@ -72,6 +69,12 @@ def _tag_repl(data_path: str, contacts: list[model.Contact]) -> None:
             _add_tags_to_contact(data_path, contacts)
         except error.CommandSkipError:
             print("Skipping...")
+
+
+def _get_all_tags(contacts: list[model.Contact]) -> list[str]:
+    return list(
+        sorted(set(tag for contact in contacts for tag in (contact.tags or [])))
+    )
 
 
 def _add_tags_to_contact(data_path, contacts: list[model.Contact]):
@@ -155,34 +158,3 @@ def _get_matching_contacts(
 
 def _build_contact_name_and_tags(contact: model.Contact) -> str:
     return f"{contact_utils.name_string(contact).ljust(25)} :           {contact.tags}"
-
-
-def _tag_validate(contacts: list[model.Contact]) -> None:
-    for contact in contacts:
-        if not contact.tags:
-            continue
-
-        if _any_tag_matches_patterns(contact.tags, [re.compile(r"^Climbing-\S+$")]):
-            _expect_tag(contact, "Climbing")
-
-        if _any_tag_matches_patterns(contact.tags, [re.compile(r"^CTY\S+$")]):
-            _expect_tag(contact, "CTY")
-
-        if _any_tag_matches_patterns(
-            contact.tags, [re.compile(r"^(NHS|NPS)\d{2}$"), re.compile(r"^NHS-STAFF$")]
-        ):
-            _expect_tag(contact, "Needham")
-
-        if _any_tag_matches_patterns(
-            contact.tags, [re.compile(r"^NU-\w+\d+$"), re.compile(r"^NU\w{2}$")]
-        ):
-            _expect_tag(contact, "NU")
-
-
-def _any_tag_matches_patterns(tags: list[str], patterns: list[re.Pattern]) -> bool:
-    return any(pattern.match(tag) for tag in tags for pattern in patterns)
-
-
-def _expect_tag(contact: model.Contact, tag: str) -> None:
-    if tag not in contact.tags:
-        print(f"{contact_utils.name_string(contact)} missing {tag} tag")
