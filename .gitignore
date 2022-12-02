@@ -16,7 +16,10 @@ tmp
 
 # Project specific files
 *.json
-*.tsv
 !new-contacts-template.json
-cache/
+*.tsv
+./cache/
 ./data/
+
+# Local development
+scratch.py

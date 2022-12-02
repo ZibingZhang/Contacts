@@ -9,7 +9,7 @@ from utils import (
 )
 
 
-def push(*, cache_path: str, data_path: str, force: bool, write: bool) -> None:
+def run(*, cache_path: str, data_path: str, force: bool, write: bool) -> None:
     contacts = command_utils.read_contacts_from_disk(data_path=data_path)
 
     pushed_contacts = [
@@ -84,7 +84,7 @@ def push(*, cache_path: str, data_path: str, force: bool, write: bool) -> None:
 
 
 def _pull_contacts_to_sync_etag(cache_path: str, data_path: str) -> None:
-    command.pull(
+    command.pull.run(
         cache_path=cache_path,
         cached=False,
         data_path=data_path,

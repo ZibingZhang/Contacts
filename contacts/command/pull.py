@@ -10,7 +10,7 @@ from utils import (
 from data import icloud
 
 
-def pull(*, cached: bool, data_path: str, cache_path: str | None = None) -> None:
+def run(*, cached: bool, data_path: str, cache_path: str | None = None) -> None:
     icloud_contacts = command_utils.read_contacts_from_icloud(
         cache_path=cache_path, cached=cached
     )

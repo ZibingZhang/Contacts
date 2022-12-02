@@ -1,5 +1,6 @@
 import argparse
 
+import command
 from command import tag
 
 
@@ -25,6 +26,7 @@ def _create_parser():
     build_pull_command_parser(command_parser, [base_parser, sync_parser])
     build_push_command_parser(command_parser, [base_parser, sync_parser])
     build_tag_command_parser(command_parser, [base_parser])
+    build_validate_command_parser(command_parser, [base_parser])
 
     return parser
 
@@ -59,7 +61,7 @@ def build_add_command_parser(
     command_parser: argparse._SubParsersAction, parents: list[argparse.ArgumentParser]
 ) -> argparse.ArgumentParser:
     add_command_parser = command_parser.add_parser(
-        "add",
+        command.Command.ADD,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         parents=parents,
         help="add a contact",
@@ -71,7 +73,7 @@ def build_pull_command_parser(
     command_parser: argparse._SubParsersAction, parents: list[argparse.ArgumentParser]
 ) -> argparse.ArgumentParser:
     pull_parser = command_parser.add_parser(
-        "pull",
+        command.Command.PULL,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         parents=parents,
         help="pull contacts from remote source",
@@ -86,7 +88,7 @@ def build_push_command_parser(
     command_parser: argparse._SubParsersAction, parents: list[argparse.ArgumentParser]
 ) -> argparse.ArgumentParser:
     push_parser = command_parser.add_parser(
-        "push",
+        command.Command.PUSH,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         parents=parents,
         help="push contacts to remote source",
@@ -104,7 +106,7 @@ def build_tag_command_parser(
     command_parser: argparse._SubParsersAction, parents: list[argparse.ArgumentParser]
 ) -> argparse.ArgumentParser:
     tag_parser = command_parser.add_parser(
-        "tag",
+        command.Command.TAG,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         parents=parents,
         help="tag contacts",
@@ -119,7 +121,6 @@ def build_tag_command_parser(
     tag_action_parser.add_parser(
         tag.TagAction.REPL.value, help="repl to add tags to contacts"
     )
-    tag_action_parser.add_parser(tag.TagAction.VALIDATE.value, help="validate tags")
 
     mv_tag_action_parser.add_argument(
         "old",
@@ -129,3 +130,15 @@ def build_tag_command_parser(
     )
 
     return tag_parser
+
+
+def build_validate_command_parser(
+    command_parser: argparse._SubParsersAction, parents: list[argparse.ArgumentParser]
+) -> argparse.ArgumentParser:
+    validate_parser = command_parser.add_parser(
+        command.Command.VALIDATE,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        parents=parents,
+        help="validate contacts",
+    )
+    return validate_parser

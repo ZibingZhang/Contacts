@@ -1,3 +1,4 @@
+import functools
 from typing import Any, Callable, TypeVar
 
 T = TypeVar("T", bound=Callable[..., Any])
@@ -14,12 +15,13 @@ def run_once(fn: T) -> T:
         The wrapped function.
     """
 
-    def wrapper(*args, **kwargs) -> T:
-        if not wrapper.has_run:
-            wrapper.has_run = True
-            wrapper.run_result = fn(*args, **kwargs)
-            return wrapper.run_result
-        return wrapper.run_result
+    @functools.wraps(fn)
+    def with_cached_result(*args, **kwargs) -> T:
+        if not with_cached_result.has_run:
+            with_cached_result.has_run = True
+            with_cached_result.run_result = fn(*args, **kwargs)
+            return with_cached_result.run_result
+        return with_cached_result.run_result
 
-    wrapper.has_run = False
-    return wrapper
+    with_cached_result.has_run = False
+    return with_cached_result

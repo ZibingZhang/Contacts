@@ -5,7 +5,7 @@ import model
 from utils import command_utils, contact_utils, input_utils
 
 
-def add(*, data_path) -> None:
+def run(*, data_path) -> None:
     new_contacts = command_utils.read_contacts_from_disk(
         data_path=data_path, file_name=constant.NEW_CONTACT_FILE_NAME
     )
@@ -25,5 +25,4 @@ def add(*, data_path) -> None:
                     break
         else:
             contacts.append(new_contact)
-
-    command_utils.write_contacts_to_disk(data_path=data_path, contacts=contacts)
+            command_utils.write_contacts_to_disk(data_path=data_path, contacts=contacts)

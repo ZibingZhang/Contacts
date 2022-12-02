@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+from typing import Any
 
 from model import date, enumeration
 from utils import dataclasses_utils
@@ -105,3 +106,9 @@ class Contact(dataclasses_utils.DataClassJsonMixin):
     social_profiles: SocialProfiles | None = None
     street_addresses: list[StreetAddress] | None = None
     tags: list[str] | None = None
+
+    def __setattr__(self, key: str, value: Any) -> None:
+        if key == "tags" and value is not None:
+            super().__setattr__(key, list(sorted(set(value))))
+            return
+        super().__setattr__(key, value)
