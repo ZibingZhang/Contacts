@@ -190,10 +190,10 @@ class ICloudContactManager(metaclass=singleton.Singleton):
 
     def _update_etag(self, contact: icloud.ICloudContact) -> None:
         etag = contact.etag
-        last_sync_number = int(re.search(r"(?<=^C=)\d+", etag)[0])
-        if last_sync_number >= self._sync_token_number:
-            etag = re.sub(r"^C=\d+", f"C={self._sync_token_number}", etag)
-            contact.etag = etag
+        # last_sync_number = int(re.search(r"(?<=^C=)\d+", etag)[0])
+        # if last_sync_number >= self._sync_token_number:
+        etag = re.sub(r"^C=\d+", f"C={self._sync_token_number}", etag)
+        contact.etag = etag
 
     @staticmethod
     def _build_contacts_request_body(contacts: list[icloud.ICloudContact]) -> dict:

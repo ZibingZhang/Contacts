@@ -1,7 +1,7 @@
 import os
 
-import constant
 import model
+from common import constant
 from utils import file_io_utils, icloud_utils, progress_utils
 
 from data import icloud

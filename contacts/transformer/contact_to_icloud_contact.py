@@ -3,8 +3,8 @@ from __future__ import annotations
 import re
 import uuid
 
-import constant
 import model
+from common import constant
 from transformer import notes as nt
 
 from data import icloud
@@ -113,6 +113,15 @@ def _transform_social_profiles(
             icloud.model.Profile(
                 field=social_profile.link,
                 label="GAMECENTER",
+                user=social_profile.username,
+            )
+        )
+    if social_profiles.instagram:
+        social_profile = social_profiles.instagram
+        icloud_profiles.append(
+            icloud.model.Profile(
+                field=f"http://www.instagram.com/{social_profile.username}",
+                label="INSTAGRAM",
                 user=social_profile.username,
             )
         )

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import enum
-import re
 import typing
 
 from common import error
@@ -157,4 +156,4 @@ def _get_matching_contacts(
 
 
 def _build_contact_name_and_tags(contact: model.Contact) -> str:
-    return f"{contact_utils.name_string(contact).ljust(25)} :           {contact.tags}"
+    return f"{contact_utils.extract_name(contact).ljust(25)} :           {contact.tags}"

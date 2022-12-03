@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Tuple, Union
+from typing import Any, Callable, Tuple, TypeVar, Union
 
 import dataclasses_json
 from utils import json_utils
 
+TDataClassJsonMixin = TypeVar("TDataClassJsonMixin", bound="DataClassJsonMixin")
 
-# https://github.com/lidatong/dataclasses-json/issues/187#issuecomment-919992503
+
 class DataClassJsonMixin(dataclasses_json.DataClassJsonMixin):
+    # https://github.com/lidatong/dataclasses-json/issues/187#issuecomment-919992503
     dataclass_json_config = dataclasses_json.config(
         exclude=lambda f: f is None, undefined=dataclasses_json.Undefined.RAISE
     )["dataclasses_json"]
@@ -36,6 +38,12 @@ class DataClassJsonMixin(dataclasses_json.DataClassJsonMixin):
             sort_keys=sort_keys,
             **kw,
         )
+
+    def copy(self) -> TDataClassJsonMixin:
+        return self.__class__.from_dict(self.to_dict())
+
+    def patch(self, patch: TDataClassJsonMixin) -> TDataClassJsonMixin:
+        return patch
 
 
 def diff(dataclass_1: DataClassJsonMixin, dataclass_2: DataClassJsonMixin) -> dict:

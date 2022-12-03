@@ -4,8 +4,9 @@ from __future__ import annotations
 import dataclasses
 
 import model
-from data.icloud.model import date_field
 from utils import dataclasses_utils
+
+from data.icloud.model import date_field
 
 
 @dataclasses.dataclass

@@ -10,6 +10,7 @@ UniversityName = enumeration.UniversityName
 
 FacebookProfile = contact.FacebookProfile
 GameCenterProfile = contact.GameCenterProfile
+InstagramProfile = contact.InstagramProfile
 HighSchool = contact.HighSchool
 University = contact.University
 

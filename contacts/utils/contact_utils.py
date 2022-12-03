@@ -3,8 +3,15 @@ import re
 import model
 
 
-def name_string(contact: model.Contact) -> str:
-    return f"{contact.name.first_name} {contact.name.last_name}"
+def extract_name(contact: model.Contact) -> str:
+    name = ""
+    if contact.name.first_name is not None:
+        name = contact.name.first_name
+    if contact.name.last_name:
+        if name:
+            return name + " " + contact.name.last_name
+        return contact.name.last_name
+    return name
 
 
 def add_tag(contact: model.Contact, tag: str) -> None:

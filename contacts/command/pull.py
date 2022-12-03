@@ -40,6 +40,7 @@ def run(*, cached: bool, data_path: str, cache_path: str | None = None) -> None:
     for icloud_id in (
         icloud_id_to_current_contact_map.keys() & icloud_id_to_pulled_contact_map.keys()
     ):
+        # TODO: merge pulled contact into a copy of the current contact
         pulled_contact = icloud_id_to_pulled_contact_map.get(icloud_id)
         current_contact = icloud_id_to_current_contact_map.get(icloud_id)
 

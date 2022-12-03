@@ -122,6 +122,10 @@ def _transform_social_profiles(
                 social_profiles.game_center = model.GameCenterProfile(
                     link=icloud_profile.field, username=icloud_profile.user
                 )
+            case "INSTAGRAM":
+                social_profiles.instagram = model.InstagramProfile(
+                    username=icloud_profile.user
+                )
             case _:
                 raise ValueError(
                     f"Unsupported social profile label: {icloud_profile.label}"
