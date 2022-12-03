@@ -1,3 +1,4 @@
+"""Utilities for pretty-printing."""
 import textwrap
 
 

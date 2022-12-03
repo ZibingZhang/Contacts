@@ -1,11 +1,22 @@
+"""Utilities for dataclasses."""
 from __future__ import annotations
 
+import dataclasses
 from typing import Any, Callable, Tuple, TypeVar, Union
 
 import dataclasses_json
-from utils import json_utils
+import jsondiff
 
 TDataClassJsonMixin = TypeVar("TDataClassJsonMixin", bound="DataClassJsonMixin")
+
+
+def diff(dataclass_1: DataClassJsonMixin, dataclass_2: DataClassJsonMixin) -> dict:
+    return jsondiff.diff(
+        dataclass_1.to_dict(),
+        dataclass_2.to_dict(),
+        marshal=True,
+        syntax="explicit",
+    )
 
 
 class DataClassJsonMixin(dataclasses_json.DataClassJsonMixin):
@@ -15,7 +26,7 @@ class DataClassJsonMixin(dataclasses_json.DataClassJsonMixin):
     )["dataclasses_json"]
 
     def to_json(
-        self,
+        self: TDataClassJsonMixin,
         *,
         skipkeys: bool = False,
         ensure_ascii: bool = False,
@@ -39,12 +50,22 @@ class DataClassJsonMixin(dataclasses_json.DataClassJsonMixin):
             **kw,
         )
 
-    def copy(self) -> TDataClassJsonMixin:
+    def copy(self: TDataClassJsonMixin) -> TDataClassJsonMixin:
         return self.__class__.from_dict(self.to_dict())
 
-    def patch(self, patch: TDataClassJsonMixin) -> TDataClassJsonMixin:
-        return patch
+    def patch(self: TDataClassJsonMixin, patch: TDataClassJsonMixin) -> None:
+        if not issubclass(patch.__class__, self.__class__):
+            raise ValueError
 
+        for field in dataclasses.fields(self):
+            self_value = getattr(self, field.name)
+            patch_value = getattr(patch, field.name)
 
-def diff(dataclass_1: DataClassJsonMixin, dataclass_2: DataClassJsonMixin) -> dict:
-    return json_utils.diff(dataclass_1.to_dict(), dataclass_2.to_dict())
+            if patch_value is None:
+                continue
+            elif self_value is None:
+                setattr(self, field.name, patch_value)
+            elif issubclass(self_value.__class__, DataClassJsonMixin):
+                self_value.patch(patch_value)
+            else:
+                setattr(self, field.name, patch_value)

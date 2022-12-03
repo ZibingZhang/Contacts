@@ -1,3 +1,4 @@
+"""Utilities for file I/O."""
 import json
 import textwrap
 from typing import Type, TypeVar
@@ -55,7 +56,7 @@ def write_dataclass_objects_as_json_array(
         path: The path of the file to write to.
         objects: The dataclass objects to write to the file.
     """
-    if len(objects) > 0 and type(objects[0]) is model.Contact:
+    if len(objects) > 0 and issubclass(objects[0].__class__, model.Contact.__class__):
         objects = sorted(objects, key=_contact_key)
     with open(path, mode="w", encoding="utf-8") as f:
         f.write("[\n")

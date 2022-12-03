@@ -9,10 +9,16 @@ from transformer import notes as nt
 
 from data import icloud
 
-PHONE_NUMBER_REGEX = re.compile(r"^\+\d+$")
-
 
 def contact_to_icloud_contact(contact: model.Contact) -> icloud.ICloudContact:
+    """Convert a model.Contact into an icloud.ICloudContact.
+
+    Args:
+        contact: The contact to transform.
+
+    Returns:
+        The transformed icloud.ICloudContact.
+    """
     if not contact.icloud:
         contact.icloud = model.ICloud(uuid=str(uuid.uuid4()).upper())
 

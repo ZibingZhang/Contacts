@@ -38,12 +38,12 @@ def run(*, cache_path: str, data_path: str, force: bool, write: bool) -> None:
 
         print(pretty_print_utils.bordered(json_utils.dumps(new_contact.to_dict())))
 
-        if input_utils.yes_no_input("Accept creation?"):
+        if write or input_utils.yes_no_input("Accept creation?"):
             icloud_id_to_icloud_contact_map[icloud_id] = new_contact
             new_contacts.append(new_contact)
 
     if write:
-        command_utils.write_new_contacts_to_icloud(icloud_contacts=new_contacts)
+        command_utils.write_new_contacts_to_icloud(new_contacts)
     else:
         print(f"Would have created {len(new_contacts)} contact(s)")
 
@@ -74,7 +74,7 @@ def run(*, cache_path: str, data_path: str, force: bool, write: bool) -> None:
                 updated_contacts.append(pushed_contact)
 
     if write:
-        command_utils.write_updated_contacts_to_icloud(icloud_contacts=updated_contacts)
+        command_utils.write_updated_contacts_to_icloud(updated_contacts)
     else:
         print(f"Would have updated {len(updated_contacts)} contact(s)")
 

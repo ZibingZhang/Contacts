@@ -25,4 +25,5 @@ def run(*, data_path) -> None:
                     break
         else:
             contacts.append(new_contact)
+            print(f"Adding new contact {new_contact_name}")
             command_utils.write_contacts_to_disk(data_path=data_path, contacts=contacts)

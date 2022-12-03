@@ -1,26 +1,38 @@
+"""Utilities for contacts."""
 import re
 
 import model
 
 
 def extract_name(contact: model.Contact) -> str:
-    name = ""
-    if contact.name.first_name is not None:
-        name = contact.name.first_name
-    if contact.name.last_name:
-        if name:
-            return name + " " + contact.name.last_name
-        return contact.name.last_name
-    return name
+    """Extract the name from a contact.
+
+    Args:
+        contact: A contact.
+
+    Returns:
+        The name of the contact.
+    """
+    name_parts = []
+    if first_name := contact.name.first_name:
+        name_parts.append(first_name)
+    if last_name := contact.name.last_name:
+        name_parts.append(last_name)
+    return " ".join(name_parts)
 
 
-def add_tag(contact: model.Contact, tag: str) -> None:
-    contact.tags = contact.tags + [tag]
+def add_email_address_if_not_exists(
+    contact: model.Contact, email_address: str, label: str
+) -> None:
+    """Add an email address to a contact if the contact does not have the email address.
 
-
-def add_email_if_not_exists(contact: model.Contact, email: str, label: str) -> None:
-    assert email.count("@") == 1
-    local_part, domain = email.split("@")
+    Args:
+        contact: The contact to add the email address to.
+        email_address: The email address to add to the contact.
+        label: The label of the email address.
+    """
+    assert email_address.count("@") == 1
+    local_part, domain = email_address.split("@")
     new_email_address = model.EmailAddresss(
         domain=domain, label=label, local_part=local_part
     )
@@ -38,6 +50,14 @@ def add_email_if_not_exists(contact: model.Contact, email: str, label: str) -> N
 def add_phone_number_if_not_exists(
     contact: model.Contact, country_code: model.CountryCode, number: str, label: str
 ) -> None:
+    """Add a phone number to a contact if the contact does not have the phone number.
+
+    Args:
+        contact: The contact to add the email address to.
+        country_code: The country code of the phone number.
+        number: The phone number without the country code.
+        label: The label of the phone number.
+    """
     assert re.match(r"^\d+$", number)
     new_phone_number = model.PhoneNumber(
         country_code=country_code, number=number, label=label

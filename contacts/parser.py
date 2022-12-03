@@ -61,7 +61,7 @@ def build_add_command_parser(
     command_parser: argparse._SubParsersAction, parents: list[argparse.ArgumentParser]
 ) -> argparse.ArgumentParser:
     add_command_parser = command_parser.add_parser(
-        command.Command.ADD,
+        command.Command.ADD.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         parents=parents,
         help="add a contact",
@@ -73,7 +73,7 @@ def build_pull_command_parser(
     command_parser: argparse._SubParsersAction, parents: list[argparse.ArgumentParser]
 ) -> argparse.ArgumentParser:
     pull_parser = command_parser.add_parser(
-        command.Command.PULL,
+        command.Command.PULL.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         parents=parents,
         help="pull contacts from remote source",
@@ -88,7 +88,7 @@ def build_push_command_parser(
     command_parser: argparse._SubParsersAction, parents: list[argparse.ArgumentParser]
 ) -> argparse.ArgumentParser:
     push_parser = command_parser.add_parser(
-        command.Command.PUSH,
+        command.Command.PUSH.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         parents=parents,
         help="push contacts to remote source",
@@ -106,7 +106,7 @@ def build_tag_command_parser(
     command_parser: argparse._SubParsersAction, parents: list[argparse.ArgumentParser]
 ) -> argparse.ArgumentParser:
     tag_parser = command_parser.add_parser(
-        command.Command.TAG,
+        command.Command.TAG.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         parents=parents,
         help="tag contacts",

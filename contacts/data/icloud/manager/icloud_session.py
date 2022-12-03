@@ -6,9 +6,9 @@ import logging
 from typing import Text
 
 import requests
+from data.icloud import exception
 
 from data import icloud
-from data.icloud import exception
 
 LOGGER = logging.getLogger(__name__)
 
