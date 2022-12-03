@@ -1,4 +1,4 @@
-"""Aids the creation of date fields for iCloud contacts."""
+"""Utilities for creating date fields on iCloud contacts."""
 from __future__ import annotations
 
 import dataclasses
