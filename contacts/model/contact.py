@@ -76,9 +76,15 @@ class GameCenterProfile(dataclasses_utils.DataClassJsonMixin):
 
 
 @dataclasses.dataclass
+class InstagramProfile(dataclasses_utils.DataClassJsonMixin):
+    username: str
+
+
+@dataclasses.dataclass
 class SocialProfiles(dataclasses_utils.DataClassJsonMixin):
     facebook: FacebookProfile | None = None
     game_center: GameCenterProfile | None = None
+    instagram: InstagramProfile | None = None
 
 
 @dataclasses.dataclass
@@ -93,6 +99,7 @@ class StreetAddress(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class Contact(dataclasses_utils.DataClassJsonMixin):
+    name: Name
     birthday: date.Date | None = date.new_field(required=False)
     dated: date.DateRange | None = None
     education: Education | None = None
@@ -100,7 +107,6 @@ class Contact(dataclasses_utils.DataClassJsonMixin):
     favorite: dict | None = None
     friends_friend: str | None = None
     icloud: ICloud | None = None
-    name: Name | None = None
     notes: str | None = None
     phone_numbers: list[PhoneNumber] | None = None
     social_profiles: SocialProfiles | None = None
@@ -108,7 +114,16 @@ class Contact(dataclasses_utils.DataClassJsonMixin):
     tags: list[str] | None = None
 
     def __setattr__(self, key: str, value: Any) -> None:
-        if key == "tags" and value is not None:
+        if key == "email_addresses" and value is not None:
+            super().__setattr__(
+                key,
+                sorted(
+                    value,
+                    key=lambda email_address: email_address.domain
+                    + email_address.local_part,
+                ),
+            )
+        elif key == "tags" and value is not None:
             super().__setattr__(key, list(sorted(set(value))))
-            return
-        super().__setattr__(key, value)
+        else:
+            super().__setattr__(key, value)

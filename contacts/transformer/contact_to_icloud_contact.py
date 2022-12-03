@@ -1,18 +1,23 @@
 from __future__ import annotations
 
-import re
 import uuid
 
-import constant
 import model
+from common import constant
 from transformer import notes as nt
 
 from data import icloud
 
-PHONE_NUMBER_REGEX = re.compile(r"^\+\d+$")
-
 
 def contact_to_icloud_contact(contact: model.Contact) -> icloud.ICloudContact:
+    """Convert a model.Contact into an icloud.ICloudContact.
+
+    Args:
+        contact: The contact to transform.
+
+    Returns:
+        The transformed icloud.ICloudContact.
+    """
     if not contact.icloud:
         contact.icloud = model.ICloud(uuid=str(uuid.uuid4()).upper())
 
@@ -113,6 +118,15 @@ def _transform_social_profiles(
             icloud.model.Profile(
                 field=social_profile.link,
                 label="GAMECENTER",
+                user=social_profile.username,
+            )
+        )
+    if social_profiles.instagram:
+        social_profile = social_profiles.instagram
+        icloud_profiles.append(
+            icloud.model.Profile(
+                field=f"http://www.instagram.com/{social_profile.username}",
+                label="INSTAGRAM",
                 user=social_profile.username,
             )
         )

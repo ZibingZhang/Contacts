@@ -1,7 +1,8 @@
+"""High-level utilities for commands."""
 import os
 
-import constant
 import model
+from common import constant
 from utils import file_io_utils, icloud_utils, progress_utils
 
 from data import icloud
@@ -17,7 +18,7 @@ def read_contact_from_disk(*, data_path: str, file_name: str) -> model.Contact:
 
 @progress_utils.annotate("Reading contacts from disk")
 def read_contacts_from_disk(
-    *, data_path: str, file_name: str = constant.CONTACTS_FILE_NAME
+    *, data_path: str = "data", file_name: str = constant.CONTACTS_FILE_NAME
 ) -> list[model.Contact]:
     contacts = file_io_utils.read_json_array_as_dataclass_objects(
         os.path.join(data_path, file_name), model.Contact
@@ -28,7 +29,7 @@ def read_contacts_from_disk(
 
 @progress_utils.annotate("Reading contacts from iCloud")
 def read_contacts_from_icloud(
-    cache_path: str, cached: bool
+    *, cache_path: str, cached: bool
 ) -> list[icloud.ICloudContact]:
     icloud_contacts, _ = icloud_utils.get_contacts_and_groups(
         cache_path=cache_path, cached=cached
@@ -39,9 +40,9 @@ def read_contacts_from_icloud(
 
 @progress_utils.annotate("Writing contacts to disk")
 def write_contacts_to_disk(
-    *,
-    data_path: str,
     contacts: list[model.Contact],
+    *,
+    data_path: str = "data",
     file_name: str = constant.CONTACTS_FILE_NAME,
 ) -> None:
     file_io_utils.write_dataclass_objects_as_json_array(
@@ -52,9 +53,7 @@ def write_contacts_to_disk(
 
 
 @progress_utils.annotate("Writing new contacts to iCloud")
-def write_new_contacts_to_icloud(
-    *, icloud_contacts: list[icloud.ICloudContact]
-) -> None:
+def write_new_contacts_to_icloud(icloud_contacts: list[icloud.ICloudContact]) -> None:
     if len(icloud_contacts) > 0:
         contacts_manager = icloud.ICloudManager().contact_manager
         contacts_manager.create_contacts(icloud_contacts)
@@ -63,7 +62,6 @@ def write_new_contacts_to_icloud(
 
 @progress_utils.annotate("Writing updated contacts to iCloud")
 def write_updated_contacts_to_icloud(
-    *,
     icloud_contacts: list[icloud.ICloudContact],
 ) -> None:
     if len(icloud_contacts) > 0:

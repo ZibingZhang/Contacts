@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import enum
-import re
 import typing
 
 from common import error
@@ -55,8 +54,7 @@ def _tag_mv(data_path: str, contacts: list[model.Contact], old: str, new: str) -
     for contact in contacts:
         if old in (contact.tags or []):
             contact.tags.remove(old)
-            contact.tags.append(new)
-            contact.tags.sort()
+            contact.tags += [new]
             count += 1
 
     if input_utils.yes_no_input(f"Update {count} contact(s)?"):
@@ -78,7 +76,9 @@ def _get_all_tags(contacts: list[model.Contact]) -> list[str]:
 
 
 def _add_tags_to_contact(data_path, contacts: list[model.Contact]):
-    name = input_utils.basic_input("Enter the name of the contact to add tags to")
+    name = input_utils.basic_input(
+        "Enter the name of the contact to add tags to", lower=True
+    )
 
     matching_contacts = _get_matching_contacts(contacts, name)
     if len(matching_contacts) == 0:
@@ -115,9 +115,7 @@ def _add_tags_to_contact(data_path, contacts: list[model.Contact]):
     while True:
         new_tags = [
             tag.strip()
-            for tag in input_utils.input_with_skip(
-                "Enter the tags to add", lower=False
-            ).split(",")
+            for tag in input_utils.input_with_skip("Enter the tags to add").split(",")
         ]
         tags = sorted(set((selected_contact.tags or []) + new_tags))
 
@@ -157,4 +155,4 @@ def _get_matching_contacts(
 
 
 def _build_contact_name_and_tags(contact: model.Contact) -> str:
-    return f"{contact_utils.name_string(contact).ljust(25)} :           {contact.tags}"
+    return f"{contact_utils.extract_name(contact).ljust(25)} :           {contact.tags}"

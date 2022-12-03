@@ -1,8 +1,8 @@
+import collections
 import re
 
 import model
 from utils import command_utils, contact_utils
-
 
 PATTERN_TO_HIGH_SCHOOL_NAME_MAP = {
     re.compile(r"^ABRSH$"): model.HighSchoolName.ACTON_BOXBOROUGH_REGIONAL_HIGH_SCHOOL,
@@ -13,9 +13,59 @@ PATTERN_TO_HIGH_SCHOOL_NAME_MAP = {
 
 def run(*, data_path: str) -> None:
     contacts = command_utils.read_contacts_from_disk(data_path=data_path)
+    _validate_names(contacts)
     for contact in contacts:
-        _validate_tags(contact)
+        _validate_email_addresses(contact)
         _validate_education(contact)
+        _validate_tags(contact)
+
+
+def _validate_names(contacts: list[model.Contact]) -> None:
+    names_counter = collections.Counter()
+    for contact in contacts:
+        names_counter[contact_utils.extract_name(contact)] += 1
+    for name in sorted(names_counter.keys()):
+        if names_counter[name] > 1:
+            print(f"Duplicate name {name}")
+
+
+def _validate_email_addresses(contact: model.Contact) -> None:
+    if contact.email_addresses is None:
+        return
+
+    normalized_email_addresses = set()
+    for email_address in contact.email_addresses:
+        normalized_email_addresses.add(
+            (email_address.local_part + email_address.domain).lower().replace(".", "")
+        )
+    if len(normalized_email_addresses) < len(contact.email_addresses):
+        print(f"{contact_utils.extract_name(contact)} has duplicate email addresses")
+
+
+def _validate_education(contact: model.Contact) -> None:
+    if not contact.tags:
+        return
+
+    for pattern in PATTERN_TO_HIGH_SCHOOL_NAME_MAP.keys():
+        if _any_tag_matches_pattern(contact.tags, pattern):
+            _expect_high_school(contact, PATTERN_TO_HIGH_SCHOOL_NAME_MAP.get(pattern))
+
+
+def _expect_high_school(contact: model.Contact, high_school_name: str) -> None:
+    contact_name = contact_utils.extract_name(contact)
+    if contact.education is None:
+        print(f"{contact_name} missing education")
+        return
+    if contact.education.high_school is None:
+        print(f"{contact_name} missing high school")
+        return
+    if contact.education.high_school.name == high_school_name is None:
+        print(f"{contact_name} high school is not {high_school_name}")
+    if (
+        contact.education.high_school.name == model.HighSchoolName.NEEDHAM_HIGH_SCHOOL
+        and contact.education.high_school.graduation_year is None
+    ):
+        print(f"{contact_name} missing graduation year")
 
 
 def _validate_tags(contact: model.Contact) -> None:
@@ -37,34 +87,7 @@ def _validate_tags(contact: model.Contact) -> None:
 
 def _expect_tag(contact: model.Contact, tag: str) -> None:
     if tag not in contact.tags:
-        print(f"{contact_utils.name_string(contact)} missing {tag} tag")
-
-
-def _validate_education(contact: model.Contact) -> None:
-    if not contact.tags:
-        return
-
-    for pattern in PATTERN_TO_HIGH_SCHOOL_NAME_MAP.keys():
-        if _any_tag_matches_pattern(contact.tags, pattern):
-            _expect_high_school(contact, PATTERN_TO_HIGH_SCHOOL_NAME_MAP.get(pattern))
-
-    for pattern in PATTERN_TO_HIGH_SCHOOL_NAME_MAP.keys():
-        if _any_tag_matches_pattern(contact.tags, pattern):
-            _expect_high_school(contact, PATTERN_TO_HIGH_SCHOOL_NAME_MAP.get(pattern))
-
-
-def _expect_high_school(contact: model.Contact, high_school_name: str) -> None:
-    contact_name = contact_utils.name_string(contact)
-    if not contact.education:
-        print(f"{contact_name} missing education")
-        return
-    if not contact.education.high_school:
-        print(f"{contact_name} missing high school")
-        return
-    if not contact.education.high_school.name == high_school_name:
-        print(f"{contact_name} high school is not {high_school_name}")
-    if not contact.education.high_school.graduation_year:
-        print(f"{contact_name} missing graduation year")
+        print(f"{contact_utils.extract_name(contact)} missing {tag} tag")
 
 
 def _any_tag_matches_pattern(tags: list[str], pattern: re.Pattern) -> bool:

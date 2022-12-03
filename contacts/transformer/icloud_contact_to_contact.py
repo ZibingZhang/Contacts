@@ -14,6 +14,14 @@ PHONE_NUMBER_REGEX = re.compile(r"^\+\d+$")
 
 
 def icloud_contact_to_contact(icloud_contact: icloud.ICloudContact) -> model.Contact:
+    """Convert an icloud.ICloudContact into a model.Contact.
+
+    Args:
+        icloud_contact: The iCloud contact to transform.
+
+    Returns:
+        The transformed model.Contact.
+    """
     # TODO: add support for these fields
     if (
         icloud_contact.IMs
@@ -121,6 +129,10 @@ def _transform_social_profiles(
             case "GAMECENTER":
                 social_profiles.game_center = model.GameCenterProfile(
                     link=icloud_profile.field, username=icloud_profile.user
+                )
+            case "INSTAGRAM":
+                social_profiles.instagram = model.InstagramProfile(
+                    username=icloud_profile.user
                 )
             case _:
                 raise ValueError(

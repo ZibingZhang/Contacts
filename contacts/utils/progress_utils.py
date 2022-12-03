@@ -1,3 +1,4 @@
+"""Utilities for displaying a method's progress."""
 import functools
 from typing import Callable, TypeVar
 

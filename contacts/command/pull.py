@@ -42,11 +42,13 @@ def run(*, cached: bool, data_path: str, cache_path: str | None = None) -> None:
     ):
         pulled_contact = icloud_id_to_pulled_contact_map.get(icloud_id)
         current_contact = icloud_id_to_current_contact_map.get(icloud_id)
+        updated_contact = current_contact.copy()
+        updated_contact.patch(pulled_contact)
 
-        diff = dataclasses_utils.diff(current_contact, pulled_contact)
+        diff = dataclasses_utils.diff(current_contact, updated_contact)
         if diff:
             if _only_etag_updated(diff):
-                icloud_id_to_current_contact_map[icloud_id] = pulled_contact
+                icloud_id_to_current_contact_map[icloud_id] = updated_contact
                 continue
 
             current_contact_display = pretty_print_utils.bordered(
@@ -56,7 +58,7 @@ def run(*, cached: bool, data_path: str, cache_path: str | None = None) -> None:
             print(pretty_print_utils.besides(current_contact_display, diff_display))
 
             if input_utils.yes_no_input("Accept update?"):
-                icloud_id_to_current_contact_map[icloud_id] = pulled_contact
+                icloud_id_to_current_contact_map[icloud_id] = updated_contact
 
     command_utils.write_contacts_to_disk(
         data_path=data_path, contacts=list(icloud_id_to_current_contact_map.values())

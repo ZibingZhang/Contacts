@@ -1,7 +1,7 @@
 import uuid
 
-import constant
 import model
+from common import constant
 from utils import command_utils, contact_utils, input_utils
 
 
@@ -15,9 +15,9 @@ def run(*, data_path) -> None:
     for new_contact in new_contacts:
         new_contact.icloud = model.ICloud(uuid=str(uuid.uuid4()).upper())
 
-        new_contact_name = contact_utils.name_string(new_contact)
+        new_contact_name = contact_utils.extract_name(new_contact)
         for contact in contacts:
-            if new_contact_name == contact_utils.name_string(contact):
+            if new_contact_name == contact_utils.extract_name(contact):
                 if not input_utils.yes_no_input(
                     f"A contact already exists with this name: {contact.to_json()}\n"
                     f"Do you want to continue?"
@@ -25,4 +25,5 @@ def run(*, data_path) -> None:
                     break
         else:
             contacts.append(new_contact)
+            print(f"Adding new contact {new_contact_name}")
             command_utils.write_contacts_to_disk(data_path=data_path, contacts=contacts)

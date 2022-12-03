@@ -1,8 +1,8 @@
+"""Utilities for iCloud."""
 import configparser
 import os
 
-import constant
-from common import decorator
+from common import constant, decorator
 from utils import file_io_utils
 
 from data import icloud
