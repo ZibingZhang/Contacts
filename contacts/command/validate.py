@@ -78,11 +78,20 @@ def _validate_tags(contact: model.Contact) -> None:
     if _any_tag_matches_pattern(contact.tags, re.compile(r"^CTY.+$")):
         _expect_tag(contact, "CTY")
 
+    if _any_tag_matches_pattern(contact.tags, re.compile(r"^HubSpot.+$")):
+        _expect_tag(contact, "HubSpot")
+
     if _any_tag_matches_pattern(contact.tags, re.compile(r"^(NHS|NPS).+$")):
         _expect_tag(contact, "Needham")
 
     if _any_tag_matches_pattern(contact.tags, re.compile(r"^NU.+$")):
         _expect_tag(contact, "NU")
+
+    if _any_tag_matches_pattern(contact.tags, re.compile(r"^PowerAdvocate.+$")):
+        _expect_tag(contact, "PowerAdvocate")
+
+    if _any_tag_matches_pattern(contact.tags, re.compile(r"^Sharks.+$")):
+        _expect_tag(contact, "Sharks")
 
 
 def _expect_tag(contact: model.Contact, tag: str) -> None:
