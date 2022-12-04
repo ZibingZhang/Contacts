@@ -1,9 +1,9 @@
+import time
 from typing import Callable
 
 import model
+from dao import icloud
 from utils import command_utils, uuid_utils
-
-from data import icloud
 
 
 def run(*, cache_path: str, data_path: str) -> None:
@@ -21,7 +21,7 @@ def run(*, cache_path: str, data_path: str) -> None:
         ]
         if name not in icloud_group_name_to_icloud_group_map.keys():
             command_utils.write_new_group_to_icloud(
-                icloud.ICloudGroup(
+                icloud._model.ICloudGroup(
                     contactIds=contact_ids, groupId=uuid_utils.generate(), name=name
                 )
             )
@@ -29,6 +29,7 @@ def run(*, cache_path: str, data_path: str) -> None:
             icloud_group = icloud_group_name_to_icloud_group_map.get(name)
             icloud_group.contactIds = contact_ids
             command_utils.write_updated_group_to_icloud(icloud_group)
+        time.sleep(1)
 
 
 def _has_tag_predicate_factory(tag: str) -> Callable[[model.Contact], bool]:

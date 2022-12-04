@@ -3,9 +3,8 @@ import os
 
 import model
 from common import constant
-from utils import file_io_utils, icloud_utils, progress_utils
-
-from data import icloud
+from dao import icloud
+from utils import file_io_utils, progress_utils
 
 
 @progress_utils.annotate("Reading contacts from disk")
@@ -22,21 +21,17 @@ def read_contacts_from_disk(
 
 
 @progress_utils.annotate("Reading contacts from iCloud")
-def read_contacts_from_icloud(
-    *, cache_path: str, cached: bool
-) -> list[icloud.ICloudContact]:
-    icloud_contacts, _ = icloud_utils.get_contacts_and_groups(
-        cache_path=cache_path, cached=cached
-    )
-    progress_utils.message(f"Read {len(icloud_contacts)} contact(s)")
-    return icloud_contacts
+def read_contacts_from_icloud(*, cache_path: str, cached: bool) -> list[model.Contact]:
+    contacts, _ = icloud.read_contacts_and_groups(cache_path=cache_path, cached=cached)
+    progress_utils.message(f"Read {len(contacts)} contact(s)")
+    return contacts
 
 
 @progress_utils.annotate("Reading groups from iCloud")
 def read_groups_from_icloud(
     *, cache_path: str, cached: bool
-) -> list[icloud.ICloudGroup]:
-    _, icloud_groups = icloud_utils.get_contacts_and_groups(
+) -> list[icloud._model.ICloudGroup]:
+    _, icloud_groups = icloud.read_contacts_and_groups(
         cache_path=cache_path, cached=cached
     )
     progress_utils.message(f"Read {len(icloud_groups)} groups(s)")
@@ -58,39 +53,35 @@ def write_contacts_to_disk(
 
 
 @progress_utils.annotate("Creating new iCloud contacts")
-def write_new_contacts_to_icloud(icloud_contacts: list[icloud.ICloudContact]) -> None:
-    if len(icloud_contacts) > 0:
-        contacts_manager = icloud.ICloudManager().contact_manager
-        contacts_manager.create_contacts(icloud_contacts)
-    progress_utils.message(f"Created {len(icloud_contacts)} contact(s)")
+def write_new_contacts_to_icloud(contacts: list[model.Contact]) -> None:
+    if len(contacts) > 0:
+        icloud.create_contacts(contacts)
+    progress_utils.message(f"Created {len(contacts)} contact(s)")
 
 
-@progress_utils.annotate("Creating iCloud group")
-def write_new_group_to_icloud(icloud_group: icloud.ICloudGroup) -> None:
-    contacts_manager = icloud.ICloudManager().contact_manager
-    contacts_manager.create_group(icloud_group)
+@progress_utils.annotate("Updating iCloud contacts")
+def write_updated_contacts_to_icloud(
+    contacts: list[model.Contact],
+) -> None:
+    if len(contacts) > 0:
+        icloud.update_contacts(contacts)
+    progress_utils.message(f"Updated {len(contacts)} contact(s)")
+
+
+@progress_utils.annotate("Creating iCloud groups")
+def write_new_group_to_icloud(icloud_group: icloud._model.ICloudGroup) -> None:
+    icloud.create_group(icloud_group)
     progress_utils.message(
         f"Created group {icloud_group.name} "
         f"with {len(icloud_group.contactIds)} contact(s)"
     )
 
 
-@progress_utils.annotate("Updating iCloud contacts")
-def write_updated_contacts_to_icloud(
-    icloud_contacts: list[icloud.ICloudContact],
-) -> None:
-    if len(icloud_contacts) > 0:
-        contacts_manager = icloud.ICloudManager().contact_manager
-        contacts_manager.update_contacts(icloud_contacts)
-    progress_utils.message(f"Updated {len(icloud_contacts)} contact(s)")
-
-
-@progress_utils.annotate("Updating iCloud group")
+@progress_utils.annotate("Updating iCloud groups")
 def write_updated_group_to_icloud(
-    icloud_group: icloud.ICloudGroup,
+    icloud_group: icloud._model.ICloudGroup,
 ) -> None:
-    contacts_manager = icloud.ICloudManager().contact_manager
-    contacts_manager.update_group(icloud_group)
+    icloud.update_group(icloud_group)
     progress_utils.message(
         f"Updated group {icloud_group.name} "
         f"with {len(icloud_group.contactIds)} contact(s)"

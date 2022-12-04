@@ -6,7 +6,7 @@ import typing
 
 import command
 from common import error
-from utils import icloud_utils
+from dao import icloud
 
 if typing.TYPE_CHECKING:
     import argparse
@@ -21,7 +21,7 @@ def _run_command(cl_args: argparse.Namespace) -> None:
             _create_dir_if_not_exists(cl_args.cache)
             _create_dir_if_not_exists(cl_args.data)
             if not cl_args.cached:
-                icloud_utils.login(config_path=cl_args.config)
+                icloud.authenticate(config_path=cl_args.config)
             command.pull.run(
                 cache_path=cl_args.cache, cached=cl_args.cached, data_path=cl_args.data
             )
@@ -29,7 +29,7 @@ def _run_command(cl_args: argparse.Namespace) -> None:
         case command.Command.PUSH:
             _create_dir_if_not_exists(cl_args.cache)
             _error_if_not_exists(cl_args.data)
-            icloud_utils.login(config_path=cl_args.config)
+            icloud.authenticate(config_path=cl_args.config)
             command.push.run(
                 cache_path=cl_args.cache,
                 data_path=cl_args.data,
@@ -38,7 +38,7 @@ def _run_command(cl_args: argparse.Namespace) -> None:
             )
 
         case command.Command.SYNC_GROUPS:
-            icloud_utils.login()
+            icloud.authenticate(config_path=cl_args.config)
             command.sync_groups.run(cache_path=cl_args.cache, data_path=cl_args.data)
 
         case command.Command.TAG:

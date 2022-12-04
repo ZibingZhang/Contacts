@@ -4,7 +4,7 @@ from __future__ import annotations
 import dataclasses
 
 import model
-from data.icloud.model import date_field
+from dao.icloud._model import date_field
 from utils import dataclasses_utils
 
 
@@ -36,22 +36,6 @@ class IM(dataclasses_utils.DataClassJsonMixin):
 class Phone(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str | None = None
-
-
-@dataclasses.dataclass
-class PhotoCrop(dataclasses_utils.DataClassJsonMixin):
-    height: int
-    width: int
-    x: int
-    y: int
-
-
-@dataclasses.dataclass
-class Photo(dataclasses_utils.DataClassJsonMixin):
-    crop: PhotoCrop
-    signature: str
-    url: str
-    whitelisted: bool | None = None
 
 
 @dataclasses.dataclass
@@ -115,7 +99,7 @@ class ICloudContact(dataclasses_utils.DataClassJsonMixin):
     phoneticCompanyName: str | None = None
     phoneticFirstName: str | None = None
     phoneticLastName: str | None = None
-    photo: Photo | None = None
+    photo: model.ICloudPhoto | None = None
     prefix: str | None = None
     profiles: list[Profile] | None = None
     relatedNames: list[RelatedName] | None = None

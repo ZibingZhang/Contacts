@@ -8,9 +8,12 @@ CountryCode = enumeration.CountryCode
 HighSchoolName = enumeration.HighSchoolName
 UniversityName = enumeration.UniversityName
 
+ICloudPhotoCrop = contact.ICloudPhotoCrop
+
 FacebookProfile = contact.FacebookProfile
 GameCenterProfile = contact.GameCenterProfile
 InstagramProfile = contact.InstagramProfile
+ICloudPhoto = contact.ICloudPhoto
 HighSchool = contact.HighSchool
 University = contact.University
 

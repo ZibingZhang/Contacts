@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import model
 from common import constant
-from transformer import notes as nt
+from dao import icloud
+from dao.icloud._transformer import notes as nt
 
-from data import icloud
 
-
-def contact_to_icloud_contact(contact: model.Contact) -> icloud.ICloudContact:
+def contact_to_icloud_contact(contact: model.Contact) -> icloud.model.ICloudContact:
     """Convert a model.Contact into an icloud.ICloudContact.
 
     Args:
@@ -16,7 +15,7 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud.ICloudContact:
     Returns:
         The transformed icloud.ICloudContact.
     """
-    icloud_contact = icloud.ICloudContact(
+    icloud_contact = icloud.model.ICloudContact(
         birthday=contact.birthday,
         firstName=contact.name.first_name,
         isCompany=False,

@@ -1,5 +1,4 @@
 import command
-import transformer
 from utils import (
     command_utils,
     dataclasses_utils,
@@ -10,23 +9,16 @@ from utils import (
 
 
 def run(*, cache_path: str, data_path: str, force: bool, write: bool) -> None:
-    contacts = command_utils.read_contacts_from_disk(data_path=data_path)
-
-    pushed_contacts = [
-        transformer.contact_to_icloud_contact(contact) for contact in contacts
-    ]
-
+    pushed_contacts = command_utils.read_contacts_from_disk(data_path=data_path)
     icloud_contacts = command_utils.read_contacts_from_icloud(
         cache_path=cache_path, cached=False
     )
-    for icloud_contact in icloud_contacts:
-        icloud_contact.normalized = None
 
     icloud_id_to_pushed_contact_map = {
-        contact.contactId: contact for contact in pushed_contacts
+        contact.icloud.uuid: contact for contact in pushed_contacts
     }
     icloud_id_to_icloud_contact_map = {
-        contact.contactId: contact for contact in icloud_contacts
+        contact.icloud.uuid: contact for contact in icloud_contacts
     }
 
     pushed_contact_ids = icloud_id_to_pushed_contact_map.keys()
