@@ -51,7 +51,7 @@ def authenticate(*, config_path: str = constant.DEFAULT_CONFIG_FILE):
 
 def read_contacts_and_groups(
     *, cache_path: str = constant.DEFAULT_CACHE_DIRECTORY, cached: bool = False
-) -> tuple[list[model.Contact], list[_model.ICloudGroup]]:
+) -> tuple[list[model.Contact], list[model.Group]]:
     if cached:
         if not os.path.isdir(cache_path):
             raise ValueError(f"Cache path is not a directory, {cache_path}")

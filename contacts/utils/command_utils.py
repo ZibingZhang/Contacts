@@ -28,14 +28,10 @@ def read_contacts_from_icloud(*, cache_path: str, cached: bool) -> list[model.Co
 
 
 @progress_utils.annotate("Reading groups from iCloud")
-def read_groups_from_icloud(
-    *, cache_path: str, cached: bool
-) -> list[icloud._model.ICloudGroup]:
-    _, icloud_groups = icloud.read_contacts_and_groups(
-        cache_path=cache_path, cached=cached
-    )
-    progress_utils.message(f"Read {len(icloud_groups)} groups(s)")
-    return icloud_groups
+def read_groups_from_icloud(*, cache_path: str, cached: bool) -> list[model.Group]:
+    _, groups = icloud.read_contacts_and_groups(cache_path=cache_path, cached=cached)
+    progress_utils.message(f"Read {len(groups)} groups(s)")
+    return groups
 
 
 @progress_utils.annotate("Writing contacts to disk")
