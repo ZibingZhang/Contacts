@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import uuid
-
 import model
 from common import constant
 from transformer import notes as nt
@@ -18,13 +16,8 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud.ICloudContact:
     Returns:
         The transformed icloud.ICloudContact.
     """
-    if not contact.icloud:
-        contact.icloud = model.ICloud(uuid=str(uuid.uuid4()).upper())
-
     icloud_contact = icloud.ICloudContact(
         birthday=contact.birthday,
-        contactId=contact.icloud.uuid,
-        etag=contact.icloud.etag,
         firstName=contact.name.first_name,
         isCompany=False,
         isGuardianApproved=False,
@@ -35,6 +28,10 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud.ICloudContact:
         suffix=contact.name.suffix,
         whitelisted=False,
     )
+
+    if contact.icloud:
+        icloud_contact.contactId = contact.icloud.uuid
+        icloud_contact.etag = contact.icloud.etag
 
     if contact.tags:
         icloud_contact.companyName = ", ".join(contact.tags)

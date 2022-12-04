@@ -1,5 +1,9 @@
 import model
 
+DEFAULT_CACHE_DIRECTORY = "cache"
+DEFAULT_DATA_DIRECTORY = "data"
+DEFAULT_CONFIG_FILE = "config.ini"
+
 CONTACTS_FILE_NAME = "contacts.json"
 NEW_CONTACT_FILE_NAME = "new-contacts.json"
 

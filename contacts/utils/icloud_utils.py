@@ -9,7 +9,7 @@ from data import icloud
 
 
 @decorator.run_once
-def login(config_path: str = None):
+def login(*, config_path: str = constant.DEFAULT_CONFIG_FILE):
     config = configparser.ConfigParser()
     config.read(config_path)
     username = config["login"]["username"]
@@ -18,7 +18,7 @@ def login(config_path: str = None):
 
 
 def get_contacts_and_groups(
-    cache_path: str, cached: bool
+    *, cache_path: str = constant.DEFAULT_CACHE_DIRECTORY, cached: bool = False
 ) -> tuple[list[icloud.ICloudContact], list[icloud.ICloudGroup]]:
     if cached:
         if cache_path is None:

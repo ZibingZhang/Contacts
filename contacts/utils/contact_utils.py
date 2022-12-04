@@ -4,23 +4,6 @@ import re
 import model
 
 
-def extract_name(contact: model.Contact) -> str:
-    """Extract the name from a contact.
-
-    Args:
-        contact: A contact.
-
-    Returns:
-        The name of the contact.
-    """
-    name_parts = []
-    if first_name := contact.name.first_name:
-        name_parts.append(first_name)
-    if last_name := contact.name.last_name:
-        name_parts.append(last_name)
-    return " ".join(name_parts)
-
-
 def add_email_address_if_not_exists(
     contact: model.Contact, email_address: str, label: str
 ) -> None:
@@ -71,3 +54,20 @@ def add_phone_number_if_not_exists(
         if phone_number.country_code == country_code and phone_number.number == number:
             return
     contact.phone_numbers.append(new_phone_number)
+
+
+def extract_name(contact: model.Contact) -> str:
+    """Extract the name from a contact.
+
+    Args:
+        contact: A contact.
+
+    Returns:
+        The name of the contact.
+    """
+    name_parts = []
+    if first_name := contact.name.first_name:
+        name_parts.append(first_name)
+    if last_name := contact.name.last_name:
+        name_parts.append(last_name)
+    return " ".join(name_parts)
