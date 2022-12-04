@@ -11,24 +11,28 @@ def run(*, cache_path: str, data_path: str) -> None:
     icloud_groups = command_utils.read_groups_from_icloud(
         cache_path=cache_path, cached=False
     )
-    icloud_group_name_to_icloud_group_map = {
+    group_name_to_group_map = {
         icloud_group.name: icloud_group for icloud_group in icloud_groups
     }
 
     for name, predicate in GROUP_NAME_TO_PREDICATE_MAP.items():
-        contact_ids = [
+        contact_uuids = [
             contact.icloud.uuid for contact in contacts if predicate(contact)
         ]
-        if name not in icloud_group_name_to_icloud_group_map.keys():
+        if name not in group_name_to_group_map.keys():
             command_utils.write_new_group_to_icloud(
-                icloud._model.ICloudGroup(
-                    contactIds=contact_ids, groupId=uuid_utils.generate(), name=name
+                model.Group(
+                    icloud=model.ICloudGroup(
+                        contact_uuids=contact_uuids,
+                        uuid=uuid_utils.generate(),
+                    ),
+                    name=name,
                 )
             )
         else:
-            icloud_group = icloud_group_name_to_icloud_group_map.get(name)
-            icloud_group.contactIds = contact_ids
-            command_utils.write_updated_group_to_icloud(icloud_group)
+            group = group_name_to_group_map.get(name)
+            group.icloud.contact_uuids = contact_uuids
+            command_utils.write_updated_group_to_icloud(group)
         time.sleep(1)
 
 

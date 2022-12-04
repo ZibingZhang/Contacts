@@ -92,8 +92,12 @@ def read_contacts_and_groups(
         for icloud_contact in icloud_contacts
         if icloud_contact.contactId not in _IGNORED_UUIDS
     ]
+    groups = [
+        _transformer.icloud_group_to_group(icloud_group)
+        for icloud_group in icloud_groups
+    ]
 
-    return contacts, icloud_groups
+    return contacts, groups
 
 
 def create_contacts(contacts: list[model.Contact]) -> None:
@@ -112,14 +116,14 @@ def update_contacts(contacts: list[model.Contact]) -> None:
     contact_manager.update_contacts(icloud_contacts)
 
 
-def create_group(groups: _model.ICloudGroup) -> None:
+def create_group(group: model.Group) -> None:
     contact_manager = _get_contact_manager()
-    contact_manager.create_group(groups)
+    contact_manager.create_group(_transformer.group_to_icloud_group(group))
 
 
-def update_group(groups: _model.ICloudGroup) -> None:
+def update_group(group: model.Group) -> None:
     contact_manager = _get_contact_manager()
-    contact_manager.update_group(groups)
+    contact_manager.update_group(_transformer.group_to_icloud_group(group))
 
 
 def _get_contact_manager() -> _manager.ICloudContactManager:

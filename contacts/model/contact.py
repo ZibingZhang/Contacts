@@ -52,7 +52,7 @@ class ICloudPhoto(dataclasses_utils.DataClassJsonMixin):
 
 
 @dataclasses.dataclass
-class ICloud(dataclasses_utils.DataClassJsonMixin):
+class ICloudContact(dataclasses_utils.DataClassJsonMixin):
     uuid: str
     etag: str | None = None
     photo: ICloudPhoto | None = None
@@ -120,7 +120,7 @@ class Contact(dataclasses_utils.DataClassJsonMixin):
     email_addresses: list[EmailAddress] | None = None
     favorite: dict | None = None
     friends_friend: str | None = None
-    icloud: ICloud | None = None
+    icloud: ICloudContact | None = None
     notes: str | None = None
     phone_numbers: list[PhoneNumber] | None = None
     social_profiles: SocialProfiles | None = None

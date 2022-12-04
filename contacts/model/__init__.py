@@ -1,4 +1,4 @@
-from model import contact, date, enumeration
+from model import contact, date, enumeration, group
 
 Date = date.Date
 DateRange = date.DateRange
@@ -19,10 +19,14 @@ University = contact.University
 
 Education = contact.Education
 EmailAddresss = contact.EmailAddress
-ICloud = contact.ICloud
+ICloudContact = contact.ICloudContact
 Name = contact.Name
 PhoneNumber = contact.PhoneNumber
 SocialProfiles = contact.SocialProfiles
 StreetAddress = contact.StreetAddress
 
 Contact = contact.Contact
+
+ICloudGroup = group.ICloudGroup
+
+Group = group.Group

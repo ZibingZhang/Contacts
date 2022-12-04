@@ -41,7 +41,7 @@ def icloud_contact_to_contact(
 
     contact = model.Contact(
         birthday=icloud_contact.birthday,
-        icloud=model.ICloud(
+        icloud=model.ICloudContact(
             etag=icloud_contact.etag,
             photo=icloud_contact.photo,
             uuid=icloud_contact.contactId,
