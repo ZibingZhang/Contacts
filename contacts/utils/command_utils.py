@@ -70,7 +70,8 @@ def write_new_group_to_icloud(icloud_group: icloud.ICloudGroup) -> None:
     contacts_manager = icloud.ICloudManager().contact_manager
     contacts_manager.create_group(icloud_group)
     progress_utils.message(
-        f"Created group {icloud_group.name} with {len(icloud_group.contactIds)} contact(s)"
+        f"Created group {icloud_group.name} "
+        f"with {len(icloud_group.contactIds)} contact(s)"
     )
 
 
@@ -91,5 +92,6 @@ def write_updated_group_to_icloud(
     contacts_manager = icloud.ICloudManager().contact_manager
     contacts_manager.update_group(icloud_group)
     progress_utils.message(
-        f"Updated group {icloud_group.name} with {len(icloud_group.contactIds)} contact(s)"
+        f"Updated group {icloud_group.name} "
+        f"with {len(icloud_group.contactIds)} contact(s)"
     )

@@ -1,8 +1,9 @@
 from typing import Callable
 
 import model
-from data import icloud
 from utils import command_utils, uuid_utils
+
+from data import icloud
 
 
 def run(*, cache_path: str, data_path: str) -> None:
@@ -14,7 +15,6 @@ def run(*, cache_path: str, data_path: str) -> None:
         icloud_group.name: icloud_group for icloud_group in icloud_groups
     }
 
-    contact_manager = icloud.ICloudManager().contact_manager
     for name, predicate in GROUP_NAME_TO_PREDICATE_MAP.items():
         contact_ids = [
             contact.icloud.uuid for contact in contacts if predicate(contact)

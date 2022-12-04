@@ -1,5 +1,4 @@
 import os
-import uuid
 
 import model
 from utils import uuid_utils

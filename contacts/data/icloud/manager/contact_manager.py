@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import json
 import re
-import uuid
 
 from common import singleton
 from utils import uuid_utils

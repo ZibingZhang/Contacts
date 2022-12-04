@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import uuid
-
 import model
 from common import constant
 from transformer import notes as nt

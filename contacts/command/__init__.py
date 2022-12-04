@@ -1,6 +1,6 @@
 import enum
 
-from command import add, pull, push, tag, validate, sync_groups
+from command import add, pull, push, sync_groups, tag, validate
 
 
 class Command(str, enum.Enum):

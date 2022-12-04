@@ -1,6 +1,3 @@
-import uuid
-
-import model
 from common import constant
 from utils import command_utils, contact_utils, input_utils
 
