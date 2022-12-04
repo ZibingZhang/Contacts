@@ -58,7 +58,7 @@ def _tag_mv(data_path: str, contacts: list[model.Contact], old: str, new: str) -
             count += 1
 
     if input_utils.yes_no_input(f"Update {count} contact(s)?"):
-        command_utils.write_contacts_to_disk(data_path=data_path, contacts=contacts)
+        command_utils.write_contacts_to_disk(contacts, data_path=data_path)
 
 
 def _tag_repl(data_path: str, contacts: list[model.Contact]) -> None:
@@ -124,7 +124,7 @@ def _add_tags_to_contact(data_path, contacts: list[model.Contact]):
             break
 
     selected_contact.tags = tags
-    command_utils.write_contacts_to_disk(data_path=data_path, contacts=contacts)
+    command_utils.write_contacts_to_disk(contacts, data_path=data_path)
 
 
 def _get_matching_contacts(

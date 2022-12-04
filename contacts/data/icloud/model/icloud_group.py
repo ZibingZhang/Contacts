@@ -37,10 +37,10 @@ class HeaderPositions(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class ICloudGroup(dataclasses_utils.DataClassJsonMixin):
-    contactIds: list[uuid.UUID]
-    etag: str
-    groupId: uuid.UUID
-    headerPositions: HeaderPositions
-    isGuardianApproved: bool
+    contactIds: list[str]
+    groupId: str
     name: str
-    whitelisted: bool
+    etag: str | None = None
+    isGuardianApproved: bool | None = None
+    whitelisted: bool | None = None
+    headerPositions: HeaderPositions | None = None

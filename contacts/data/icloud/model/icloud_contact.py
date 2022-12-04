@@ -94,8 +94,8 @@ class Url(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class ICloudContact(dataclasses_utils.DataClassJsonMixin):
-    contactId: str
     isCompany: bool
+    contactId: str | None = None
     birthday: model.Date | None = date_field.new_field(required=False)
     companyName: str | None = None
     dates: list[Date] | None = None

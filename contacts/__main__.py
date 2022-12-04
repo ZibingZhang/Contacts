@@ -23,9 +23,7 @@ def _run_command(cl_args: argparse.Namespace) -> None:
             if not cl_args.cached:
                 icloud_utils.login(config_path=cl_args.config)
             command.pull.run(
-                cache_path=cl_args.cache,
-                cached=cl_args.cached,
-                data_path=cl_args.data,
+                cache_path=cl_args.cache, cached=cl_args.cached, data_path=cl_args.data
             )
 
         case command.Command.PUSH:
@@ -38,6 +36,10 @@ def _run_command(cl_args: argparse.Namespace) -> None:
                 force=cl_args.force,
                 write=cl_args.write,
             )
+
+        case command.Command.SYNC_GROUPS:
+            icloud_utils.login()
+            command.sync_groups.run(cache_path=cl_args.cache, data_path=cl_args.data)
 
         case command.Command.TAG:
             _error_if_not_exists(cl_args.data)
