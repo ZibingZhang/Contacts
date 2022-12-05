@@ -11,8 +11,8 @@ PATTERN_TO_HIGH_SCHOOL_NAME_MAP = {
 }
 
 
-def run(*, data_path: str) -> None:
-    contacts = command_utils.read_contacts_from_disk(data_path=data_path)
+def run() -> None:
+    contacts = command_utils.read_contacts_from_disk()
     _validate_names(contacts)
     for contact in contacts:
         _validate_email_addresses(contact)

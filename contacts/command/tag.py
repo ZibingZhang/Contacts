@@ -17,20 +17,16 @@ class TagAction(str, enum.Enum):
     REPL = "repl"
 
 
-def run(
-    *, data_path: str, tag_action: TagAction, action_specific_args: argparse.Namespace
-) -> None:
-    contacts = command_utils.read_contacts_from_disk(data_path=data_path)
+def run(*, tag_action: TagAction, action_specific_args: argparse.Namespace) -> None:
+    contacts = command_utils.read_contacts_from_disk()
 
     match tag_action:
         case TagAction.LS:
             _tag_ls(contacts)
         case TagAction.MV:
-            _tag_mv(
-                data_path, contacts, action_specific_args.old, action_specific_args.new
-            )
+            _tag_mv(contacts, action_specific_args.old, action_specific_args.new)
         case TagAction.REPL:
-            _tag_repl(data_path, contacts)
+            _tag_repl(contacts)
 
 
 def _tag_ls(contacts: list[model.Contact]) -> None:
@@ -42,7 +38,7 @@ def _tag_ls(contacts: list[model.Contact]) -> None:
         print("")
 
 
-def _tag_mv(data_path: str, contacts: list[model.Contact], old: str, new: str) -> None:
+def _tag_mv(contacts: list[model.Contact], old: str, new: str) -> None:
     print(f"Changing tag from {old} to {new}.")
 
     all_tags = _get_all_tags(contacts)
@@ -58,13 +54,13 @@ def _tag_mv(data_path: str, contacts: list[model.Contact], old: str, new: str) -
             count += 1
 
     if input_utils.yes_no_input(f"Update {count} contact(s)?"):
-        command_utils.write_contacts_to_disk(contacts, data_path=data_path)
+        command_utils.write_contacts_to_disk(contacts)
 
 
-def _tag_repl(data_path: str, contacts: list[model.Contact]) -> None:
+def _tag_repl(contacts: list[model.Contact]) -> None:
     while True:
         try:
-            _add_tags_to_contact(data_path, contacts)
+            _add_tags_to_contact(contacts)
         except error.CommandSkipError:
             print("Skipping...")
 
@@ -75,7 +71,7 @@ def _get_all_tags(contacts: list[model.Contact]) -> list[str]:
     )
 
 
-def _add_tags_to_contact(data_path, contacts: list[model.Contact]):
+def _add_tags_to_contact(contacts: list[model.Contact]):
     name = input_utils.basic_input(
         "Enter the name of the contact to add tags to", lower=True
     )
@@ -124,7 +120,7 @@ def _add_tags_to_contact(data_path, contacts: list[model.Contact]):
             break
 
     selected_contact.tags = tags
-    command_utils.write_contacts_to_disk(contacts, data_path=data_path)
+    command_utils.write_contacts_to_disk(contacts)
 
 
 def _get_matching_contacts(

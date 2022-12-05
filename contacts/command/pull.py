@@ -7,11 +7,9 @@ from utils import (
 )
 
 
-def run(*, cache_path: str, cached: bool, data_path: str) -> None:
-    pulled_contacts = command_utils.read_contacts_from_icloud(
-        cache_path=cache_path, cached=cached
-    )
-    disk_contacts = command_utils.read_contacts_from_disk(data_path=data_path)
+def run(*, cached: bool) -> None:
+    pulled_contacts = command_utils.read_contacts_from_icloud(cached=cached)
+    disk_contacts = command_utils.read_contacts_from_disk()
 
     icloud_id_to_pulled_contact_map = {
         contact.icloud.uuid: contact for contact in pulled_contacts
@@ -52,7 +50,7 @@ def run(*, cache_path: str, cached: bool, data_path: str) -> None:
                 icloud_id_to_current_contact_map[icloud_id] = updated_contact
 
     command_utils.write_contacts_to_disk(
-        list(icloud_id_to_current_contact_map.values()), data_path=data_path
+        list(icloud_id_to_current_contact_map.values())
     )
 
 

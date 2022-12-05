@@ -21,15 +21,15 @@ def read_contacts_from_disk(
 
 
 @progress_utils.annotate("Reading contacts from iCloud")
-def read_contacts_from_icloud(*, cache_path: str, cached: bool) -> list[model.Contact]:
-    contacts, _ = icloud.read_contacts_and_groups(cache_path=cache_path, cached=cached)
+def read_contacts_from_icloud(cached: bool = False) -> list[model.Contact]:
+    contacts, _ = icloud.read_contacts_and_groups(cached=cached)
     progress_utils.message(f"Read {len(contacts)} contact(s)")
     return contacts
 
 
 @progress_utils.annotate("Reading groups from iCloud")
-def read_groups_from_icloud(*, cache_path: str, cached: bool) -> list[model.Group]:
-    _, groups = icloud.read_contacts_and_groups(cache_path=cache_path, cached=cached)
+def read_groups_from_icloud() -> list[model.Group]:
+    _, groups = icloud.read_contacts_and_groups()
     progress_utils.message(f"Read {len(groups)} groups(s)")
     return groups
 

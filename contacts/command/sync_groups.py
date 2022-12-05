@@ -2,15 +2,12 @@ import time
 from typing import Callable
 
 import model
-from dao import icloud
 from utils import command_utils, uuid_utils
 
 
-def run(*, cache_path: str, data_path: str) -> None:
-    contacts = command_utils.read_contacts_from_disk(data_path=data_path)
-    icloud_groups = command_utils.read_groups_from_icloud(
-        cache_path=cache_path, cached=False
-    )
+def run() -> None:
+    contacts = command_utils.read_contacts_from_disk()
+    icloud_groups = command_utils.read_groups_from_icloud(cached=False)
     group_name_to_group_map = {
         icloud_group.name: icloud_group for icloud_group in icloud_groups
     }

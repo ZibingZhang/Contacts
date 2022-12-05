@@ -10,6 +10,7 @@ from dao.icloud import _manager, _model, _transformer
 from utils import file_io_utils
 
 __all__ = [
+    "authenticate",
     "read_contacts_and_groups",
     "create_contacts",
     "update_contacts",

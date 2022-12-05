@@ -8,11 +8,9 @@ from utils import (
 )
 
 
-def run(*, cache_path: str, data_path: str, force: bool, write: bool) -> None:
-    pushed_contacts = command_utils.read_contacts_from_disk(data_path=data_path)
-    icloud_contacts = command_utils.read_contacts_from_icloud(
-        cache_path=cache_path, cached=False
-    )
+def run(*, force: bool, write: bool) -> None:
+    pushed_contacts = command_utils.read_contacts_from_disk()
+    icloud_contacts = command_utils.read_contacts_from_icloud(cached=False)
 
     icloud_id_to_pushed_contact_map = {
         contact.icloud.uuid: contact for contact in pushed_contacts
@@ -72,12 +70,8 @@ def run(*, cache_path: str, data_path: str, force: bool, write: bool) -> None:
 
     if write and (len(new_contacts) > 0 or len(updated_contacts) > 0):
         print("Pulling contact(s) to sync etag(s)...")
-        _pull_contacts_to_sync_etag(cache_path, data_path)
+        _pull_contacts_to_sync_etag()
 
 
-def _pull_contacts_to_sync_etag(cache_path: str, data_path: str) -> None:
-    command.pull.run(
-        cache_path=cache_path,
-        cached=False,
-        data_path=data_path,
-    )
+def _pull_contacts_to_sync_etag() -> None:
+    command.pull.run(cached=False)
