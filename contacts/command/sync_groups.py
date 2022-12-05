@@ -19,7 +19,7 @@ def run() -> None:
         if name not in group_name_to_group_map.keys():
             command_utils.write_new_group_to_icloud(
                 model.Group(
-                    icloud=model.ICloudGroup(
+                    icloud=model.group.ICloudMetadata(
                         contact_uuids=contact_uuids,
                         uuid=uuid_utils.generate(),
                     ),

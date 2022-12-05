@@ -4,7 +4,7 @@ from utils import dataclasses_utils
 
 
 @dataclasses.dataclass
-class ICloudGroup(dataclasses_utils.DataClassJsonMixin):
+class ICloudMetadata(dataclasses_utils.DataClassJsonMixin):
     contact_uuids: list[str]
     uuid: str
     etag: str | None = None
@@ -12,5 +12,5 @@ class ICloudGroup(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class Group(dataclasses_utils.DataClassJsonMixin):
-    icloud: ICloudGroup
+    icloud: ICloudMetadata
     name: str
