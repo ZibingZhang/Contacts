@@ -35,7 +35,7 @@ _IGNORED_UUIDS = _ALERT_UUIDS + _TEST_CONTACT_UUIDS + _OTHER_UUIDS
 
 
 _contact_manager: _manager.ICloudContactManager | None = None
-_updated_sync_token: bool = False
+_init_sync_token: bool = False
 
 
 @decorator.run_once
@@ -135,7 +135,7 @@ def _get_contact_manager() -> _manager.ICloudContactManager:
 
 
 def _require_updated_sync_token() -> None:
-    global _updated_sync_token
-    if not _updated_sync_token:
+    global _init_sync_token
+    if not _init_sync_token:
         read_contacts_and_groups()
-        _updated_sync_token = True
+        _init_sync_token = True
