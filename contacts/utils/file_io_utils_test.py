@@ -1,4 +1,4 @@
-import os
+import os.path
 
 import model
 from utils import uuid_utils

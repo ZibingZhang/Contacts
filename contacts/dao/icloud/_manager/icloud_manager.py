@@ -6,7 +6,7 @@ import getpass
 import http.cookiejar as cookielib
 import json
 import logging
-import os
+import os.path
 import re
 import tempfile
 import uuid

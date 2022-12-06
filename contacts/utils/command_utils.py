@@ -1,10 +1,10 @@
 """High-level utilities for commands."""
-import os
+import os.path
 
 import model
 from common import constant
 from dao import icloud
-from utils import file_io_utils, progress_utils
+from utils import file_io_utils, progress_utils, input_utils, contact_utils
 
 
 @progress_utils.annotate("Reading contacts from disk")
@@ -82,3 +82,68 @@ def write_updated_group_to_icloud(
         f"Updated group {icloud_group.name} "
         f"with {len(icloud_group.icloud.contact_uuids)} contact(s)"
     )
+
+
+def get_contact_by_name(contacts: list[model.Contact]) -> model.Contact | None:
+    name = input_utils.basic_input(
+        "Enter the name of the contact to select", lower=True
+    )
+
+    matching_contacts = _get_matching_contacts(contacts, name)
+    if len(matching_contacts) == 0:
+        return
+    elif len(matching_contacts) == 1:
+        return matching_contacts[0]
+    else:
+        for i, contact in enumerate(matching_contacts):
+            print(f"{i + 1}. {contact_utils.build_name_and_tags_str(contact)}")
+
+        selection = input_utils.input_with_skip("Select the contact")
+        while True:
+            try:
+                selection = int(selection)
+                if selection < 1:
+                    selection = input_utils.input_with_skip(
+                        "Too low. Select the contact"
+                    )
+                    continue
+                if selection > len(matching_contacts):
+                    selection = input_utils.input_with_skip(
+                        "Too high. Select the contact"
+                    )
+                    continue
+                break
+            except ValueError:
+                selection = input_utils.input_with_skip(
+                    "Not a number. Select the contact"
+                )
+
+        return matching_contacts[selection - 1]
+
+
+def _get_matching_contacts(
+    contacts: list[model.Contact], name: str
+) -> list[model.Contact]:
+    name = " ".join(name.strip().split())
+    matching_contacts = []
+
+    if name.count(" ") == 1:
+        first_name, last_name = name.split()
+        for contact in contacts:
+            if (
+                first_name in f"{contact.name.first_name}".lower()
+                or first_name in f"{contact.name.nickname}".lower()
+            ) and last_name in f"{contact.name.last_name}".lower():
+                matching_contacts.append(contact)
+                continue
+
+    for contact in contacts:
+        contact_name = (
+            f"{contact.name.first_name} "
+            f"{contact.name.nickname} "
+            f"{contact.name.middle_name} "
+            f"{contact.name.last_name}"
+        ).lower()
+        if name in contact_name:
+            matching_contacts.append(contact)
+    return matching_contacts

@@ -58,6 +58,7 @@ def _tag_mv(contacts: list[model.Contact], old: str, new: str) -> None:
 
 
 def _tag_repl(contacts: list[model.Contact]) -> None:
+    print("Adding tags to contacts...")
     while True:
         try:
             _add_tags_to_contact(contacts)
@@ -72,83 +73,21 @@ def _get_all_tags(contacts: list[model.Contact]) -> list[str]:
 
 
 def _add_tags_to_contact(contacts: list[model.Contact]):
-    name = input_utils.basic_input(
-        "Enter the name of the contact to add tags to", lower=True
-    )
-
-    matching_contacts = _get_matching_contacts(contacts, name)
-    if len(matching_contacts) == 0:
+    contact = command_utils.get_contact_by_name(contacts)
+    if contact is None:
         return
-    elif len(matching_contacts) == 1:
-        selected_contact = matching_contacts[0]
-    else:
-        for i, contact in enumerate(matching_contacts):
-            print(f"{i + 1}. {_build_contact_name_and_tags(contact)}")
 
-        selection = input_utils.input_with_skip("Select the contact to add tags to")
-        while True:
-            try:
-                selection = int(selection)
-                if selection < 1:
-                    selection = input_utils.input_with_skip(
-                        "Too low. Select the contact to add tags to"
-                    )
-                    continue
-                if selection > len(matching_contacts):
-                    selection = input_utils.input_with_skip(
-                        "Too high. Select the contact to add tags to"
-                    )
-                    continue
-                break
-            except ValueError:
-                selection = input_utils.input_with_skip(
-                    "Not a number. Select the contact to add tags to"
-                )
-
-        selected_contact = matching_contacts[selection - 1]
-
-    print(_build_contact_name_and_tags(selected_contact))
+    print(contact_utils.build_name_and_tags_str(contact))
     while True:
         new_tags = [
             tag.strip()
             for tag in input_utils.input_with_skip("Enter the tags to add").split(",")
         ]
-        tags = sorted(set((selected_contact.tags or []) + new_tags))
+        tags = sorted(set((contact.tags or []) + new_tags))
 
         print(f"tags: {tags}")
         if input_utils.yes_no_input("Continue with this set of tags?"):
             break
 
-    selected_contact.tags = tags
+    contact.tags = tags
     command_utils.write_contacts_to_disk(contacts)
-
-
-def _get_matching_contacts(
-    contacts: list[model.Contact], name: str
-) -> list[model.Contact]:
-    name = " ".join(name.strip().split())
-    matching_contacts = []
-
-    if name.count(" ") == 1:
-        first_name, last_name = name.split()
-        for contact in contacts:
-            if (
-                first_name in f"{contact.name.first_name}".lower()
-                and last_name in f"{contact.name.last_name}".lower()
-            ):
-                matching_contacts.append(contact)
-                continue
-
-    for contact in contacts:
-        contact_name = (
-            f"{contact.name.first_name} "
-            f"{contact.name.middle_name} "
-            f"{contact.name.last_name}"
-        ).lower()
-        if name in contact_name:
-            matching_contacts.append(contact)
-    return matching_contacts
-
-
-def _build_contact_name_and_tags(contact: model.Contact) -> str:
-    return f"{contact_utils.extract_name(contact).ljust(25)} :           {contact.tags}"

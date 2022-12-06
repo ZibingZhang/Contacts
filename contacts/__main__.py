@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import os
+import os.path
 import parser
 import typing
 
@@ -21,21 +21,21 @@ def _run_command(cl_args: argparse.Namespace) -> None:
             _create_if_dir_not_exists(constant.DEFAULT_CACHE_DIRECTORY)
             _create_if_dir_not_exists(constant.DEFAULT_DATA_DIRECTORY)
             if not cl_args.cached:
-                icloud.authenticate(config_path=cl_args.config)
+                icloud.authenticate()
             command.pull.run(cached=cl_args.cached)
 
         case command.Command.PUSH:
-            _create_if_dir_not_exists(cl_args.cache)
-            _error_if_dir_not_exists(cl_args.data)
-            icloud.authenticate(config_path=cl_args.config)
+            _create_if_dir_not_exists(constant.DEFAULT_CACHE_DIRECTORY)
+            _error_if_dir_not_exists(constant.DEFAULT_DATA_DIRECTORY)
+            icloud.authenticate()
             command.push.run(force=cl_args.force, write=cl_args.write)
 
         case command.Command.SYNC_GROUPS:
-            icloud.authenticate(config_path=cl_args.config)
+            icloud.authenticate()
             command.sync_groups.run()
 
         case command.Command.TAG:
-            _error_if_dir_not_exists(cl_args.data)
+            _error_if_dir_not_exists(constant.DEFAULT_DATA_DIRECTORY)
             command.tag.run(tag_action=cl_args.tag_action, action_specific_args=cl_args)
 
         case command.Command.VALIDATE:

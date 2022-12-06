@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import configparser
-import os
+import os.path
 
 import model
 from common import constant, decorator

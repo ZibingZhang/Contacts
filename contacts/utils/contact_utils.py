@@ -56,7 +56,7 @@ def add_phone_number_if_not_exists(
     contact.phone_numbers.append(new_phone_number)
 
 
-def extract_name(contact: model.Contact) -> str:
+def build_name_str(contact: model.Contact) -> str:
     """Extract the name from a contact.
 
     Args:
@@ -71,3 +71,15 @@ def extract_name(contact: model.Contact) -> str:
     if last_name := contact.name.last_name:
         name_parts.append(last_name)
     return " ".join(name_parts)
+
+
+def build_name_and_tags_str(contact: model.Contact) -> str:
+    """Extract the name and tags from a contact.
+
+    Args:
+        contact: A contact.
+
+    Returns:
+        The name and tags of the contact.
+    """
+    return f"{build_name_str(contact)} -- {contact.tags}"

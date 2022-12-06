@@ -10,9 +10,9 @@ def run() -> None:
     contacts = command_utils.read_contacts_from_disk()
 
     for new_contact in new_contacts:
-        new_contact_name = contact_utils.extract_name(new_contact)
+        new_contact_name = contact_utils.build_name_str(new_contact)
         for contact in contacts:
-            if new_contact_name == contact_utils.extract_name(contact):
+            if new_contact_name == contact_utils.build_name_str(contact):
                 if not input_utils.yes_no_input(
                     f"A contact already exists with this name: {contact.to_json()}\n"
                     f"Do you want to continue?"
