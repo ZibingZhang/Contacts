@@ -56,12 +56,14 @@ def write_dataclass_objects_as_json_array(
         path: The path of the file to write to.
         objects: The dataclass objects to write to the file.
     """
+    output = ""
     if len(objects) > 0 and issubclass(objects[0].__class__, model.Contact):
         objects = sorted(objects, key=_contact_key)
     with open(path, mode="w", encoding="utf-8") as f:
-        f.write("[\n")
-        f.write(textwrap.indent(",\n".join(obj.to_json() for obj in objects), "    "))
-        f.write("\n]\n")
+        output += "[\n"
+        output += textwrap.indent(",\n".join(obj.to_json() for obj in objects), "    ")
+        output += "\n]\n"
+        f.write(output)
 
 
 def _contact_key(contact: model.Contact) -> str:

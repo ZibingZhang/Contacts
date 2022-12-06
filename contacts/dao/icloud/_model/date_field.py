@@ -37,7 +37,7 @@ def _date_encoder(date: model.Date | None) -> str | None:
     if date is None:
         return
     if date.month is None or date.day is None:
-        raise error.EncodingError
+        raise error.EncodingError(date)
     return (
         f"{date.year if date.year is not None else NO_YEAR:04}"
         f"-{date.month:02}"
@@ -56,7 +56,7 @@ def _date_decoder(date: str | None) -> model.Date | None:
     if date is None:
         return
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
-        raise error.DecodingError
+        raise error.DecodingError(date)
     year = int(date[:4])
     year = year if year != NO_YEAR else None
     month = int(date[5:7])

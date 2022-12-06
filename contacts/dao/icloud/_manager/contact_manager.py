@@ -4,16 +4,14 @@ from __future__ import annotations
 import json
 import re
 
-from common import singleton
+from dao import icloud
 from utils import uuid_utils
 
-from data import icloud
 
-
-class ICloudContactManager(metaclass=singleton.Singleton):
+class ICloudContactManager:
     """Manages CRUD operations on iCloud contacts and groups."""
 
-    def __init__(self, manager: icloud.ICloudManager) -> None:
+    def __init__(self, manager: icloud._manager.ICloudManager) -> None:
         self._session = manager.session
         self._params = manager.params
         self._service_root = manager.get_webservice_url("contacts")
@@ -40,22 +38,14 @@ class ICloudContactManager(metaclass=singleton.Singleton):
     def sync_token(self) -> str:
         return f"{self._sync_token_prefix}{self._sync_token_number}"
 
-    def create_contact(self, new_contact: icloud.ICloudContact) -> None:
-        """Create a contact.
-
-        Args:
-            new_contact: The new contact.
-        """
-        self.create_contacts([new_contact])
-
-    def create_contacts(self, new_contacts: list[icloud.ICloudContact]) -> None:
+    def create_contacts(self, contacts: list[icloud._model.ICloudContact]) -> None:
         """Create multiple contacts.
 
         Args:
-            new_contacts: The new contacts.
+            contacts: The new contacts.
         """
-        self._generate_contact_uuids(new_contacts)
-        body = self._build_contacts_request_body(new_contacts)
+        self._generate_contact_uuids(contacts)
+        body = self._build_contacts_request_body(contacts)
         params = dict(self._params)
         params.update(
             {
@@ -70,23 +60,15 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         ).json()
         self._update_sync_token(resp["syncToken"])
 
-    def update_contact(self, updated_contact: icloud.ICloudContact) -> None:
-        """Update a contact.
-
-        Args:
-            updated_contact: The updated contact.
-        """
-        self.update_contacts([updated_contact])
-
-    def update_contacts(self, updated_contacts: list[icloud.ICloudContact]) -> None:
+    def update_contacts(self, contacts: list[icloud._model.ICloudContact]) -> None:
         """Update multiple contacts.
 
         Args:
-            updated_contacts: The updated contacts.
+            contacts: The updated contacts.
         """
-        for updated_contact in updated_contacts:
-            self._update_etag(updated_contact)
-        body = self._build_contacts_request_body(updated_contacts)
+        for contact in contacts:
+            self._update_etag(contact)
+        body = self._build_contacts_request_body(contacts)
         params = dict(self._params)
         params.update(
             {
@@ -102,13 +84,13 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         ).json()
         self._update_sync_token(resp["syncToken"])
 
-    def create_group(self, new_group: icloud.ICloudGroup) -> None:
+    def create_group(self, group: icloud._model.ICloudGroup) -> None:
         """Create a contact group.
 
         Args:
-            new_group: The new contact group.
+            group: The new contact group.
         """
-        body = self._build_groups_request_body([new_group])
+        body = self._build_groups_request_body(group)
         params = dict(self._params)
         params.update(
             {
@@ -123,13 +105,13 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         ).json()
         self._update_sync_token(resp["syncToken"])
 
-    def update_group(self, updated_group: icloud.ICloudGroup) -> None:
+    def update_group(self, group: icloud._model.ICloudGroup) -> None:
         """Update a contact group.
 
         Args:
-            updated_group: The updated contact group.
+            group: The updated contact group.
         """
-        body = self._build_groups_request_body([updated_group])
+        body = self._build_groups_request_body(group)
         params = dict(self._params)
         params.update(
             {
@@ -147,7 +129,7 @@ class ICloudContactManager(metaclass=singleton.Singleton):
 
     def get_contacts_and_groups(
         self,
-    ) -> tuple[list[icloud.ICloudContact], list[icloud.ICloudGroup]]:
+    ) -> tuple[list[icloud._model.ICloudContact], list[icloud._model.ICloudGroup]]:
         """Get all contact and contact groups.
 
         Returns:
@@ -178,12 +160,14 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         resp = self._session.get(self._contacts_next_url, params=params_contacts).json()
         raw_contacts = resp["contacts"]
 
-        contacts = [icloud.ICloudContact.from_dict(contact) for contact in raw_contacts]
-        groups = [icloud.ICloudGroup.from_dict(group) for group in raw_groups]
+        contacts = [
+            icloud._model.ICloudContact.from_dict(contact) for contact in raw_contacts
+        ]
+        groups = [icloud._model.ICloudGroup.from_dict(group) for group in raw_groups]
 
         return contacts, groups
 
-    def _update_etag(self, contact: icloud.ICloudContact) -> None:
+    def _update_etag(self, contact: icloud._model.ICloudContact) -> None:
         etag = contact.etag
         last_sync_number = int(re.search(r"(?<=^C=)\d+", etag)[0])
         if last_sync_number >= self._sync_token_number:
@@ -195,15 +179,17 @@ class ICloudContactManager(metaclass=singleton.Singleton):
         self._sync_token_number = int(re.search(r"\d+$", sync_token)[0])
 
     @staticmethod
-    def _generate_contact_uuids(contacts: list[icloud.ICloudContact]) -> None:
+    def _generate_contact_uuids(contacts: list[icloud._model.ICloudContact]) -> None:
         for contact in contacts:
             if contact.contactId is None:
                 contact.contactId = uuid_utils.generate()
 
     @staticmethod
-    def _build_contacts_request_body(contacts: list[icloud.ICloudContact]) -> dict:
+    def _build_contacts_request_body(
+        contacts: list[icloud._model.ICloudContact],
+    ) -> dict:
         return {"contacts": [contact.to_dict() for contact in contacts]}
 
     @staticmethod
-    def _build_groups_request_body(groups: list[icloud.ICloudGroup]) -> dict:
-        return {"groups": [group.to_dict() for group in groups]}
+    def _build_groups_request_body(group: icloud._model.ICloudGroup) -> dict:
+        return {"groups": [group.to_dict()]}

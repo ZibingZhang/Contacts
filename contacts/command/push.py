@@ -1,5 +1,4 @@
 import command
-import transformer
 from utils import (
     command_utils,
     dataclasses_utils,
@@ -9,24 +8,15 @@ from utils import (
 )
 
 
-def run(*, cache_path: str, data_path: str, force: bool, write: bool) -> None:
-    contacts = command_utils.read_contacts_from_disk(data_path=data_path)
-
-    pushed_contacts = [
-        transformer.contact_to_icloud_contact(contact) for contact in contacts
-    ]
-
-    icloud_contacts = command_utils.read_contacts_from_icloud(
-        cache_path=cache_path, cached=False
-    )
-    for icloud_contact in icloud_contacts:
-        icloud_contact.normalized = None
+def run(*, force: bool, write: bool) -> None:
+    pushed_contacts = command_utils.read_contacts_from_disk()
+    icloud_contacts = command_utils.read_contacts_from_icloud(cached=False)
 
     icloud_id_to_pushed_contact_map = {
-        contact.contactId: contact for contact in pushed_contacts
+        contact.icloud.uuid: contact for contact in pushed_contacts
     }
     icloud_id_to_icloud_contact_map = {
-        contact.contactId: contact for contact in icloud_contacts
+        contact.icloud.uuid: contact for contact in icloud_contacts
     }
 
     pushed_contact_ids = icloud_id_to_pushed_contact_map.keys()
@@ -80,12 +70,8 @@ def run(*, cache_path: str, data_path: str, force: bool, write: bool) -> None:
 
     if write and (len(new_contacts) > 0 or len(updated_contacts) > 0):
         print("Pulling contact(s) to sync etag(s)...")
-        _pull_contacts_to_sync_etag(cache_path, data_path)
+        _pull_contacts_to_sync_etag()
 
 
-def _pull_contacts_to_sync_etag(cache_path: str, data_path: str) -> None:
-    command.pull.run(
-        cache_path=cache_path,
-        cached=False,
-        data_path=data_path,
-    )
+def _pull_contacts_to_sync_etag() -> None:
+    command.pull.run(cached=False)

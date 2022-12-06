@@ -71,6 +71,9 @@ class Date(dataclasses_utils.DataClassJsonMixin):
     month: int | None = None
     year: int | None = None
 
+    def __repr__(self):
+        return date_encoder(self)
+
 
 @dataclasses.dataclass
 class DateRange(dataclasses_utils.DataClassJsonMixin):

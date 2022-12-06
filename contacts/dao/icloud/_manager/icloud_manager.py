@@ -6,20 +6,19 @@ import getpass
 import http.cookiejar as cookielib
 import json
 import logging
-import os
+import os.path
 import re
 import tempfile
 import uuid
 
-from common import decorator, singleton
-from data.icloud import exception
-
-from data import icloud
+from common import decorator
+from dao import icloud
+from dao.icloud._manager import exception
 
 LOGGER = logging.getLogger(__name__)
 
 
-class ICloudManager(metaclass=singleton.Singleton):
+class ICloudManager:
     """A base authentication class for the iCloud manager.
 
     Handles the authentication required to access iCloud services.
@@ -79,7 +78,7 @@ class ICloudManager(metaclass=singleton.Singleton):
         else:
             self.session_data.update({"client_id": self.client_id})
 
-        self.session = icloud.ICloudSession(self)
+        self.session = icloud._manager.ICloudSession(self)
         self.session.verify = verify
         self.session.headers.update(
             {"Origin": self.HOME_ENDPOINT, "Referer": "%s/" % self.HOME_ENDPOINT}
@@ -101,8 +100,8 @@ class ICloudManager(metaclass=singleton.Singleton):
         self.authenticate()
 
     @functools.cached_property
-    def contact_manager(self) -> icloud.ICloudContactManager:
-        return icloud.ICloudContactManager(self)
+    def contact_manager(self) -> icloud._manager.ICloudContactManager:
+        return icloud._manager.ICloudContactManager(self)
 
     @property
     def cookiejar_path(self) -> str:

@@ -6,8 +6,6 @@ from typing import Any
 from model import date, enumeration
 from utils import dataclasses_utils
 
-from data import icloud
-
 
 @dataclasses.dataclass
 class HighSchool(dataclasses_utils.DataClassJsonMixin):
@@ -38,10 +36,26 @@ class EmailAddress(dataclasses_utils.DataClassJsonMixin):
 
 
 @dataclasses.dataclass
-class ICloud(dataclasses_utils.DataClassJsonMixin):
+class ICloudPhotoCrop(dataclasses_utils.DataClassJsonMixin):
+    height: int
+    width: int
+    x: int
+    y: int
+
+
+@dataclasses.dataclass
+class ICloudPhoto(dataclasses_utils.DataClassJsonMixin):
+    crop: ICloudPhotoCrop
+    signature: str
+    url: str
+    whitelisted: bool | None = None
+
+
+@dataclasses.dataclass
+class ICloudMetadata(dataclasses_utils.DataClassJsonMixin):
     uuid: str
     etag: str | None = None
-    photo: icloud.model.Photo | None = None
+    photo: ICloudPhoto | None = None
 
 
 @dataclasses.dataclass
@@ -106,7 +120,7 @@ class Contact(dataclasses_utils.DataClassJsonMixin):
     email_addresses: list[EmailAddress] | None = None
     favorite: dict | None = None
     friends_friend: str | None = None
-    icloud: ICloud | None = None
+    icloud: ICloudMetadata | None = None
     notes: str | None = None
     phone_numbers: list[PhoneNumber] | None = None
     social_profiles: SocialProfiles | None = None

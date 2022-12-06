@@ -6,14 +6,6 @@ import model
 from utils import dataclasses_utils, yaml_utils
 
 
-def from_string(notes: str) -> Notes:
-    return Notes.from_dict(yaml_utils.load(notes))
-
-
-def to_string(notes: Notes) -> str:
-    return yaml_utils.dump(notes)
-
-
 @dataclasses.dataclass
 class School(dataclasses_utils.DataClassJsonMixin):
     name: str
@@ -43,3 +35,11 @@ class Notes(dataclasses_utils.DataClassJsonMixin):
     favorite: Favorites | None = None
     friends_friend: str | None = None
     partner: model.DateRange | None = None
+
+    @staticmethod
+    def from_string(notes: str) -> Notes:
+        return Notes.from_dict(yaml_utils.load(notes))
+
+    @staticmethod
+    def to_string(notes: Notes) -> str:
+        return yaml_utils.dump(notes)

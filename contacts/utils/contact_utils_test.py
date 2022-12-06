@@ -3,13 +3,13 @@ import pytest
 from contact_utils import (
     add_email_address_if_not_exists,
     add_phone_number_if_not_exists,
-    extract_name,
+    build_name_str,
 )
 
 
 def test_extract_name():
     assert (
-        extract_name(
+        build_name_str(
             model.Contact(name=model.Name(first_name="John", last_name="Smith"))
         )
         == "John Smith"
@@ -17,7 +17,7 @@ def test_extract_name():
 
 
 def test_extract_name_without_last_name():
-    assert extract_name(model.Contact(name=model.Name(first_name="John"))) == "John"
+    assert build_name_str(model.Contact(name=model.Name(first_name="John"))) == "John"
 
 
 def test_add_email_address_to_contact():

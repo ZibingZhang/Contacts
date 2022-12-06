@@ -4,16 +4,18 @@ import re
 import typing
 
 import model
-from transformer import notes as nt
+from dao.icloud._model import notes as nt
 
 if typing.TYPE_CHECKING:
-    from data import icloud
+    from dao import icloud
 
 
 PHONE_NUMBER_REGEX = re.compile(r"^\+\d+$")
 
 
-def icloud_contact_to_contact(icloud_contact: icloud.ICloudContact) -> model.Contact:
+def icloud_contact_to_contact(
+    icloud_contact: icloud._model.ICloudContact,
+) -> model.Contact:
     """Convert an icloud.ICloudContact into a model.Contact.
 
     Args:
@@ -39,7 +41,7 @@ def icloud_contact_to_contact(icloud_contact: icloud.ICloudContact) -> model.Con
 
     contact = model.Contact(
         birthday=icloud_contact.birthday,
-        icloud=model.ICloud(
+        icloud=model.contact.ICloudMetadata(
             etag=icloud_contact.etag,
             photo=icloud_contact.photo,
             uuid=icloud_contact.contactId,
@@ -73,13 +75,13 @@ def icloud_contact_to_contact(icloud_contact: icloud.ICloudContact) -> model.Con
         )
 
     if icloud_contact.notes:
-        _extract_from_notes(contact, nt.from_string(icloud_contact.notes))
+        _extract_from_notes(contact, nt.Notes.from_string(icloud_contact.notes))
 
     return contact
 
 
 def _transform_email_addresses(
-    icloud_email_addresses: list[icloud.model.EmailAddress],
+    icloud_email_addresses: list[icloud._model.EmailAddress],
 ) -> list[model.EmailAddresss]:
     email_addresses = []
     for icloud_email_address in icloud_email_addresses:
@@ -94,7 +96,7 @@ def _transform_email_addresses(
 
 
 def _transform_phone_numbers(
-    icloud_phones: list[icloud.model.Phone],
+    icloud_phones: list[icloud._model.Phone],
 ) -> list[model.PhoneNumber]:
     phone_numbers = []
     for icloud_phone in icloud_phones:
@@ -117,7 +119,7 @@ def _transform_phone_numbers(
 
 
 def _transform_social_profiles(
-    icloud_profiles: list[icloud.model.Profile],
+    icloud_profiles: list[icloud._model.Profile],
 ) -> model.SocialProfiles:
     social_profiles = model.SocialProfiles()
     for icloud_profile in icloud_profiles:
@@ -142,7 +144,7 @@ def _transform_social_profiles(
 
 
 def _transform_street_addresses(
-    icloud_street_addresses: list[icloud.model.StreetAddress],
+    icloud_street_addresses: list[icloud._model.StreetAddress],
 ) -> list[model.StreetAddress]:
     street_addresses = []
     for icloud_street_address in icloud_street_addresses:
