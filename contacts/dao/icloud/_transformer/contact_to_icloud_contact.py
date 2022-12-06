@@ -3,7 +3,7 @@ from __future__ import annotations
 import model
 from common import constant
 from dao import icloud
-from dao.icloud._transformer import notes as nt
+from dao.icloud._model import notes as nt
 
 
 def contact_to_icloud_contact(contact: model.Contact) -> icloud._model.ICloudContact:
@@ -58,7 +58,7 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud._model.ICloudCon
         or contact.name.chinese_name
         or contact.notes
     ):
-        icloud_contact.notes = nt.to_string(_extract_notes(contact))
+        icloud_contact.notes = nt.Notes.to_string(_extract_notes(contact))
 
     return icloud_contact
 

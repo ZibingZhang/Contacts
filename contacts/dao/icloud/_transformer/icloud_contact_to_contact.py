@@ -4,7 +4,7 @@ import re
 import typing
 
 import model
-from dao.icloud._transformer import notes as nt
+from dao.icloud._model import notes as nt
 
 if typing.TYPE_CHECKING:
     from dao import icloud
@@ -75,7 +75,7 @@ def icloud_contact_to_contact(
         )
 
     if icloud_contact.notes:
-        _extract_from_notes(contact, nt.from_string(icloud_contact.notes))
+        _extract_from_notes(contact, nt.Notes.from_string(icloud_contact.notes))
 
     return contact
 
