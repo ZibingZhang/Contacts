@@ -4,7 +4,7 @@ import os.path
 import model
 from common import constant
 from dao import icloud
-from utils import file_io_utils, progress_utils, input_utils, contact_utils
+from utils import contact_utils, file_io_utils, input_utils, progress_utils
 
 
 @progress_utils.annotate("Reading contacts from disk")
