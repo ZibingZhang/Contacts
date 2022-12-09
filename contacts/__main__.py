@@ -46,7 +46,7 @@ def _create_if_dir_not_exists(path: str) -> None:
         os.mkdir(path)
 
 
-def _error_if_dir_not_exists(path) -> None:
+def _error_if_dir_not_exists(path: str) -> None:
     if not os.path.exists(path):
         raise ValueError(f"Directory {path} does not exist.")
     if not os.path.isdir(path):
