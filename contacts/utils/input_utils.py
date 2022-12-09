@@ -1,5 +1,7 @@
 """Utilities for getting user input."""
-from common import error
+from __future__ import annotations
+
+from contacts.common import error
 
 
 def basic_input(
@@ -19,7 +21,7 @@ def yes_no_input(prompt: str) -> bool:
 
 
 def input_with_skip(
-    prompt: str, lower: bool = False, options: tuple[str] | None = ()
+    prompt: str, lower: bool = False, options: tuple[str, ...] | None = ()
 ) -> str:
     response = basic_input(prompt, lower, options)
     if not response:

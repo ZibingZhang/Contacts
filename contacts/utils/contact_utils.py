@@ -1,7 +1,9 @@
-"""Utilities for contacts."""
+"""Utilities for the contact model."""
+from __future__ import annotations
+
 import re
 
-import model
+from contacts import model
 
 
 def add_email_address_if_not_exists(
@@ -22,11 +24,11 @@ def add_email_address_if_not_exists(
 
     if contact.email_addresses is None:
         contact.email_addresses = [new_email_address]
-        return
+        return None
 
     for email_address in contact.email_addresses:
         if email_address.local_part == local_part and email_address.domain == domain:
-            return
+            return None
     contact.email_addresses.append(new_email_address)
 
 
@@ -48,11 +50,11 @@ def add_phone_number_if_not_exists(
 
     if contact.phone_numbers is None:
         contact.phone_numbers = [new_phone_number]
-        return
+        return None
 
     for phone_number in contact.phone_numbers:
         if phone_number.country_code == country_code and phone_number.number == number:
-            return
+            return None
     contact.phone_numbers.append(new_phone_number)
 
 

@@ -1,15 +1,18 @@
-from common.decorator import run_once
+"""Tests for contacts.common.decorator."""
+from __future__ import annotations
+
+from contacts.common import decorator
 
 times_run = 0
 
 
-@run_once
-def example_function():
+@decorator.run_once
+def example_function() -> None:
     global times_run
     times_run += 1
 
 
-def test_decorator_run_once():
+def test_decorator_run_once() -> None:
     global times_run
     times_run = 0
 

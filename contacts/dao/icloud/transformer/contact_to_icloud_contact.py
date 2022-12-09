@@ -1,21 +1,22 @@
+"""Convert a model.Contact into an icloud.model.ICloudContact."""
 from __future__ import annotations
 
-import model
-from common import constant
-from dao import icloud
-from dao.icloud._model import notes as nt
+from contacts import model
+from contacts.common import constant
+from contacts.dao import icloud
+from contacts.dao.icloud.model import notes as nt
 
 
-def contact_to_icloud_contact(contact: model.Contact) -> icloud._model.ICloudContact:
-    """Convert a model.Contact into an icloud.ICloudContact.
+def contact_to_icloud_contact(contact: model.Contact) -> icloud.model.ICloudContact:
+    """Convert a model.Contact into an icloud.model.ICloudContact.
 
     Args:
         contact: The contact to transform.
 
     Returns:
-        The transformed icloud.ICloudContact.
+        The transformed icloud.model.ICloudContact.
     """
-    icloud_contact = icloud._model.ICloudContact(
+    icloud_contact = icloud.model.ICloudContact(
         birthday=contact.birthday,
         firstName=contact.name.first_name,
         isCompany=False,
@@ -65,11 +66,11 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud._model.ICloudCon
 
 def _transform_email_addresses(
     email_addresses: list[model.EmailAddresss],
-) -> list[icloud._model.EmailAddress]:
+) -> list[icloud.model.EmailAddress]:
     icloud_email_addresses = []
     for email_address in email_addresses:
         icloud_email_addresses.append(
-            icloud._model.EmailAddress(
+            icloud.model.EmailAddress(
                 field=f"{email_address.local_part}@{email_address.domain}",
                 label=email_address.label,
             )
@@ -79,11 +80,11 @@ def _transform_email_addresses(
 
 def _transform_phone_numbers(
     phone_numbers: list[model.PhoneNumber],
-) -> list[icloud._model.Phone]:
+) -> list[icloud.model.Phone]:
     icloud_phones = []
     for phone_number in phone_numbers:
         icloud_phones.append(
-            icloud._model.Phone(
+            icloud.model.Phone(
                 field=f"+{phone_number.country_code}{phone_number.number}",
                 label=phone_number.label,
             )
@@ -93,12 +94,12 @@ def _transform_phone_numbers(
 
 def _transform_social_profiles(
     social_profiles: model.SocialProfiles,
-) -> [icloud._model.Profile]:
+) -> [icloud.model.Profile]:
     icloud_profiles = []
     if social_profiles.facebook:
         social_profile = social_profiles.facebook
         icloud_profiles.append(
-            icloud._model.Profile(
+            icloud.model.Profile(
                 field=(
                     f"http://www.facebook.com/"
                     f"{social_profile.username if social_profile.username else ''}"
@@ -111,7 +112,7 @@ def _transform_social_profiles(
     if social_profiles.game_center:
         social_profile = social_profiles.game_center
         icloud_profiles.append(
-            icloud._model.Profile(
+            icloud.model.Profile(
                 field=social_profile.link,
                 label="GAMECENTER",
                 user=social_profile.username,
@@ -120,7 +121,7 @@ def _transform_social_profiles(
     if social_profiles.instagram:
         social_profile = social_profiles.instagram
         icloud_profiles.append(
-            icloud._model.Profile(
+            icloud.model.Profile(
                 field=f"http://www.instagram.com/{social_profile.username}",
                 label="INSTAGRAM",
                 user=social_profile.username,
@@ -131,12 +132,12 @@ def _transform_social_profiles(
 
 def _transform_street_addresses(
     street_addresses: list[model.StreetAddress],
-) -> list[icloud._model.StreetAddress]:
+) -> list[icloud.model.StreetAddress]:
     icloud_street_addresses = []
     for street_address in street_addresses:
         icloud_street_addresses.append(
-            icloud._model.StreetAddress(
-                field=icloud._model.StreetAddressField(
+            icloud.model.StreetAddress(
+                field=icloud.model.StreetAddressField(
                     city=street_address.city,
                     country=street_address.country,
                     countryCode=constant.COUNTRY_TO_COUNTRY_CODE_MAP.get(

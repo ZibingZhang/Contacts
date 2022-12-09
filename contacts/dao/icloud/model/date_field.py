@@ -1,4 +1,4 @@
-"""Utilities for creating date fields on iCloud contacts."""
+"""A date field on an iCloud contact."""
 from __future__ import annotations
 
 import dataclasses
@@ -6,10 +6,11 @@ import re
 import typing
 
 import dataclasses_json
-from common import error
+
+from contacts.common import error
 
 if typing.TYPE_CHECKING:
-    import model
+    from contacts import model
 
 NO_YEAR = 1604
 
@@ -35,7 +36,7 @@ def _date_encoder(date: model.Date | None) -> str | None:
         A string representation of a model.Date.
     """
     if date is None:
-        return
+        return None
     if date.month is None or date.day is None:
         raise error.EncodingError(date)
     return (
@@ -51,10 +52,10 @@ def _date_decoder(date: str | None) -> model.Date | None:
     Returns:
         A model.Date or None.
     """
-    import model
+    from contacts import model
 
     if date is None:
-        return
+        return None
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
         raise error.DecodingError(date)
     year = int(date[:4])

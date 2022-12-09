@@ -11,9 +11,9 @@ import re
 import tempfile
 import uuid
 
-from common import decorator
-from dao import icloud
-from dao.icloud._manager import exception
+from contacts.common import decorator
+from contacts.dao import icloud
+from contacts.dao.icloud.manager import exception
 
 LOGGER = logging.getLogger(__name__)
 
@@ -78,7 +78,7 @@ class ICloudManager:
         else:
             self.session_data.update({"client_id": self.client_id})
 
-        self.session = icloud._manager.ICloudSession(self)
+        self.session = icloud.manager.ICloudSession(self)
         self.session.verify = verify
         self.session.headers.update(
             {"Origin": self.HOME_ENDPOINT, "Referer": "%s/" % self.HOME_ENDPOINT}
@@ -90,7 +90,7 @@ class ICloudManager:
             try:
                 self.session.cookies.load(ignore_discard=True, ignore_expires=True)
                 LOGGER.debug("Read cookies from %s" % cookiejar_path)
-            except FileNotFoundError | ValueError:
+            except (FileNotFoundError, ValueError):
                 # Most likely a pickled cookiejar from earlier versions.
                 # The cookiejar will get replaced with a valid one after
                 # successful authentication.
@@ -100,8 +100,8 @@ class ICloudManager:
         self.authenticate()
 
     @functools.cached_property
-    def contact_manager(self) -> icloud._manager.ICloudContactManager:
-        return icloud._manager.ICloudContactManager(self)
+    def contact_manager(self) -> icloud.manager.ICloudContactManager:
+        return icloud.manager.ICloudContactManager(self)
 
     @property
     def cookiejar_path(self) -> str:
@@ -319,9 +319,9 @@ class ICloudManager:
             req = self.session.post("%s/validate" % self.SETUP_ENDPOINT, data="null")
             LOGGER.debug("Session token is still valid")
             return req.json()
-        except exception.ICloudAPIResponseException as err:
+        except exception.ICloudAPIResponseException as error:
             LOGGER.debug("Invalid authentication token")
-            raise err
+            raise error
 
     def _get_auth_headers(self, overrides=None) -> dict[str, str]:
         headers = {

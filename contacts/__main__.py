@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import os.path
-import parser
 import typing
 
-import command
-from common import constant, error
-from dao import icloud
+from contacts import command, parser
+from contacts.common import constant, error
+from contacts.dao import icloud
 
 if typing.TYPE_CHECKING:
     import argparse
@@ -42,12 +41,12 @@ def _run_command(cl_args: argparse.Namespace) -> None:
             command.validate.run()
 
 
-def _create_if_dir_not_exists(path):
+def _create_if_dir_not_exists(path: str) -> None:
     if not os.path.exists(path):
         os.mkdir(path)
 
 
-def _error_if_dir_not_exists(path):
+def _error_if_dir_not_exists(path: str) -> None:
     if not os.path.exists(path):
         raise ValueError(f"Directory {path} does not exist.")
     if not os.path.isdir(path):

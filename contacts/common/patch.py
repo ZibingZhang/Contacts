@@ -1,9 +1,12 @@
+"""Monkey patches."""
+from __future__ import annotations
+
 import json
 import uuid
 
 
 # https://github.com/jazzband/django-push-notifications/issues/586#issuecomment-963930371
-def json_encode_uuid():
+def json_encode_uuid() -> None:
     old_default = json.JSONEncoder.default
 
     def new_default(self, obj):

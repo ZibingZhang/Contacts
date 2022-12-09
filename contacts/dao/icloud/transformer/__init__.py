@@ -1,4 +1,5 @@
-from dao.icloud._transformer import (
+"""Transformers between models and iCloud models."""
+from contacts.dao.icloud.transformer import (
     contact_to_icloud_contact,
     group_to_icloud_group,
     icloud_contact_to_contact,

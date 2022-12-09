@@ -1,4 +1,7 @@
-from utils import (
+"""Command to pull contacts from a remote source."""
+from __future__ import annotations
+
+from contacts.utils import (
     command_utils,
     dataclasses_utils,
     input_utils,

@@ -1,14 +1,15 @@
+"""Command to tag contacts."""
 from __future__ import annotations
 
 import argparse
 import enum
 import typing
 
-from common import error
-from utils import command_utils, contact_utils, input_utils
+from contacts.common import error
+from contacts.utils import command_utils, contact_utils, input_utils
 
 if typing.TYPE_CHECKING:
-    import model
+    from contacts import model
 
 
 class TagAction(str, enum.Enum):
@@ -44,7 +45,7 @@ def _tag_mv(contacts: list[model.Contact], old: str, new: str) -> None:
     all_tags = _get_all_tags(contacts)
     if new in all_tags:
         if not input_utils.yes_no_input("Tag already exists. Do you wish to continue?"):
-            return
+            return None
 
     count = 0
     for contact in contacts:
@@ -72,10 +73,10 @@ def _get_all_tags(contacts: list[model.Contact]) -> list[str]:
     )
 
 
-def _add_tags_to_contact(contacts: list[model.Contact]):
+def _add_tags_to_contact(contacts: list[model.Contact]) -> None:
     contact = command_utils.get_contact_by_name(contacts)
     if contact is None:
-        return
+        return None
 
     print(contact_utils.build_name_and_tags_str(contact))
     while True:

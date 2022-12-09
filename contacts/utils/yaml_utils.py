@@ -1,4 +1,4 @@
-"""Utilities for YAML."""
+"""Utilities for YAML formatted data."""
 from __future__ import annotations
 
 import typing
@@ -7,7 +7,7 @@ from typing import Any
 import yaml
 
 if typing.TYPE_CHECKING:
-    from utils import dataclasses_utils
+    from contacts.utils import dataclasses_utils
 
 
 def load(obj: str) -> Any:

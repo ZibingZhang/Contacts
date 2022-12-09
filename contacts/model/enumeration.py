@@ -1,3 +1,4 @@
+"""Various enumerations."""
 import enum
 
 

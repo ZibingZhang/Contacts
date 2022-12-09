@@ -32,7 +32,7 @@ class DataClassJsonMixin(dataclasses_json.DataClassJsonMixin):
         ensure_ascii: bool = False,
         check_circular: bool = True,
         allow_nan: bool = True,
-        indent: Union[int, str] | None = None,
+        indent: Union[int, str, None] = None,
         separators: Tuple[str, str] | None = None,
         default: Callable[[Any, ...], Any] | None = None,
         sort_keys: bool = False,

@@ -1,7 +1,7 @@
 """A dataclass representation of the json object response for an iCloud group."""
 import dataclasses
 
-from utils import dataclasses_utils
+from contacts.utils import dataclasses_utils
 
 
 @dataclasses.dataclass

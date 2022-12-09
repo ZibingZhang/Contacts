@@ -1,3 +1,6 @@
+"""Utilities for generating random uuids."""
+from __future__ import annotations
+
 import uuid
 
 

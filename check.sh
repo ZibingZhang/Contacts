@@ -3,7 +3,8 @@ then
     ARGS="-v"
 fi
 
-python3 -m black $ARGS contacts
-python3 -m isort $ARGS contacts
-python3 -m pflake8 $ARGS contacts
-python3 -m pytest $ARGS contacts
+python -m black $ARGS contacts
+python -m isort $ARGS contacts
+python -m pflake8 $ARGS contacts
+#MYPYPATH="contacts" python -m mypy --explicit-package-bases $ARGS contacts
+python -m pytest $ARGS contacts

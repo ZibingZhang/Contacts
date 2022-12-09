@@ -1,8 +1,9 @@
+"""Command to update remote contact groups."""
 import time
 from typing import Callable
 
-import model
-from utils import command_utils, uuid_utils
+from contacts import model
+from contacts.utils import command_utils, uuid_utils
 
 
 def run() -> None:

@@ -4,13 +4,14 @@ from __future__ import annotations
 import configparser
 import os.path
 
-import model
-from common import constant, decorator
-from dao.icloud import _manager, _model, _transformer
-from utils import file_io_utils
+import contacts
+from contacts.common import constant, decorator
+from contacts.dao.icloud import manager, model, transformer
+from contacts.utils import file_io_utils
 
 __all__ = [
     "authenticate",
+    # CRUD for contacts and groups
     "read_contacts_and_groups",
     "create_contacts",
     "update_contacts",
@@ -34,17 +35,17 @@ _OTHER_UUIDS = [
 _IGNORED_UUIDS = _ALERT_UUIDS + _TEST_CONTACT_UUIDS + _OTHER_UUIDS
 
 
-_contact_manager: _manager.ICloudContactManager | None = None
+_contact_manager: manager.ICloudContactManager | None = None
 _init_sync_token: bool = False
 
 
 @decorator.run_once
-def authenticate(*, config_path: str = constant.DEFAULT_CONFIG_FILE):
+def authenticate(*, config_path: str = constant.DEFAULT_CONFIG_FILE) -> None:
     config = configparser.ConfigParser()
     config.read(config_path)
     username = config["login"]["username"]
     password = config["login"]["password"]
-    icloud_manager = _manager.ICloudManager(username, password)
+    icloud_manager = manager.ICloudManager(username, password)
     icloud_manager.login()
     global _contact_manager
     _contact_manager = icloud_manager.contact_manager
@@ -52,7 +53,7 @@ def authenticate(*, config_path: str = constant.DEFAULT_CONFIG_FILE):
 
 def read_contacts_and_groups(
     *, cache_path: str = constant.DEFAULT_CACHE_DIRECTORY, cached: bool = False
-) -> tuple[list[model.Contact], list[model.Group]]:
+) -> tuple[list[contacts.model.Contact], list[contacts.model.Group]]:
     if cached:
         if not os.path.isdir(cache_path):
             raise ValueError(f"Cache path is not a directory, {cache_path}")
@@ -69,11 +70,11 @@ def read_contacts_and_groups(
 
         icloud_contacts = file_io_utils.read_json_array_as_dataclass_objects(
             contacts_file_path,
-            _model.ICloudContact,
+            model.ICloudContact,
         )
         icloud_groups = file_io_utils.read_json_array_as_dataclass_objects(
             groups_file_path,
-            _model.ICloudGroup,
+            model.ICloudGroup,
         )
 
     else:
@@ -89,45 +90,45 @@ def read_contacts_and_groups(
         )
 
     contacts = [
-        _transformer.icloud_contact_to_contact(icloud_contact)
+        transformer.icloud_contact_to_contact(icloud_contact)
         for icloud_contact in icloud_contacts
         if icloud_contact.contactId not in _IGNORED_UUIDS
     ]
     groups = [
-        _transformer.icloud_group_to_group(icloud_group)
+        transformer.icloud_group_to_group(icloud_group)
         for icloud_group in icloud_groups
     ]
 
     return contacts, groups
 
 
-def create_contacts(contacts: list[model.Contact]) -> None:
+def create_contacts(contacts: list[contacts.model.Contact]) -> None:
     contact_manager = _get_contact_manager()
     icloud_contacts = [
-        _transformer.contact_to_icloud_contact(contact) for contact in contacts
+        transformer.contact_to_icloud_contact(contact) for contact in contacts
     ]
     contact_manager.create_contacts(icloud_contacts)
 
 
-def update_contacts(contacts: list[model.Contact]) -> None:
+def update_contacts(contacts: list[contacts.model.Contact]) -> None:
     contact_manager = _get_contact_manager()
     icloud_contacts = [
-        _transformer.contact_to_icloud_contact(contact) for contact in contacts
+        transformer.contact_to_icloud_contact(contact) for contact in contacts
     ]
     contact_manager.update_contacts(icloud_contacts)
 
 
-def create_group(group: model.Group) -> None:
+def create_group(group: contacts.model.Group) -> None:
     contact_manager = _get_contact_manager()
-    contact_manager.create_group(_transformer.group_to_icloud_group(group))
+    contact_manager.create_group(transformer.group_to_icloud_group(group))
 
 
-def update_group(group: model.Group) -> None:
+def update_group(group: contacts.model.Group) -> None:
     contact_manager = _get_contact_manager()
-    contact_manager.update_group(_transformer.group_to_icloud_group(group))
+    contact_manager.update_group(transformer.group_to_icloud_group(group))
 
 
-def _get_contact_manager() -> _manager.ICloudContactManager:
+def _get_contact_manager() -> manager.ICloudContactManager:
     global _contact_manager
     if _contact_manager is None:
         raise RuntimeError("Authentication required")
