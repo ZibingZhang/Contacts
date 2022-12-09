@@ -1,8 +1,11 @@
 """iCloud exceptions."""
+from __future__ import annotations
 
 
 class ICloudException(Exception):
     """Generic iCloud exception."""
+
+    pass
 
 
 class ICloudAPIResponseException(ICloudException):
@@ -25,9 +28,13 @@ class ICloudAPIResponseException(ICloudException):
 class ICloudServiceNotActivatedException(ICloudAPIResponseException):
     """iCloud manager not activated exception."""
 
+    pass
+
 
 class ICloudFailedLoginException(ICloudException):
     """iCloud failed login exception."""
+
+    pass
 
 
 class ICloud2SARequiredException(ICloudException):

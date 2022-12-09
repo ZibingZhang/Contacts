@@ -1,6 +1,9 @@
+"""The model for a contact group."""
+from __future__ import annotations
+
 import dataclasses
 
-from utils import dataclasses_utils
+from contacts.utils import dataclasses_utils
 
 
 @dataclasses.dataclass

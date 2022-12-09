@@ -1,3 +1,4 @@
+"""The model for a dates."""
 from __future__ import annotations
 
 import dataclasses
@@ -5,14 +6,15 @@ import re
 import typing
 
 import dataclasses_json
-from common import error
-from utils import dataclasses_utils
+
+from contacts.common import error
+from contacts.utils import dataclasses_utils
 
 if typing.TYPE_CHECKING:
-    import model
+    from contacts import model
 
 
-def new_field(*, required) -> dataclasses.Field:
+def new_field(*, required: bool) -> dataclasses.Field:
     kwargs = {
         "metadata": dataclasses_json.config(
             decoder=date_decoder,
@@ -33,7 +35,7 @@ def date_encoder(date: model.Date | None) -> str | None:
         A string representation of a model.Date.
     """
     if date is None:
-        return
+        return None
     return (
         f"{date.year if date.year is not None else 'XXXX':04}"
         f"-{date.month if date.month is not None else 'XX':02}"
@@ -47,10 +49,10 @@ def date_decoder(date: str | None) -> model.Date | None:
     Returns:
         A model.Date or None.
     """
-    import model
+    from contacts import model
 
     if date is None:
-        return
+        return None
     if not re.match(r"^[0-9X]{4}-[0-9X]{2}-[0-9X]{2}$", date):
         raise error.DecodingError(date)
 
@@ -71,7 +73,7 @@ class Date(dataclasses_utils.DataClassJsonMixin):
     month: int | None = None
     year: int | None = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return date_encoder(self)
 
 

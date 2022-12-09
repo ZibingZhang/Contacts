@@ -1,10 +1,11 @@
+"""The model for a contact."""
 from __future__ import annotations
 
 import dataclasses
 from typing import Any
 
-from model import date, enumeration
-from utils import dataclasses_utils
+from contacts.model import date, enumeration
+from contacts.utils import dataclasses_utils
 
 
 @dataclasses.dataclass

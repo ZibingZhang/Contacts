@@ -1,4 +1,5 @@
-from model import contact, date, enumeration, group
+"""Contact models."""
+from contacts.model import contact, date, enumeration, group
 
 Date = date.Date
 DateRange = date.DateRange

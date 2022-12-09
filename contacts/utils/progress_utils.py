@@ -1,4 +1,6 @@
 """Utilities for displaying a method's progress."""
+from __future__ import annotations
+
 import functools
 from typing import Callable, TypeVar
 

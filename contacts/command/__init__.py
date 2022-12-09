@@ -1,6 +1,7 @@
+"""Command line commands."""
 import enum
 
-from command import add, pull, push, sync_groups, tag, validate
+from contacts.command import add, pull, push, sync_groups, tag, validate
 
 
 class Command(str, enum.Enum):

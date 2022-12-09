@@ -1,5 +1,8 @@
-import command
-from utils import (
+"""Command to push contacts to a remote source."""
+from __future__ import annotations
+
+from contacts import command
+from contacts.utils import (
     command_utils,
     dataclasses_utils,
     input_utils,
@@ -70,8 +73,4 @@ def run(*, force: bool, write: bool) -> None:
 
     if write and (len(new_contacts) > 0 or len(updated_contacts) > 0):
         print("Pulling contact(s) to sync etag(s)...")
-        _pull_contacts_to_sync_etag()
-
-
-def _pull_contacts_to_sync_etag() -> None:
-    command.pull.run(cached=False)
+        command.pull.run(cached=False)

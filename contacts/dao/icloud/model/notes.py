@@ -1,9 +1,10 @@
+"""A dataclass representation of the data stored in an iCloud contact notes field."""
 from __future__ import annotations
 
 import dataclasses
 
-import model
-from utils import dataclasses_utils, yaml_utils
+from contacts import model
+from contacts.utils import dataclasses_utils, yaml_utils
 
 
 @dataclasses.dataclass

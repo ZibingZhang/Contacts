@@ -1,10 +1,12 @@
 """Utilities for file I/O."""
+from __future__ import annotations
+
 import json
 import textwrap
 from typing import Type, TypeVar
 
-import model
-from utils import dataclasses_utils
+from contacts import model
+from contacts.utils import dataclasses_utils
 
 T = TypeVar("T", bound=dataclasses_utils.DataClassJsonMixin)
 

@@ -1,3 +1,4 @@
+"""An iCloud browsing session."""
 from __future__ import annotations
 
 import inspect
@@ -6,8 +7,9 @@ import logging
 from typing import Text
 
 import requests
-from dao import icloud
-from dao.icloud._manager import exception
+
+from contacts.dao import icloud
+from contacts.dao.icloud.manager import exception
 
 LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +25,7 @@ HEADER_DATA = {
 class ICloudSession(requests.Session):
     """iCloud session."""
 
-    def __init__(self, manager: icloud._model.ICloudManager) -> None:
+    def __init__(self, manager: icloud.manager.ICloudManager) -> None:
         self.manager = manager
         requests.Session.__init__(self)
 

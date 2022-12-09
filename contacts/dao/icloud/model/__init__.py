@@ -1,4 +1,5 @@
-from dao.icloud._model import icloud_contact, icloud_group
+"""iCloud request and response models."""
+from contacts.dao.icloud.model import icloud_contact, icloud_group
 
 ICloudContact = icloud_contact.ICloudContact
 ICloudGroup = icloud_group.ICloudGroup

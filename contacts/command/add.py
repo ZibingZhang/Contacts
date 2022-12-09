@@ -1,5 +1,8 @@
-from common import constant
-from utils import command_utils, contact_utils, input_utils
+"""Command to add a contact."""
+from __future__ import annotations
+
+from contacts.common import constant
+from contacts.utils import command_utils, contact_utils, input_utils
 
 
 def run() -> None:

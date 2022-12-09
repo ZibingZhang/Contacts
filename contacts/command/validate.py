@@ -1,8 +1,11 @@
+"""Command to validate contacts."""
+from __future__ import annotations
+
 import collections
 import re
 
-import model
-from utils import command_utils, contact_utils
+from contacts import model
+from contacts.utils import command_utils, contact_utils
 
 PATTERN_TO_HIGH_SCHOOL_NAME_MAP = {
     re.compile(r"^ABRSH$"): model.HighSchoolName.ACTON_BOXBOROUGH_REGIONAL_HIGH_SCHOOL,
@@ -31,7 +34,7 @@ def _validate_names(contacts: list[model.Contact]) -> None:
 
 def _validate_email_addresses(contact: model.Contact) -> None:
     if contact.email_addresses is None:
-        return
+        return None
 
     normalized_email_addresses = set()
     for email_address in contact.email_addresses:
@@ -44,7 +47,7 @@ def _validate_email_addresses(contact: model.Contact) -> None:
 
 def _validate_education(contact: model.Contact) -> None:
     if not contact.tags:
-        return
+        return None
 
     for pattern in PATTERN_TO_HIGH_SCHOOL_NAME_MAP.keys():
         if _any_tag_matches_pattern(contact.tags, pattern):
@@ -55,10 +58,10 @@ def _expect_high_school(contact: model.Contact, high_school_name: str) -> None:
     contact_name = contact_utils.build_name_str(contact)
     if contact.education is None:
         print(f"{contact_name} missing education")
-        return
+        return None
     if contact.education.high_school is None:
         print(f"{contact_name} missing high school")
-        return
+        return None
     if contact.education.high_school.name == high_school_name is None:
         print(f"{contact_name} high school is not {high_school_name}")
     if (
@@ -70,7 +73,7 @@ def _expect_high_school(contact: model.Contact, high_school_name: str) -> None:
 
 def _validate_tags(contact: model.Contact) -> None:
     if not contact.tags:
-        return
+        return None
 
     if _any_tag_matches_pattern(contact.tags, re.compile(r"^Climbing-.+$")):
         _expect_tag(contact, "Climbing")

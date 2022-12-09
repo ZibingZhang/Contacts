@@ -1,10 +1,12 @@
 """High-level utilities for commands."""
+from __future__ import annotations
+
 import os.path
 
-import model
-from common import constant
-from dao import icloud
-from utils import contact_utils, file_io_utils, input_utils, progress_utils
+from contacts import model
+from contacts.common import constant
+from contacts.dao import icloud
+from contacts.utils import contact_utils, file_io_utils, input_utils, progress_utils
 
 
 @progress_utils.annotate("Reading contacts from disk")
@@ -91,7 +93,7 @@ def get_contact_by_name(contacts: list[model.Contact]) -> model.Contact | None:
 
     matching_contacts = _get_matching_contacts(contacts, name)
     if len(matching_contacts) == 0:
-        return
+        return None
     elif len(matching_contacts) == 1:
         return matching_contacts[0]
     else:

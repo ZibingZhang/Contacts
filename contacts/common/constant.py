@@ -1,4 +1,7 @@
-import model
+"""Constants."""
+from __future__ import annotations
+
+from contacts import model
 
 DEFAULT_CACHE_DIRECTORY = "cache"
 DEFAULT_DATA_DIRECTORY = "data"

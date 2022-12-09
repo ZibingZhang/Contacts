@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import dataclasses
 
-import model
-from dao.icloud._model import date_field
-from utils import dataclasses_utils
+from contacts import model
+from contacts.dao.icloud.model import date_field
+from contacts.utils import dataclasses_utils
 
 
 @dataclasses.dataclass

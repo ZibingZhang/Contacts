@@ -1,14 +1,17 @@
+"""Parse command line arguments."""
+from __future__ import annotations
+
 import argparse
 
-import command
-from command import tag
+from contacts import command
+from contacts.command import tag
 
 
 def parse_arguments() -> argparse.Namespace:
     return _create_parser().parse_args()
 
 
-def _create_parser():
+def _create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -19,17 +22,17 @@ def _create_parser():
         help="commands",
     )
 
-    build_add_command_parser(command_parser)
-    build_pull_command_parser(command_parser)
-    build_push_command_parser(command_parser)
-    build_tag_command_parser(command_parser)
-    build_sync_groups_command_parser(command_parser)
-    build_validate_command_parser(command_parser)
+    _build_add_command_parser(command_parser)
+    _build_pull_command_parser(command_parser)
+    _build_push_command_parser(command_parser)
+    _build_tag_command_parser(command_parser)
+    _build_sync_groups_command_parser(command_parser)
+    _build_validate_command_parser(command_parser)
 
     return parser
 
 
-def build_add_command_parser(command_parser: argparse._SubParsersAction) -> None:
+def _build_add_command_parser(command_parser: argparse._SubParsersAction) -> None:
     command_parser.add_parser(
         command.Command.ADD.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -37,7 +40,7 @@ def build_add_command_parser(command_parser: argparse._SubParsersAction) -> None
     )
 
 
-def build_pull_command_parser(command_parser: argparse._SubParsersAction) -> None:
+def _build_pull_command_parser(command_parser: argparse._SubParsersAction) -> None:
     pull_parser = command_parser.add_parser(
         command.Command.PULL.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -48,7 +51,7 @@ def build_pull_command_parser(command_parser: argparse._SubParsersAction) -> Non
     )
 
 
-def build_push_command_parser(command_parser: argparse._SubParsersAction) -> None:
+def _build_push_command_parser(command_parser: argparse._SubParsersAction) -> None:
     push_parser = command_parser.add_parser(
         command.Command.PUSH.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -68,7 +71,7 @@ def build_push_command_parser(command_parser: argparse._SubParsersAction) -> Non
     )
 
 
-def build_sync_groups_command_parser(
+def _build_sync_groups_command_parser(
     command_parser: argparse._SubParsersAction,
 ) -> None:
     command_parser.add_parser(
@@ -78,7 +81,7 @@ def build_sync_groups_command_parser(
     )
 
 
-def build_tag_command_parser(command_parser: argparse._SubParsersAction) -> None:
+def _build_tag_command_parser(command_parser: argparse._SubParsersAction) -> None:
     tag_parser = command_parser.add_parser(
         command.Command.TAG.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -103,7 +106,7 @@ def build_tag_command_parser(command_parser: argparse._SubParsersAction) -> None
     )
 
 
-def build_validate_command_parser(command_parser: argparse._SubParsersAction) -> None:
+def _build_validate_command_parser(command_parser: argparse._SubParsersAction) -> None:
     command_parser.add_parser(
         command.Command.VALIDATE.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
