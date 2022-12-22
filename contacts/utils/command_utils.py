@@ -5,7 +5,7 @@ import os.path
 
 from contacts import model
 from contacts.common import constant
-from contacts.dao import icloud
+from contacts.dao import icloud_dao
 from contacts.utils import contact_utils, file_io_utils, input_utils, progress_utils
 
 
@@ -24,14 +24,14 @@ def read_contacts_from_disk(
 
 @progress_utils.annotate("Reading contacts from iCloud")
 def read_contacts_from_icloud(cached: bool = False) -> list[model.Contact]:
-    contacts, _ = icloud.read_contacts_and_groups(cached=cached)
+    contacts, _ = icloud_dao.read_contacts_and_groups(cached=cached)
     progress_utils.message(f"Read {len(contacts)} contact(s)")
     return contacts
 
 
 @progress_utils.annotate("Reading groups from iCloud")
 def read_groups_from_icloud() -> list[model.Group]:
-    _, groups = icloud.read_contacts_and_groups()
+    _, groups = icloud_dao.read_contacts_and_groups()
     progress_utils.message(f"Read {len(groups)} groups(s)")
     return groups
 
@@ -53,7 +53,7 @@ def write_contacts_to_disk(
 @progress_utils.annotate("Creating new iCloud contacts")
 def write_new_contacts_to_icloud(contacts: list[model.Contact]) -> None:
     if len(contacts) > 0:
-        icloud.create_contacts(contacts)
+        icloud_dao.create_contacts(contacts)
     progress_utils.message(f"Created {len(contacts)} contact(s)")
 
 
@@ -62,13 +62,13 @@ def write_updated_contacts_to_icloud(
     contacts: list[model.Contact],
 ) -> None:
     if len(contacts) > 0:
-        icloud.update_contacts(contacts)
+        icloud_dao.update_contacts(contacts)
     progress_utils.message(f"Updated {len(contacts)} contact(s)")
 
 
 @progress_utils.annotate("Creating iCloud groups")
 def write_new_group_to_icloud(icloud_group: model.Group) -> None:
-    icloud.create_group(icloud_group)
+    icloud_dao.create_group(icloud_group)
     progress_utils.message(
         f"Created group {icloud_group.name} "
         f"with {len(icloud_group.icloud.contact_uuids)} contact(s)"
@@ -79,7 +79,7 @@ def write_new_group_to_icloud(icloud_group: model.Group) -> None:
 def write_updated_group_to_icloud(
     icloud_group: model.Group,
 ) -> None:
-    icloud.update_group(icloud_group)
+    icloud_dao.update_group(icloud_group)
     progress_utils.message(
         f"Updated group {icloud_group.name} "
         f"with {len(icloud_group.icloud.contact_uuids)} contact(s)"

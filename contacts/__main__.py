@@ -5,7 +5,7 @@ import typing
 
 from contacts import command, parser
 from contacts.common import constant, error
-from contacts.dao import icloud
+from contacts.dao import icloud_dao
 
 if typing.TYPE_CHECKING:
     import argparse
@@ -20,17 +20,17 @@ def _run_command(cl_args: argparse.Namespace) -> None:
             _create_if_dir_not_exists(constant.DEFAULT_CACHE_DIRECTORY)
             _create_if_dir_not_exists(constant.DEFAULT_DATA_DIRECTORY)
             if not cl_args.cached:
-                icloud.authenticate()
+                icloud_dao.authenticate()
             command.pull.run(cached=cl_args.cached)
 
         case command.Command.PUSH:
             _create_if_dir_not_exists(constant.DEFAULT_CACHE_DIRECTORY)
             _error_if_dir_not_exists(constant.DEFAULT_DATA_DIRECTORY)
-            icloud.authenticate()
+            icloud_dao.authenticate()
             command.push.run(force=cl_args.force, write=cl_args.write)
 
         case command.Command.SYNC_GROUPS:
-            icloud.authenticate()
+            icloud_dao.authenticate()
             command.sync_groups.run()
 
         case command.Command.TAG:

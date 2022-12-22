@@ -22,11 +22,11 @@ def annotate(action: str) -> Callable[[Callable[..., T]], Callable[..., T]]:
 
 
 def starting(action: str) -> None:
-    print(f"{action}...".ljust(46), end="\t", flush=True)
+    print(f"{action}...".ljust(50), end="", flush=True)
 
 
 def message(msg: str) -> None:
-    print(msg.ljust(46), end="\t", flush=True)
+    print(msg.ljust(50), end="", flush=True)
 
 
 def finished() -> None:

@@ -115,6 +115,7 @@ class StreetAddress(dataclasses_utils.DataClassJsonMixin):
 @dataclasses.dataclass
 class Contact(dataclasses_utils.DataClassJsonMixin):
     name: Name
+    id: int | None = None
     birthday: date.Date | None = date.new_field(required=False)
     dated: date.DateRange | None = None
     education: Education | None = None

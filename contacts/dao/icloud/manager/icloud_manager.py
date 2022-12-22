@@ -11,7 +11,6 @@ import re
 import tempfile
 import uuid
 
-from contacts.common import decorator
 from contacts.dao import icloud
 from contacts.dao.icloud.manager import exception
 
@@ -147,7 +146,6 @@ class ICloudManager:
         )
         return request.json().get("devices")
 
-    @decorator.run_once
     def login(self) -> None:
         if self.requires_2fa:
             print("Two-factor authentication required.")
