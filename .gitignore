@@ -21,5 +21,8 @@ tmp
 ./cache/
 ./data/
 
+# macOS files
+.DS_Store
+
 # Local development
 scratch.py
