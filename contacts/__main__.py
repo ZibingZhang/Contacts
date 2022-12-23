@@ -17,15 +17,15 @@ def _run_command(cl_args: argparse.Namespace) -> None:
             command.add.run()
 
         case command.Command.PULL:
-            _create_if_dir_not_exists(constant.DEFAULT_CACHE_DIRECTORY)
-            _create_if_dir_not_exists(constant.DEFAULT_DATA_DIRECTORY)
+            _create_if_dir_not_exists(constant.CACHE_DIRECTORY)
+            _create_if_dir_not_exists(constant.DATA_DIRECTORY)
             if not cl_args.cached:
                 icloud_dao.authenticate()
             command.pull.run(cached=cl_args.cached)
 
         case command.Command.PUSH:
-            _create_if_dir_not_exists(constant.DEFAULT_CACHE_DIRECTORY)
-            _error_if_dir_not_exists(constant.DEFAULT_DATA_DIRECTORY)
+            _create_if_dir_not_exists(constant.CACHE_DIRECTORY)
+            _error_if_dir_not_exists(constant.DATA_DIRECTORY)
             icloud_dao.authenticate()
             command.push.run(force=cl_args.force, write=cl_args.write)
 
@@ -34,7 +34,7 @@ def _run_command(cl_args: argparse.Namespace) -> None:
             command.sync_groups.run()
 
         case command.Command.TAG:
-            _error_if_dir_not_exists(constant.DEFAULT_DATA_DIRECTORY)
+            _error_if_dir_not_exists(constant.DATA_DIRECTORY)
             command.tag.run(tag_action=cl_args.tag_action, action_specific_args=cl_args)
 
         case command.Command.VALIDATE:

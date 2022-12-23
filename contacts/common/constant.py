@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from contacts import model
 
-DEFAULT_CACHE_DIRECTORY = "cache"
-DEFAULT_DATA_DIRECTORY = "data"
-DEFAULT_CONFIG_FILE = "config.ini"
+CACHE_DIRECTORY = "cache"
+DATA_DIRECTORY = "data"
+CONFIG_FILE = "config.ini"
 
 CONTACTS_FILE_NAME = "contacts.json"
 NEW_CONTACT_FILE_NAME = "new-contacts.json"

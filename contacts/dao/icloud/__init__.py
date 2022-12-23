@@ -9,7 +9,6 @@ from contacts.common import constant
 from contacts.dao.icloud import manager, model, transformer
 from contacts.utils import file_io_utils
 
-
 _ALERT_UUIDS = [
     "4B949DAF-F587-47DF-95C2-857B85800ADC",
     "0A4DED51-0751-4B30-AD58-27E8556D5D91",
@@ -30,12 +29,12 @@ class ICloudDao:
     _authenticated: bool = False
     _init_sync_token: bool = False
 
-    def authenticate(self, *, config_path: str = constant.DEFAULT_CONFIG_FILE) -> None:
+    def authenticate(self) -> None:
         if self._authenticated:
             return
 
         config = configparser.ConfigParser()
-        config.read(config_path)
+        config.read(constant.CONFIG_FILE)
         username = config["login"]["username"]
         password = config["login"]["password"]
         icloud_manager = manager.ICloudManager(username, password)
@@ -46,21 +45,22 @@ class ICloudDao:
     def read_contacts_and_groups(
         self,
         *,
-        cache_path: str = constant.DEFAULT_CACHE_DIRECTORY,
         cached: bool = False,
     ) -> tuple[list[contacts.model.Contact], list[contacts.model.Group]]:
         if cached:
-            if not os.path.isdir(cache_path):
-                raise ValueError(f"Cache path is not a directory, {cache_path}")
+            if not os.path.isdir(constant.CACHE_DIRECTORY):
+                raise ValueError(
+                    f"Cache path is not a directory, {constant.CACHE_DIRECTORY}"
+                )
 
             contacts_file_path = os.path.join(
-                cache_path, constant.ICLOUD_CONTACTS_FILE_NAME
+                constant.CACHE_DIRECTORY, constant.ICLOUD_CONTACTS_FILE_NAME
             )
             if not os.path.isfile(contacts_file_path):
                 raise ValueError(f"Contacts file does not exist, {contacts_file_path}")
 
             groups_file_path = os.path.join(
-                cache_path, constant.ICLOUD_GROUPS_FILE_NAME
+                constant.CACHE_DIRECTORY, constant.ICLOUD_GROUPS_FILE_NAME
             )
             if not os.path.isfile(contacts_file_path):
                 raise ValueError(f"Groups file does not exist, {groups_file_path}")
@@ -79,11 +79,15 @@ class ICloudDao:
             icloud_contacts, icloud_groups = contact_manager.get_contacts_and_groups()
 
             file_io_utils.write_dataclass_objects_as_json_array(
-                os.path.join(cache_path, constant.ICLOUD_CONTACTS_FILE_NAME),
+                os.path.join(
+                    constant.CACHE_DIRECTORY, constant.ICLOUD_CONTACTS_FILE_NAME
+                ),
                 icloud_contacts,
             )
             file_io_utils.write_dataclass_objects_as_json_array(
-                os.path.join(cache_path, constant.ICLOUD_GROUPS_FILE_NAME),
+                os.path.join(
+                    constant.CACHE_DIRECTORY, constant.ICLOUD_GROUPS_FILE_NAME
+                ),
                 icloud_groups,
             )
 

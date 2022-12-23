@@ -10,13 +10,10 @@ from contacts.utils import contact_utils, file_io_utils, input_utils, progress_u
 
 
 @progress_utils.annotate("Reading contacts from disk")
-def read_contacts_from_disk(
-    *,
-    data_path: str = constant.DEFAULT_DATA_DIRECTORY,
-    file_name: str = constant.CONTACTS_FILE_NAME,
-) -> list[model.Contact]:
+def read_contacts_from_disk() -> list[model.Contact]:
     contacts = file_io_utils.read_json_array_as_dataclass_objects(
-        os.path.join(data_path, file_name), model.Contact
+        os.path.join(constant.DATA_DIRECTORY, constant.CONTACTS_FILE_NAME),
+        model.Contact,
     )
     progress_utils.message(f"Read {len(contacts)} contact(s)")
     return contacts
@@ -37,14 +34,9 @@ def read_groups_from_icloud() -> list[model.Group]:
 
 
 @progress_utils.annotate("Writing contacts to disk")
-def write_contacts_to_disk(
-    contacts: list[model.Contact],
-    *,
-    data_path: str = constant.DEFAULT_DATA_DIRECTORY,
-    file_name: str = constant.CONTACTS_FILE_NAME,
-) -> None:
+def write_contacts_to_disk(contacts: list[model.Contact]) -> None:
     file_io_utils.write_dataclass_objects_as_json_array(
-        os.path.join(data_path, file_name),
+        os.path.join(constant.DATA_DIRECTORY, constant.CONTACTS_FILE_NAME),
         contacts,
     )
     progress_utils.message(f"Wrote {len(contacts)} contact(s) to disk")
