@@ -9,6 +9,7 @@ temp
 tmp
 
 # Unit test / coverage reports
+.mypy_cache/
 .pytest_cache/
 
 # PyCharm project settings
