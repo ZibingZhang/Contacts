@@ -1,10 +1,11 @@
 """An iCloud browsing session."""
 from __future__ import annotations
 
+import http.cookiejar as cookielib
 import inspect
 import json
 import logging
-from typing import Text
+from typing import NoReturn, cast
 
 import requests
 
@@ -26,20 +27,23 @@ class ICloudSession(requests.Session):
     """iCloud session."""
 
     def __init__(self, manager: icloud.manager.ICloudManager) -> None:
+        super().__init__()
         self.manager = manager
-        requests.Session.__init__(self)
+        self.cookies: cookielib.LWPCookieJar | None = None  # type: ignore
 
-    def request(
-        self, method: str, url: str | bytes | Text, **kwargs
+    def request(  # type: ignore
+        self, method: str | bytes, url: str | bytes, **kwargs
     ) -> requests.Response:
         # Change logging to the right manager endpoint
         callee = inspect.stack()[2]
         module = inspect.getmodule(callee[0])
-        request_logger = logging.getLogger(module.__name__).getChild("http")
+        request_logger = logging.getLogger(
+            module.__name__ if module is not None else ""
+        ).getChild("http")
         if self.manager.password_filter not in request_logger.filters:
             request_logger.addFilter(self.manager.password_filter)
 
-        request_logger.debug("%s %s %s" % (method, url, kwargs.get("data", "")))
+        request_logger.debug("%r %r %s" % (method, url, kwargs.get("data", "")))
 
         has_retried = kwargs.get("retried")
         kwargs.pop("retried", None)
@@ -61,7 +65,9 @@ class ICloudSession(requests.Session):
             LOGGER.debug("Saved session data to file")
 
         # Save cookies to file
-        self.cookies.save(ignore_discard=True, ignore_expires=True)
+        cast(cookielib.LWPCookieJar, self.cookies).save(
+            ignore_discard=True, ignore_expires=True
+        )
         LOGGER.debug("Cookies saved to %s", self.manager.cookiejar_path)
 
         if not response.ok and (
@@ -125,18 +131,20 @@ class ICloudSession(requests.Session):
 
         return response
 
-    def _raise_error(self, code: int, reason: str) -> None:
+    def _raise_error(self, code: int | str | None, reason: str) -> NoReturn:
         if (
             self.manager.requires_2sa
             and reason == "Missing X-APPLE-WEBAUTH-TOKEN cookie"
         ):
-            raise exception.ICloud2SARequiredException(self.manager.user["apple_id"])
+            raise exception.ICloud2SARequiredException(self.manager.user["accountName"])
         if code in ("ZONE_NOT_FOUND", "AUTHENTICATION_FAILED"):
             reason = (
                 "Please log into https://icloud.com/ to manually "
                 "finish setting up your iCloud manager"
             )
-            api_error = exception.ICloudServiceNotActivatedException(reason, code)
+            api_error: exception.ICloudException = (
+                exception.ICloudServiceNotActivatedException(reason, code)
+            )
             LOGGER.error(api_error)
 
             raise api_error

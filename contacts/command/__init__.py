@@ -4,7 +4,7 @@ import enum
 from contacts.command import add, pull, push, sync_groups, tag, validate
 
 
-class Command(str, enum.Enum):
+class Command(enum.StrEnum):
     ADD = "add"
     PULL = "pull"
     PUSH = "push"

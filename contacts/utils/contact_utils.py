@@ -26,8 +26,11 @@ def add_email_address_if_not_exists(
         contact.email_addresses = [new_email_address]
         return None
 
-    for email_address in contact.email_addresses:
-        if email_address.local_part == local_part and email_address.domain == domain:
+    for exisiting_email_address in contact.email_addresses:
+        if (
+            exisiting_email_address.local_part == local_part
+            and exisiting_email_address.domain == domain
+        ):
             return None
     contact.email_addresses.append(new_email_address)
 

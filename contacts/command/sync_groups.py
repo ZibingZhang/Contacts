@@ -28,7 +28,7 @@ def run() -> None:
                 )
             )
         else:
-            group = group_name_to_group_map.get(name)
+            group = group_name_to_group_map[name]
             group.icloud.contact_uuids = contact_uuids
             command_utils.write_updated_group_to_icloud(group)
         time.sleep(1)
@@ -36,7 +36,7 @@ def run() -> None:
 
 def _has_tag_predicate_factory(tag: str) -> Callable[[model.Contact], bool]:
     def has_tag_predicate(contact: model.Contact) -> bool:
-        return contact.tags and tag in contact.tags
+        return contact.tags is not None and tag in contact.tags
 
     return has_tag_predicate
 

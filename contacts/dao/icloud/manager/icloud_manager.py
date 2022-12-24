@@ -10,6 +10,7 @@ import os.path
 import re
 import tempfile
 import uuid
+from typing import Any, TypedDict
 
 from contacts.dao import icloud
 from contacts.dao.icloud.manager import exception
@@ -41,9 +42,9 @@ class ICloudManager:
                 "'apple_id' and 'password' required for initial instantiation"
             )
 
-        self.user = {"accountName": apple_id, "password": password}
-        self.data = {}
-        self.params = {}
+        self.user: _User = {"accountName": apple_id, "password": password}
+        self.data: dict[str, Any] = {}
+        self.params: dict[str, str] = {}
         self.client_id = client_id or ("auth-%s" % str(uuid.uuid1()).lower())
         self.with_family = with_family
 
@@ -72,8 +73,8 @@ class ICloudManager:
                 self.session_data = json.load(session_f)
         except FileNotFoundError:
             LOGGER.debug("Session file does not exist")
-        if self.session_data.get("client_id"):
-            self.client_id = self.session_data.get("client_id")
+        if client_id := self.session_data.get("client_id"):
+            self.client_id = client_id
         else:
             self.session_data.update({"client_id": self.client_id})
 
@@ -95,7 +96,7 @@ class ICloudManager:
                 # successful authentication.
                 LOGGER.warning("Failed to read cookiejar %s" % cookiejar_path)
 
-        self._webservices = None
+        self._webservices: dict[str, dict[str, str]] = {}
         self.authenticate()
 
     @functools.cached_property
@@ -107,7 +108,7 @@ class ICloudManager:
         """Get path for cookiejar file."""
         return os.path.join(
             self._cookie_directory,
-            "".join([c for c in self.user.get("accountName") if re.match(r"\w", c)]),
+            "".join([c for c in self.user["accountName"] if re.match(r"\w", c)]),
         )
 
     @property
@@ -115,7 +116,7 @@ class ICloudManager:
         """Get path for session data file."""
         return os.path.join(
             self._cookie_directory,
-            "".join([c for c in self.user.get("accountName") if re.match(r"\w", c)])
+            "".join([c for c in self.user["accountName"] if re.match(r"\w", c)])
             + ".session",
         )
 
@@ -234,7 +235,7 @@ class ICloudManager:
         if not login_successful:
             LOGGER.debug("Authenticating as %s" % self.user["accountName"])
 
-            data = dict(self.user)
+            data: dict[str, Any] = dict(self.user)
 
             data["rememberMe"] = True
             data["trustTokens"] = []
@@ -243,11 +244,11 @@ class ICloudManager:
 
             headers = self._get_auth_headers()
 
-            if self.session_data.get("scnt"):
-                headers["scnt"] = self.session_data.get("scnt")
+            if scnt := self.session_data.get("scnt"):
+                headers["scnt"] = scnt
 
-            if self.session_data.get("session_id"):
-                headers["X-Apple-ID-Session-Id"] = self.session_data.get("session_id")
+            if session_id := self.session_data.get("session_id"):
+                headers["X-Apple-ID-Session-Id"] = session_id
 
             try:
                 self.session.post(
@@ -379,11 +380,11 @@ class ICloudManager:
 
         headers = self._get_auth_headers({"Accept": "application/json"})
 
-        if self.session_data.get("scnt"):
-            headers["scnt"] = self.session_data.get("scnt")
+        if scnt := self.session_data.get("scnt"):
+            headers["scnt"] = scnt
 
-        if self.session_data.get("session_id"):
-            headers["X-Apple-ID-Session-Id"] = self.session_data.get("session_id")
+        if session_id := self.session_data.get("session_id"):
+            headers["X-Apple-ID-Session-Id"] = session_id
 
         try:
             self.session.post(
@@ -407,11 +408,11 @@ class ICloudManager:
         """Request session trust to avoid user log in going forward."""
         headers = self._get_auth_headers()
 
-        if self.session_data.get("scnt"):
-            headers["scnt"] = self.session_data.get("scnt")
+        if scnt := self.session_data.get("scnt"):
+            headers["scnt"] = scnt
 
-        if self.session_data.get("session_id"):
-            headers["X-Apple-ID-Session-Id"] = self.session_data.get("session_id")
+        if session_id := self.session_data.get("session_id"):
+            headers["X-Apple-ID-Session-Id"] = session_id
 
         try:
             self.session.get(
@@ -435,5 +436,10 @@ class _PasswordFilter(logging.Filter):
         message = record.getMessage()
         if self.name in message:
             record.msg = message.replace(self.name, "*" * 8)
-            record.args = []
+            record.args = ()
         return True
+
+
+class _User(TypedDict):
+    accountName: str
+    password: str

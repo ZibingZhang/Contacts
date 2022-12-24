@@ -27,7 +27,9 @@ def besides(a: str, b: str) -> str:
 
 
 # https://stackoverflow.com/a/20757491
-def bordered(text: str, width: int | None = 88) -> str:
+def bordered(text: str | None, width: int | None = 88) -> str:
+    if text is None:
+        text = ""
     if width:
         text = "\n".join(
             wrapped_line

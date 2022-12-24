@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
     from contacts import model
 
 
-class TagAction(str, enum.Enum):
+class TagAction(enum.StrEnum):
     LS = "ls"
     MV = "mv"
     REPL = "repl"
@@ -49,7 +49,7 @@ def _tag_mv(contacts: list[model.Contact], old: str, new: str) -> None:
 
     count = 0
     for contact in contacts:
-        if old in (contact.tags or []):
+        if contact.tags is not None and old in contact.tags:
             contact.tags.remove(old)
             contact.tags += [new]
             count += 1

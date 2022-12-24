@@ -5,6 +5,7 @@ from contacts import model
 from contacts.common import constant
 from contacts.dao import icloud
 from contacts.dao.icloud.model import notes as nt
+from contacts.utils import uuid_utils
 
 
 def contact_to_icloud_contact(contact: model.Contact) -> icloud.model.ICloudContact:
@@ -16,8 +17,14 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud.model.ICloudCont
     Returns:
         The transformed icloud.model.ICloudContact.
     """
+    if contact.icloud:
+        contact_id = contact.icloud.uuid
+    else:
+        contact_id = uuid_utils.generate()
+
     icloud_contact = icloud.model.ICloudContact(
         birthday=contact.birthday,
+        contactId=contact_id,
         firstName=contact.name.first_name,
         isCompany=False,
         isGuardianApproved=False,
@@ -30,7 +37,6 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud.model.ICloudCont
     )
 
     if contact.icloud:
-        icloud_contact.contactId = contact.icloud.uuid
         icloud_contact.etag = contact.icloud.etag
 
     if contact.tags:
@@ -94,37 +100,37 @@ def _transform_phone_numbers(
 
 def _transform_social_profiles(
     social_profiles: model.SocialProfiles,
-) -> [icloud.model.Profile]:
+) -> list[icloud.model.Profile]:
     icloud_profiles = []
     if social_profiles.facebook:
-        social_profile = social_profiles.facebook
+        facebook_profile = social_profiles.facebook
         icloud_profiles.append(
             icloud.model.Profile(
                 field=(
                     f"http://www.facebook.com/"
-                    f"{social_profile.username if social_profile.username else ''}"
+                    f"{facebook_profile.username if facebook_profile.username else ''}"
                 ),
                 label="FACEBOOK",
-                user=social_profile.username,
-                userId=social_profile.user_id,
+                user=facebook_profile.username,
+                userId=facebook_profile.user_id,
             )
         )
     if social_profiles.game_center:
-        social_profile = social_profiles.game_center
+        game_center_profile = social_profiles.game_center
         icloud_profiles.append(
             icloud.model.Profile(
-                field=social_profile.link,
+                field=game_center_profile.link,
                 label="GAMECENTER",
-                user=social_profile.username,
+                user=game_center_profile.username,
             )
         )
     if social_profiles.instagram:
-        social_profile = social_profiles.instagram
+        instagram_profile = social_profiles.instagram
         icloud_profiles.append(
             icloud.model.Profile(
-                field=f"http://www.instagram.com/{social_profile.username}",
+                field=f"http://www.instagram.com/{instagram_profile.username}",
                 label="INSTAGRAM",
-                user=social_profile.username,
+                user=instagram_profile.username,
             )
         )
     return icloud_profiles
@@ -135,21 +141,22 @@ def _transform_street_addresses(
 ) -> list[icloud.model.StreetAddress]:
     icloud_street_addresses = []
     for street_address in street_addresses:
-        icloud_street_addresses.append(
-            icloud.model.StreetAddress(
-                field=icloud.model.StreetAddressField(
-                    city=street_address.city,
-                    country=street_address.country,
-                    countryCode=constant.COUNTRY_TO_COUNTRY_CODE_MAP.get(
-                        street_address.country
-                    ),
-                    postalCode=street_address.postal_code,
-                    state=street_address.state,
-                    street="\n".join(street_address.street),
-                ),
-                label=street_address.label,
-            )
+        icloud_street_address = icloud.model.StreetAddress(
+            field=icloud.model.StreetAddressField(
+                city=street_address.city,
+                country=street_address.country,
+                postalCode=street_address.postal_code,
+                state=street_address.state,
+            ),
+            label=street_address.label,
         )
+        if street_address.country:
+            icloud_street_address.field.countryCode = (
+                constant.COUNTRY_TO_COUNTRY_CODE_MAP[street_address.country]
+            )
+        if street_address.street:
+            icloud_street_address.field.street = "\n".join(street_address.street)
+        icloud_street_addresses.append(icloud_street_address)
     return icloud_street_addresses
 
 
@@ -160,7 +167,7 @@ def _extract_notes(contact: model.Contact) -> nt.Notes:
     if contact.notes:
         notes.comment = contact.notes
     if contact.favorite:
-        notes.favorite = contact.favorite
+        notes.favorite = nt.Favorites.from_dict(contact.favorite)
     if contact.friends_friend:
         notes.friends_friend = contact.friends_friend
     if contact.dated:
@@ -192,9 +199,7 @@ def _extract_notes(contact: model.Contact) -> nt.Notes:
         if contact.education.master:
             education.master = nt.School(name=contact.education.master.name.value)
             if contact.education.master.graduation_year:
-                education.master.graduation_year = (
-                    contact.education.master.graduation_year
-                )
+                education.master.grad_year = contact.education.master.graduation_year
             if contact.education.master.majors:
                 education.master.majors = ", ".join(contact.education.master.majors)
             if contact.education.master.minors:

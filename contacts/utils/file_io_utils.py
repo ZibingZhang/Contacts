@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import textwrap
+from collections.abc import Sequence
 from typing import Type, TypeVar
 
 from contacts import model
@@ -46,21 +47,33 @@ def read_json_array_as_dataclass_objects(path: str, cls: Type[T]) -> list[T]:
     return [cls.from_dict(obj) for obj in objects]
 
 
+def write_contacts_as_json_array(path: str, contacts: Sequence[model.Contact]) -> None:
+    """Write contacts to a file.
+
+    Transform a sequence of contacts to a json array of objects and write them to a
+    file.
+
+    Args:
+        path: The path of the file to write to.
+        contacts: The contacts to write to the file.
+    """
+    sorted_contacts = sorted(contacts, key=_contact_key)
+    write_dataclass_objects_as_json_array(path, sorted_contacts)
+
+
 def write_dataclass_objects_as_json_array(
-    path: str, objects: list[dataclasses_utils.DataClassJsonMixin]
+    path: str, objects: Sequence[dataclasses_utils.DataClassJsonMixin]
 ) -> None:
     """Write dataclass objects to a file.
 
-    Transform a list of dataclass objects to a json array of objects and write them to
-    a file.
+    Transform a sequence of dataclass objects to a json array of objects and write them
+    to a file.
 
     Args:
         path: The path of the file to write to.
         objects: The dataclass objects to write to the file.
     """
     output = ""
-    if len(objects) > 0 and issubclass(objects[0].__class__, model.Contact):
-        objects = sorted(objects, key=_contact_key)
     with open(path, mode="w", encoding="utf-8") as f:
         output += "[\n"
         output += textwrap.indent(",\n".join(obj.to_json() for obj in objects), "    ")

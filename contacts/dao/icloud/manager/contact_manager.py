@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import json
 import re
+from typing import cast
 
 from contacts.dao import icloud
-from contacts.utils import uuid_utils
 
 
 class ICloudContactManager:
@@ -44,7 +44,6 @@ class ICloudContactManager:
         Args:
             contacts: The new contacts.
         """
-        self._generate_contact_uuids(contacts)
         body = self._build_contacts_request_body(contacts)
         params = dict(self._params)
         params.update(
@@ -169,20 +168,16 @@ class ICloudContactManager:
 
     def _update_etag(self, contact: icloud.model.ICloudContact) -> None:
         etag = contact.etag
-        last_sync_number = int(re.search(r"(?<=^C=)\d+", etag)[0])
+        if etag is None:
+            return None
+        last_sync_number = int(cast(re.Match, re.search(r"(?<=^C=)\d+", etag))[0])
         if last_sync_number >= self._sync_token_number:
             etag = re.sub(r"^C=\d+", f"C={self._sync_token_number}", etag)
         contact.etag = etag
 
     def _update_sync_token(self, sync_token: str) -> None:
-        self._sync_token_prefix = re.search(r"^.*S=", sync_token)[0]
-        self._sync_token_number = int(re.search(r"\d+$", sync_token)[0])
-
-    @staticmethod
-    def _generate_contact_uuids(contacts: list[icloud.model.ICloudContact]) -> None:
-        for contact in contacts:
-            if contact.contactId is None:
-                contact.contactId = uuid_utils.generate()
+        self._sync_token_prefix = cast(re.Match, re.search(r"^.*S=", sync_token))[0]
+        self._sync_token_number = int(cast(re.Match, re.search(r"\d+$", sync_token))[0])
 
     @staticmethod
     def _build_contacts_request_body(

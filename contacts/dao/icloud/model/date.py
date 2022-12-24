@@ -1,11 +1,8 @@
 """A date field on an iCloud contact."""
 from __future__ import annotations
 
-import dataclasses
 import re
 import typing
-
-import dataclasses_json
 
 from contacts.common import error
 
@@ -15,21 +12,7 @@ if typing.TYPE_CHECKING:
 NO_YEAR = 1604
 
 
-def new_field(*, required) -> dataclasses.Field:
-    kwargs = {
-        "metadata": dataclasses_json.config(
-            decoder=_date_decoder,
-            encoder=_date_encoder,
-        )
-    }
-
-    if not required:
-        kwargs["default"] = None
-
-    return dataclasses.field(**kwargs)
-
-
-def _date_encoder(date: model.Date | None) -> str | None:
+def encoder(date: model.Date | None) -> str | None:
     """An encoder for a date field.
 
     Returns:
@@ -46,7 +29,7 @@ def _date_encoder(date: model.Date | None) -> str | None:
     )
 
 
-def _date_decoder(date: str | None) -> model.Date | None:
+def decoder(date: str | None) -> model.Date | None:
     """A decoder for a date field.
 
     Returns:
@@ -58,8 +41,7 @@ def _date_decoder(date: str | None) -> model.Date | None:
         return None
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
         raise error.DecodingError(date)
-    year = int(date[:4])
-    year = year if year != NO_YEAR else None
+    year = None if (year := int(date[:4])) == NO_YEAR else year
     month = int(date[5:7])
     day = int(date[8:])
     return model.Date(year=year, month=month, day=day)

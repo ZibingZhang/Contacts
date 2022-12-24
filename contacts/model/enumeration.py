@@ -2,11 +2,11 @@
 import enum
 
 
-class Country(str, enum.Enum):
+class Country(enum.StrEnum):
     UNITED_STATES = "United States"
 
 
-class CountryCode(int, enum.Enum):
+class CountryCode(enum.IntEnum):
     NANP = 1
     IRELAND = 353
     UNITED_KINGDOM = 44
@@ -19,7 +19,7 @@ class CountryCode(int, enum.Enum):
     TAIWAN = 886
 
 
-class HighSchoolName(str, enum.Enum):
+class HighSchoolName(enum.StrEnum):
     ACTON_BOXBOROUGH_REGIONAL_HIGH_SCHOOL = "Acton-Boxborough Regional High School"
     ADVANCED_MATH_AND_SCIENCE_ACADECY_CHARTER_SCHOOL = (
         "Advanced Math and Science Academy Charter School"
@@ -60,7 +60,7 @@ class HighSchoolName(str, enum.Enum):
     WINSOR_SCHOOL = "Winsor School"
 
 
-class UniversityName(str, enum.Enum):
+class UniversityName(enum.StrEnum):
     AMERICAN_UNIVERSITY = "American University"
     AMHERST_COLLEGE = "Amherst College"
     BABSON_COLLEGE = "Babson College"

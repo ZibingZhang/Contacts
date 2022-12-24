@@ -27,7 +27,7 @@ def run(*, force: bool, write: bool) -> None:
 
     new_contacts = []
     for icloud_id in pushed_contact_ids - icloud_contact_ids:
-        new_contact = icloud_id_to_pushed_contact_map.get(icloud_id)
+        new_contact = icloud_id_to_pushed_contact_map[icloud_id]
 
         print(pretty_print_utils.bordered(json_utils.dumps(new_contact.to_dict())))
 
@@ -42,8 +42,8 @@ def run(*, force: bool, write: bool) -> None:
 
     updated_contacts = []
     for icloud_id in pushed_contact_ids & icloud_contact_ids:
-        pushed_contact = icloud_id_to_pushed_contact_map.get(icloud_id)
-        icloud_contact = icloud_id_to_icloud_contact_map.get(icloud_id)
+        pushed_contact = icloud_id_to_pushed_contact_map[icloud_id]
+        icloud_contact = icloud_id_to_icloud_contact_map[icloud_id]
 
         diff = dataclasses_utils.diff(icloud_contact, pushed_contact)
         if diff:

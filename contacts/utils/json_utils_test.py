@@ -1,7 +1,7 @@
 """Tests for contacts.utils.json_utils."""
 from __future__ import annotations
 
-from utils import json_utils
+from contacts.utils import json_utils
 
 
 def test_delegate_to_json_dumps() -> None:

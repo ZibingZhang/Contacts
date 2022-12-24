@@ -24,7 +24,7 @@ def run() -> None:
 
 
 def _validate_names(contacts: list[model.Contact]) -> None:
-    names_counter = collections.Counter()
+    names_counter: collections.Counter[str] = collections.Counter()
     for contact in contacts:
         names_counter[contact_utils.build_name_str(contact)] += 1
     for name in sorted(names_counter.keys()):
@@ -51,7 +51,7 @@ def _validate_education(contact: model.Contact) -> None:
 
     for pattern in PATTERN_TO_HIGH_SCHOOL_NAME_MAP.keys():
         if _any_tag_matches_pattern(contact.tags, pattern):
-            _expect_high_school(contact, PATTERN_TO_HIGH_SCHOOL_NAME_MAP.get(pattern))
+            _expect_high_school(contact, PATTERN_TO_HIGH_SCHOOL_NAME_MAP[pattern])
 
 
 def _expect_high_school(contact: model.Contact, high_school_name: str) -> None:
@@ -98,7 +98,7 @@ def _validate_tags(contact: model.Contact) -> None:
 
 
 def _expect_tag(contact: model.Contact, tag: str) -> None:
-    if tag not in contact.tags:
+    if contact.tags is None or tag not in contact.tags:
         print(f"{contact_utils.build_name_str(contact)} missing {tag} tag")
 
 

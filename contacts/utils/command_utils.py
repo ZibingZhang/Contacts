@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os.path
+from collections.abc import Sequence
 
 from contacts import model
 from contacts.common import constant
@@ -34,8 +35,8 @@ def read_groups_from_icloud() -> list[model.Group]:
 
 
 @progress_utils.annotate("Writing contacts to disk")
-def write_contacts_to_disk(contacts: list[model.Contact]) -> None:
-    file_io_utils.write_dataclass_objects_as_json_array(
+def write_contacts_to_disk(contacts: Sequence[model.Contact]) -> None:
+    file_io_utils.write_contacts_as_json_array(
         os.path.join(constant.DATA_DIRECTORY, constant.CONTACTS_FILE_NAME),
         contacts,
     )
@@ -92,23 +93,23 @@ def get_contact_by_name(contacts: list[model.Contact]) -> model.Contact | None:
         for i, contact in enumerate(matching_contacts):
             print(f"{i + 1}. {contact_utils.build_name_and_tags_str(contact)}")
 
-        selection = input_utils.input_with_skip("Select the contact")
+        selection_inp = input_utils.input_with_skip("Select the contact")
         while True:
             try:
-                selection = int(selection)
+                selection = int(selection_inp)
                 if selection < 1:
-                    selection = input_utils.input_with_skip(
+                    selection_inp = input_utils.input_with_skip(
                         "Too low. Select the contact"
                     )
                     continue
                 if selection > len(matching_contacts):
-                    selection = input_utils.input_with_skip(
+                    selection_inp = input_utils.input_with_skip(
                         "Too high. Select the contact"
                     )
                     continue
                 break
             except ValueError:
-                selection = input_utils.input_with_skip(
+                selection_inp = input_utils.input_with_skip(
                     "Not a number. Select the contact"
                 )
 

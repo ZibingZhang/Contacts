@@ -24,7 +24,7 @@ def run(*, cached: bool) -> None:
     for icloud_id in (
         icloud_id_to_pulled_contact_map.keys() - icloud_id_to_current_contact_map.keys()
     ):
-        pulled_contact = icloud_id_to_pulled_contact_map.get(icloud_id)
+        pulled_contact = icloud_id_to_pulled_contact_map[icloud_id]
         print(pretty_print_utils.bordered(json_utils.dumps(pulled_contact.to_dict())))
         if input_utils.yes_no_input("Accept creation?"):
             icloud_id_to_current_contact_map[icloud_id] = pulled_contact
@@ -32,8 +32,8 @@ def run(*, cached: bool) -> None:
     for icloud_id in (
         icloud_id_to_current_contact_map.keys() & icloud_id_to_pulled_contact_map.keys()
     ):
-        pulled_contact = icloud_id_to_pulled_contact_map.get(icloud_id)
-        current_contact = icloud_id_to_current_contact_map.get(icloud_id)
+        pulled_contact = icloud_id_to_pulled_contact_map[icloud_id]
+        current_contact = icloud_id_to_current_contact_map[icloud_id]
         updated_contact = current_contact.copy()
         updated_contact.patch(pulled_contact)
 
@@ -60,14 +60,14 @@ def run(*, cached: bool) -> None:
 def _only_etag_updated(diff: dict) -> bool:
     if set(diff.keys()) != {"$update"}:
         return False
-    update = diff.get("$update")
+    update = diff["$update"]
     if set(update.keys()) != {"icloud"}:
         return False
-    icloud_diff = update.get("icloud")
+    icloud_diff = update["icloud"]
     if set(icloud_diff.keys()) == {"$update"}:
-        icloud_update = icloud_diff.get("$update")
+        icloud_update = icloud_diff["$update"]
         return set(icloud_update.keys()) == {"etag"}
     if set(icloud_diff.keys()) == {"$insert"}:
-        icloud_insert = icloud_diff.get("$insert")
+        icloud_insert = icloud_diff["$insert"]
         return set(icloud_insert.keys()) == {"etag"}
     return False

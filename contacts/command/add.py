@@ -1,14 +1,11 @@
 """Command to add a contact."""
 from __future__ import annotations
 
-from contacts.common import constant
 from contacts.utils import command_utils, contact_utils, input_utils
 
 
 def run() -> None:
-    new_contacts = command_utils.read_contacts_from_disk(
-        file_name=constant.NEW_CONTACT_FILE_NAME
-    )
+    new_contacts = command_utils.read_contacts_from_disk()
 
     contacts = command_utils.read_contacts_from_disk()
 

@@ -130,10 +130,17 @@ def _transform_social_profiles(
                     user_id=icloud_profile.userId, username=icloud_profile.user
                 )
             case "GAMECENTER":
+                if icloud_profile.user is None:
+                    raise ValueError("Missing username for Game Center profile")
+                social_profiles.instagram = model.InstagramProfile(
+                    username=icloud_profile.user
+                )
                 social_profiles.game_center = model.GameCenterProfile(
                     link=icloud_profile.field, username=icloud_profile.user
                 )
             case "INSTAGRAM":
+                if icloud_profile.user is None:
+                    raise ValueError("Missing username for Instagram profile")
                 social_profiles.instagram = model.InstagramProfile(
                     username=icloud_profile.user
                 )
@@ -149,16 +156,20 @@ def _transform_street_addresses(
 ) -> list[model.StreetAddress]:
     street_addresses = []
     for icloud_street_address in icloud_street_addresses:
-        street_addresses.append(
-            model.StreetAddress(
-                city=icloud_street_address.field.city,
-                country=icloud_street_address.field.country,
-                label=icloud_street_address.label,
-                postal_code=icloud_street_address.field.postalCode,
-                state=icloud_street_address.field.state,
-                street=icloud_street_address.field.street.splitlines(),
-            )
+        street_address = model.StreetAddress(
+            city=icloud_street_address.field.city,
+            label=icloud_street_address.label,
+            postal_code=icloud_street_address.field.postalCode,
+            state=icloud_street_address.field.state,
+            street=(
+                icloud_street_address.field.street.splitlines()
+                if icloud_street_address.field.street is not None
+                else None
+            ),
         )
+        if icloud_street_address.field.country:
+            street_address.country = model.Country(icloud_street_address.field.country)
+        street_addresses.append(street_address)
     return street_addresses
 
 
@@ -168,7 +179,7 @@ def _extract_from_notes(contact: model.Contact, notes: nt.Notes) -> None:
     if notes.comment:
         contact.notes = notes.comment
     if notes.favorite:
-        contact.favorite = notes.favorite
+        contact.favorite = notes.favorite.to_dict()
     if notes.friends_friend:
         contact.friends_friend = notes.friends_friend
     if notes.partner:

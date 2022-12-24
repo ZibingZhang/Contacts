@@ -4,6 +4,8 @@ from __future__ import annotations
 import dataclasses
 from typing import Any
 
+import dataclasses_json
+
 from contacts.model import date, enumeration
 from contacts.utils import dataclasses_utils
 
@@ -80,7 +82,7 @@ class PhoneNumber(dataclasses_utils.DataClassJsonMixin):
 # https://www.facebook.com/help/211813265517027
 @dataclasses.dataclass
 class FacebookProfile(dataclasses_utils.DataClassJsonMixin):
-    user_id: int | None = None
+    user_id: str | None = None
     username: str | None = None
 
 
@@ -104,10 +106,10 @@ class SocialProfiles(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class StreetAddress(dataclasses_utils.DataClassJsonMixin):
+    label: str
     country: enumeration.Country | None = None
     city: str | None = None
-    label: str | None = None
-    postal_code: int | None = None
+    postal_code: str | None = None
     state: str | None = None
     street: list[str] | None = None
 
@@ -115,14 +117,20 @@ class StreetAddress(dataclasses_utils.DataClassJsonMixin):
 @dataclasses.dataclass
 class Contact(dataclasses_utils.DataClassJsonMixin):
     name: Name
-    id: int | None = None
-    birthday: date.Date | None = date.new_field(required=False)
+    icloud: ICloudMetadata
+    id: int | None = None  # TODO: make required
+    birthday: date.Date | None = dataclasses.field(
+        default=None,
+        metadata=dataclasses_json.config(
+            decoder=date.decoder,
+            encoder=date.encoder,
+        ),
+    )
     dated: date.DateRange | None = None
     education: Education | None = None
     email_addresses: list[EmailAddress] | None = None
     favorite: dict | None = None
     friends_friend: str | None = None
-    icloud: ICloudMetadata | None = None
     notes: str | None = None
     phone_numbers: list[PhoneNumber] | None = None
     social_profiles: SocialProfiles | None = None

@@ -3,15 +3,22 @@ from __future__ import annotations
 
 import dataclasses
 
+import dataclasses_json
+
 from contacts import model
-from contacts.dao.icloud.model import date_field
+from contacts.dao.icloud.model import date
 from contacts.utils import dataclasses_utils
 
 
 @dataclasses.dataclass
 class Date(dataclasses_utils.DataClassJsonMixin):
     label: str
-    field: model.Date = date_field.new_field(required=True)
+    field: model.Date = dataclasses.field(
+        metadata=dataclasses_json.config(
+            decoder=date.decoder,
+            encoder=date.encoder,
+        ),
+    )
 
 
 @dataclasses.dataclass
@@ -78,9 +85,15 @@ class Url(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class ICloudContact(dataclasses_utils.DataClassJsonMixin):
+    contactId: str
     isCompany: bool
-    contactId: str | None = None
-    birthday: model.Date | None = date_field.new_field(required=False)
+    birthday: model.Date | None = dataclasses.field(
+        default=None,
+        metadata=dataclasses_json.config(
+            decoder=date.decoder,
+            encoder=date.encoder,
+        ),
+    )
     companyName: str | None = None
     dates: list[Date] | None = None
     department: str | None = None

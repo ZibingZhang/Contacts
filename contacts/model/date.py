@@ -14,21 +14,7 @@ if typing.TYPE_CHECKING:
     from contacts import model
 
 
-def new_field(*, required: bool) -> dataclasses.Field:
-    kwargs = {
-        "metadata": dataclasses_json.config(
-            decoder=date_decoder,
-            encoder=date_encoder,
-        )
-    }
-
-    if not required:
-        kwargs["default"] = None
-
-    return dataclasses.field(**kwargs)
-
-
-def date_encoder(date: model.Date | None) -> str | None:
+def encoder(date: model.Date | None) -> str | None:
     """An encoder for a date field.
 
     Returns:
@@ -43,7 +29,7 @@ def date_encoder(date: model.Date | None) -> str | None:
     )
 
 
-def date_decoder(date: str | None) -> model.Date | None:
+def decoder(date: str | None) -> model.Date | None:
     """A decoder for a date field.
 
     Returns:
@@ -56,15 +42,31 @@ def date_decoder(date: str | None) -> model.Date | None:
     if not re.match(r"^[0-9X]{4}-[0-9X]{2}-[0-9X]{2}$", date):
         raise error.DecodingError(date)
 
-    year = date[:4]
-    month = date[5:7]
-    day = date[8:]
+    year_str = date[:4]
+    month_str = date[5:7]
+    day_str = date[8:]
 
-    year = int(year) if year != "XXXX" else None
-    month = int(month) if month != "XX" else None
-    day = int(day) if day != "XX" else None
+    year = int(year_str) if year_str != "XXXX" else None
+    month = int(month_str) if month_str != "XX" else None
+    day = int(day_str) if day_str != "XX" else None
 
     return model.Date(year=year, month=month, day=day)
+
+
+@dataclasses.dataclass
+class DateRange(dataclasses_utils.DataClassJsonMixin):
+    start: Date | None = dataclasses.field(
+        metadata=dataclasses_json.config(
+            decoder=decoder,
+            encoder=encoder,
+        )
+    )
+    end: Date | None = dataclasses.field(
+        metadata=dataclasses_json.config(
+            decoder=decoder,
+            encoder=encoder,
+        )
+    )
 
 
 @dataclasses.dataclass
@@ -74,10 +76,4 @@ class Date(dataclasses_utils.DataClassJsonMixin):
     year: int | None = None
 
     def __repr__(self) -> str:
-        return date_encoder(self)
-
-
-@dataclasses.dataclass
-class DateRange(dataclasses_utils.DataClassJsonMixin):
-    start: Date | None = new_field(required=False)
-    end: Date | None = new_field(required=False)
+        return encoder(self) or "XXXX-XX-XX"
