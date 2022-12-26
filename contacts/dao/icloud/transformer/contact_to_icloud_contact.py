@@ -17,14 +17,12 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud.model.ICloudCont
     Returns:
         The transformed icloud.model.ICloudContact.
     """
-    if contact.icloud:
-        contact_id = contact.icloud.uuid
-    else:
-        contact_id = uuid_utils.generate()
+    if contact.icloud is None:
+        contact.icloud = model.ICloudMetadata(uuid=uuid_utils.generate())
 
     icloud_contact = icloud.model.ICloudContact(
         birthday=contact.birthday,
-        contactId=contact_id,
+        contactId=contact.icloud.uuid,
         firstName=contact.name.first_name,
         isCompany=False,
         isGuardianApproved=False,
@@ -36,24 +34,24 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud.model.ICloudCont
         whitelisted=False,
     )
 
-    if contact.icloud:
+    if contact.icloud is not None:
         icloud_contact.etag = contact.icloud.etag
 
-    if contact.tags:
+    if contact.tags is not None:
         icloud_contact.companyName = ", ".join(contact.tags)
 
-    if contact.email_addresses:
+    if contact.email_addresses is not None:
         icloud_contact.emailAddresses = _transform_email_addresses(
             contact.email_addresses
         )
 
-    if contact.phone_numbers:
+    if contact.phone_numbers is not None:
         icloud_contact.phones = _transform_phone_numbers(contact.phone_numbers)
 
-    if contact.social_profiles:
+    if contact.social_profiles is not None:
         icloud_contact.profiles = _transform_social_profiles(contact.social_profiles)
 
-    if contact.street_addresses:
+    if contact.street_addresses is not None:
         icloud_contact.streetAddresses = _transform_street_addresses(
             contact.street_addresses
         )
@@ -102,7 +100,7 @@ def _transform_social_profiles(
     social_profiles: model.SocialProfiles,
 ) -> list[icloud.model.Profile]:
     icloud_profiles = []
-    if social_profiles.facebook:
+    if social_profiles.facebook is not None:
         facebook_profile = social_profiles.facebook
         icloud_profiles.append(
             icloud.model.Profile(
@@ -115,7 +113,7 @@ def _transform_social_profiles(
                 userId=facebook_profile.user_id,
             )
         )
-    if social_profiles.game_center:
+    if social_profiles.game_center is not None:
         game_center_profile = social_profiles.game_center
         icloud_profiles.append(
             icloud.model.Profile(
@@ -124,7 +122,7 @@ def _transform_social_profiles(
                 user=game_center_profile.username,
             )
         )
-    if social_profiles.instagram:
+    if social_profiles.instagram is not None:
         instagram_profile = social_profiles.instagram
         icloud_profiles.append(
             icloud.model.Profile(
@@ -150,11 +148,11 @@ def _transform_street_addresses(
             ),
             label=street_address.label,
         )
-        if street_address.country:
+        if street_address.country is not None:
             icloud_street_address.field.countryCode = (
                 constant.COUNTRY_TO_COUNTRY_CODE_MAP[street_address.country]
             )
-        if street_address.street:
+        if street_address.street is not None:
             icloud_street_address.field.street = "\n".join(street_address.street)
         icloud_street_addresses.append(icloud_street_address)
     return icloud_street_addresses
@@ -162,47 +160,45 @@ def _transform_street_addresses(
 
 def _extract_notes(contact: model.Contact) -> nt.Notes:
     notes = nt.Notes()
-    if contact.name.chinese_name:
+    if contact.name.chinese_name is not None:
         notes.chinese_name = contact.name.chinese_name
-    if contact.notes:
+    if contact.notes is not None:
         notes.comment = contact.notes
-    if contact.favorite:
+    if contact.favorite is not None:
         notes.favorite = nt.Favorites.from_dict(contact.favorite)
-    if contact.friends_friend:
+    if contact.friends_friend is not None:
         notes.friends_friend = contact.friends_friend
-    if contact.dated:
+    if contact.dated is not None:
         notes.partner = contact.dated
 
-    if contact.education:
+    if contact.education is not None:
         education = nt.Education()
 
-        if contact.education.bachelor:
-            education.bachelor = nt.School(name=contact.education.bachelor.name.value)
-            if contact.education.bachelor.graduation_year:
+        if contact.education.bachelor is not None:
+            education.bachelor = nt.School(name=contact.education.bachelor.name)
+            if contact.education.bachelor.graduation_year is not None:
                 education.bachelor.grad_year = (
                     contact.education.bachelor.graduation_year
                 )
-            if contact.education.bachelor.majors:
+            if contact.education.bachelor.majors is not None:
                 education.bachelor.majors = ", ".join(contact.education.bachelor.majors)
-            if contact.education.bachelor.minors:
+            if contact.education.bachelor.minors is not None:
                 education.bachelor.minors = ", ".join(contact.education.bachelor.minors)
 
-        if contact.education.high_school:
-            education.high_school = nt.School(
-                name=contact.education.high_school.name.value
-            )
+        if contact.education.high_school is not None:
+            education.high_school = nt.School(name=contact.education.high_school.name)
             if contact.education.high_school.graduation_year:
                 education.high_school.grad_year = (
                     contact.education.high_school.graduation_year
                 )
 
-        if contact.education.master:
-            education.master = nt.School(name=contact.education.master.name.value)
-            if contact.education.master.graduation_year:
+        if contact.education.master is not None:
+            education.master = nt.School(name=contact.education.master.name)
+            if contact.education.master.graduation_year is not None:
                 education.master.grad_year = contact.education.master.graduation_year
-            if contact.education.master.majors:
+            if contact.education.master.majors is not None:
                 education.master.majors = ", ".join(contact.education.master.majors)
-            if contact.education.master.minors:
+            if contact.education.master.minors is not None:
                 education.master.minors = ", ".join(contact.education.master.minors)
 
         notes.education = education

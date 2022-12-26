@@ -15,7 +15,9 @@ def run() -> None:
 
     for name, predicate in GROUP_NAME_TO_PREDICATE_MAP.items():
         contact_uuids = [
-            contact.icloud.uuid for contact in contacts if predicate(contact)
+            contact.icloud.uuid
+            for contact in contacts
+            if contact.icloud is not None and predicate(contact)
         ]
         if name not in group_name_to_group_map.keys():
             command_utils.write_new_group_to_icloud(

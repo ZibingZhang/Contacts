@@ -117,8 +117,8 @@ class StreetAddress(dataclasses_utils.DataClassJsonMixin):
 @dataclasses.dataclass
 class Contact(dataclasses_utils.DataClassJsonMixin):
     name: Name
-    icloud: ICloudMetadata
-    id: int | None = None  # TODO: make required
+    icloud: ICloudMetadata | None = None
+    id: int | None = None
     birthday: date.Date | None = dataclasses.field(
         default=None,
         metadata=dataclasses_json.config(

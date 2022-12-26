@@ -1,6 +1,9 @@
 """Command to pull contacts from a remote source."""
 from __future__ import annotations
 
+from typing import cast
+
+from contacts import model
 from contacts.utils import (
     command_utils,
     dataclasses_utils,
@@ -15,10 +18,13 @@ def run(*, cached: bool) -> None:
     disk_contacts = command_utils.read_contacts_from_disk()
 
     icloud_id_to_pulled_contact_map = {
-        contact.icloud.uuid: contact for contact in pulled_contacts
+        cast(model.ICloudMetadata, contact.icloud).uuid: contact
+        for contact in pulled_contacts
     }
     icloud_id_to_current_contact_map = {
-        contact.icloud.uuid: contact for contact in disk_contacts
+        contact.icloud.uuid: contact
+        for contact in disk_contacts
+        if contact.icloud is not None
     }
 
     for icloud_id in (

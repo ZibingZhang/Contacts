@@ -1,7 +1,9 @@
 """Command to push contacts to a remote source."""
 from __future__ import annotations
 
-from contacts import command
+from typing import cast
+
+from contacts import command, model
 from contacts.utils import (
     command_utils,
     dataclasses_utils,
@@ -16,10 +18,13 @@ def run(*, force: bool, write: bool) -> None:
     icloud_contacts = command_utils.read_contacts_from_icloud(cached=False)
 
     icloud_id_to_pushed_contact_map = {
-        contact.icloud.uuid: contact for contact in pushed_contacts
+        contact.icloud.uuid: contact
+        for contact in pushed_contacts
+        if contact.icloud is not None
     }
     icloud_id_to_icloud_contact_map = {
-        contact.icloud.uuid: contact for contact in icloud_contacts
+        cast(model.ICloudMetadata, contact.icloud).uuid: contact
+        for contact in icloud_contacts
     }
 
     pushed_contact_ids = icloud_id_to_pushed_contact_map.keys()
