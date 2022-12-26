@@ -12,16 +12,22 @@ from contacts.utils import dataclasses_utils
 
 @dataclasses.dataclass
 class HighSchool(dataclasses_utils.DataClassJsonMixin):
-    name: enumeration.HighSchoolName
+    name: str
     graduation_year: int | None = None
+
+    def __post_init__(self):
+        assert self.name in enumeration.HighSchoolName.values()
 
 
 @dataclasses.dataclass
 class University(dataclasses_utils.DataClassJsonMixin):
-    name: enumeration.UniversityName
+    name: str
     graduation_year: int | None = None
     majors: list[str] | None = None
     minors: list[str] | None = None
+
+    def __post_init__(self):
+        assert self.name in enumeration.UniversityName.values()
 
 
 @dataclasses.dataclass
@@ -74,9 +80,12 @@ class Name(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class PhoneNumber(dataclasses_utils.DataClassJsonMixin):
-    country_code: enumeration.CountryCode
+    country_code: int
     number: str
     label: str | None = None
+
+    def __post_init__(self):
+        assert self.country_code in enumeration.CountryCode.values()
 
 
 # https://www.facebook.com/help/211813265517027
@@ -107,11 +116,14 @@ class SocialProfiles(dataclasses_utils.DataClassJsonMixin):
 @dataclasses.dataclass
 class StreetAddress(dataclasses_utils.DataClassJsonMixin):
     label: str
-    country: enumeration.Country | None = None
+    country: str | None = None
     city: str | None = None
     postal_code: str | None = None
     state: str | None = None
     street: list[str] | None = None
+
+    def __post_init__(self):
+        assert self.country is None or self.country in enumeration.Country.values()
 
 
 @dataclasses.dataclass
@@ -131,6 +143,7 @@ class Contact(dataclasses_utils.DataClassJsonMixin):
     email_addresses: list[EmailAddress] | None = None
     favorite: dict | None = None
     friends_friend: str | None = None
+    mtime: float | None = None
     notes: str | None = None
     phone_numbers: list[PhoneNumber] | None = None
     social_profiles: SocialProfiles | None = None

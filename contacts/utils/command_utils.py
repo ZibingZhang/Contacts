@@ -6,14 +6,16 @@ from collections.abc import Sequence
 
 from contacts import model
 from contacts.common import constant
-from contacts.dao import icloud_dao
+from contacts.dao import icloud_dao, obsidian_dao
 from contacts.utils import contact_utils, file_io_utils, input_utils, progress_utils
 
 
 @progress_utils.annotate("Reading contacts from disk")
-def read_contacts_from_disk() -> list[model.Contact]:
+def read_contacts_from_disk(
+    *, file_name=constant.CONTACTS_FILE_NAME
+) -> list[model.Contact]:
     contacts = file_io_utils.read_json_array_as_dataclass_objects(
-        os.path.join(constant.DATA_DIRECTORY, constant.CONTACTS_FILE_NAME),
+        os.path.join(constant.DATA_DIRECTORY, file_name),
         model.Contact,
     )
     progress_utils.message(f"Read {len(contacts)} contact(s)")
@@ -40,6 +42,7 @@ def write_contacts_to_disk(contacts: Sequence[model.Contact]) -> None:
         os.path.join(constant.DATA_DIRECTORY, constant.CONTACTS_FILE_NAME),
         contacts,
     )
+    obsidian_dao.create_contacts(contacts)
     progress_utils.message(f"Wrote {len(contacts)} contact(s) to disk")
 
 

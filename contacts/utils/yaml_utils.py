@@ -10,6 +10,10 @@ if typing.TYPE_CHECKING:
     from contacts.utils import dataclasses_utils
 
 
+INDENT_SIZE = 4
+INDENT = " " * INDENT_SIZE
+
+
 def load(obj: str) -> Any:
     """Load YAML formatted data as a Python object.
 

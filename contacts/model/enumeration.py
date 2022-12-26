@@ -1,9 +1,15 @@
 """Various enumerations."""
 import enum
+import functools
 
 
 class Country(enum.StrEnum):
     UNITED_STATES = "United States"
+
+    @staticmethod
+    @functools.cache
+    def values() -> list[str]:
+        return [item for item in Country]
 
 
 class CountryCode(enum.IntEnum):
@@ -17,6 +23,11 @@ class CountryCode(enum.IntEnum):
     HONG_KONG = 852
     CHINA = 86
     TAIWAN = 886
+
+    @staticmethod
+    @functools.cache
+    def values() -> list[int]:
+        return [item for item in CountryCode]
 
 
 class HighSchoolName(enum.StrEnum):
@@ -58,6 +69,11 @@ class HighSchoolName(enum.StrEnum):
     WESTWOOD_HIGH_SCHOOL = "Westwood High School"
     WINCHESTER_HIGH_SCHOOL = "Winchester High School"
     WINSOR_SCHOOL = "Winsor School"
+
+    @staticmethod
+    @functools.cache
+    def values() -> list[str]:
+        return [item for item in HighSchoolName]
 
 
 class UniversityName(enum.StrEnum):
@@ -182,3 +198,8 @@ class UniversityName(enum.StrEnum):
     WILLIAMS_COLLEGE = "Williams College"
     WORCESTER_POLYTECHNIC_INSTITUTE = "Worcester Polytechnic Institute"
     YALE_UNIVERSITY = "Yale University"
+
+    @staticmethod
+    @functools.cache
+    def values() -> list[str]:
+        return [item for item in UniversityName]

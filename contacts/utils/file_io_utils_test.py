@@ -8,8 +8,8 @@ from contacts.utils import file_io_utils, uuid_utils
 
 
 def test_reading_and_writing_dataclasses_are_inverses() -> None:
-    object_1 = model.PhoneNumber(country_code=model.CountryCode.NANP, number="1234")
-    object_2 = model.PhoneNumber(country_code=model.CountryCode.CHINA, number="5678")
+    object_1 = model.PhoneNumber(country_code=1, number="1234")
+    object_2 = model.PhoneNumber(country_code=86, number="5678")
     written_objects = [object_1, object_2]
     file_path = uuid_utils.generate()
 

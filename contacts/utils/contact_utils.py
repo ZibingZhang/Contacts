@@ -36,7 +36,7 @@ def add_email_address_if_not_exists(
 
 
 def add_phone_number_if_not_exists(
-    contact: model.Contact, country_code: model.CountryCode, number: str, label: str
+    contact: model.Contact, country_code: int, number: str, label: str
 ) -> None:
     """Add a phone number to a contact if the contact does not have the phone number.
 
