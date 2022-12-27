@@ -30,9 +30,7 @@ def test_extract_name_without_last_name() -> None:
 
 def test_add_email_address_to_contact() -> None:
     contact = contact_fixtures.build()
-    local_part = "john.smith"
-    domain = "gmail.com"
-    email_address = f"{local_part}@{domain}"
+    email_address = "john.smith@gmail.com"
     label = "HOME"
 
     contact_utils.add_email_address_if_not_exists(contact, email_address, label)
@@ -40,19 +38,15 @@ def test_add_email_address_to_contact() -> None:
     assert contact.email_addresses is not None
     assert len(contact.email_addresses) == 1
     assert contact.email_addresses[0] == model.EmailAddresss(
-        local_part=local_part, domain=domain, label=label
+        address=email_address, label=label
     )
 
 
 def test_add_email_address_to_contact_does_nothing_if_already_exists() -> None:
-    local_part = "john.smith"
-    domain = "gmail.com"
-    email_address = f"{local_part}@{domain}"
+    email_address = "john.smith@gmail.com"
     label = "HOME"
     contact = contact_fixtures.build(
-        email_addresses=[
-            model.EmailAddresss(local_part=local_part, domain=domain, label=label)
-        ],
+        email_addresses=[model.EmailAddresss(address=email_address, label=label)],
     )
 
     assert contact.email_addresses is not None

@@ -38,9 +38,7 @@ def _validate_email_addresses(contact: model.Contact) -> None:
 
     normalized_email_addresses = set()
     for email_address in contact.email_addresses:
-        normalized_email_addresses.add(
-            (email_address.local_part + email_address.domain).lower().replace(".", "")
-        )
+        normalized_email_addresses.add(email_address.address.lower().replace(".", ""))
     if len(normalized_email_addresses) < len(contact.email_addresses):
         print(f"{contact_utils.build_name_str(contact)} has duplicate email addresses")
 

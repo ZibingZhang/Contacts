@@ -86,11 +86,9 @@ def _transform_email_addresses(
 ) -> list[model.EmailAddresss]:
     email_addresses = []
     for icloud_email_address in icloud_email_addresses:
-        assert icloud_email_address.field.count("@") == 1
-        local_part, domain = icloud_email_address.field.split("@")
         email_addresses.append(
             model.EmailAddresss(
-                domain=domain, label=icloud_email_address.label, local_part=local_part
+                address=icloud_email_address.field, label=icloud_email_address.label
             )
         )
     return email_addresses

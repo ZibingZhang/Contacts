@@ -39,9 +39,8 @@ class Education(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class EmailAddress(dataclasses_utils.DataClassJsonMixin):
+    address: str
     label: str
-    local_part: str
-    domain: str
 
 
 @dataclasses.dataclass
@@ -80,8 +79,8 @@ class Name(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass
 class PhoneNumber(dataclasses_utils.DataClassJsonMixin):
-    country_code: int
     number: str
+    country_code: int = enumeration.CountryCode.NANP.value
     label: str | None = None
 
     def __post_init__(self):
@@ -154,11 +153,7 @@ class Contact(dataclasses_utils.DataClassJsonMixin):
         if key == "email_addresses" and value is not None:
             super().__setattr__(
                 key,
-                sorted(
-                    value,
-                    key=lambda email_address: email_address.domain
-                    + email_address.local_part,
-                ),
+                sorted(value, key=lambda email_address: email_address.address),
             )
         elif key == "tags" and value is not None:
             super().__setattr__(key, list(sorted(set(value))))

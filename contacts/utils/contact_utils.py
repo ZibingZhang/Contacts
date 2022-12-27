@@ -17,20 +17,14 @@ def add_email_address_if_not_exists(
         label: The label of the email address.
     """
     assert email_address.count("@") == 1
-    local_part, domain = email_address.split("@")
-    new_email_address = model.EmailAddresss(
-        domain=domain, label=label, local_part=local_part
-    )
+    new_email_address = model.EmailAddresss(address=email_address, label=label)
 
     if contact.email_addresses is None:
         contact.email_addresses = [new_email_address]
         return None
 
     for exisiting_email_address in contact.email_addresses:
-        if (
-            exisiting_email_address.local_part == local_part
-            and exisiting_email_address.domain == domain
-        ):
+        if exisiting_email_address.address == email_address:
             return None
     contact.email_addresses.append(new_email_address)
 

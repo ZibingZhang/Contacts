@@ -75,7 +75,7 @@ def _transform_email_addresses(
     for email_address in email_addresses:
         icloud_email_addresses.append(
             icloud.model.EmailAddress(
-                field=f"{email_address.local_part}@{email_address.domain}",
+                field=email_address.address,
                 label=email_address.label,
             )
         )
