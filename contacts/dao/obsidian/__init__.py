@@ -8,8 +8,9 @@ from typing import Sequence
 from contacts import model
 from contacts.common import constant
 
+_SEPERATOR = "-----------------"
 _TEMPLATE = string.Template(
-    """---
+    f"""---
 tags:
 - contact
 
@@ -21,8 +22,7 @@ obsidian:
 
 # $display_name
 
----
-"""
+{_SEPERATOR}"""
 )
 
 
@@ -51,14 +51,18 @@ class ObsidianDao:
                 self._write_contact(path, contact)
 
     def _write_contact(self, path: str, contact: model.Contact) -> None:
-        with open(path, "w") as f:
-            f.write(
-                _TEMPLATE.substitute(
-                    display_name=self._build_display_name(contact.name),
-                    phone_numbers=self._build_phone_numbers(contact.phone_numbers),
-                    tags=self._build_tags(contact.tags),
-                )
+        with open(path, "r+") as f:
+            contact_file = f.read()
+            header, body = contact_file.split(_SEPERATOR)
+            f.seek(0)
+            f.truncate()
+            text = _TEMPLATE.substitute(
+                display_name=self._build_display_name(contact.name),
+                phone_numbers=self._build_phone_numbers(contact.phone_numbers),
+                tags=self._build_tags(contact.tags),
             )
+            text += body
+            f.write(text)
 
     @staticmethod
     def _build_display_name(name: model.Name) -> str:
