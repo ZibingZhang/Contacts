@@ -1,8 +1,9 @@
 """Command to add a contact."""
 from __future__ import annotations
 
+from contacts import model
 from contacts.common import constant
-from contacts.utils import command_utils, contact_utils, input_utils
+from contacts.utils import command_utils, contact_utils, input_utils, uuid_utils
 
 
 def run() -> None:
@@ -22,6 +23,7 @@ def run() -> None:
                     break
         else:
             new_contact.id = len(contacts) + 1
+            new_contact.icloud = model.ICloudMetadata(uuid=uuid_utils.generate())
             contacts.append(new_contact)
             print(f"Adding new contact {new_contact_name}")
             command_utils.write_contacts_to_disk(contacts)

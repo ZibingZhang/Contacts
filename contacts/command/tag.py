@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import enum
 import typing
+from collections.abc import Sequence
 
 from contacts.common import error
 from contacts.utils import command_utils, contact_utils, input_utils
@@ -30,7 +31,7 @@ def run(*, tag_action: TagAction, action_specific_args: argparse.Namespace) -> N
             _tag_repl(contacts)
 
 
-def _tag_ls(contacts: list[model.Contact]) -> None:
+def _tag_ls(contacts: Sequence[model.Contact]) -> None:
     all_tags = _get_all_tags(contacts)
     all_tags_by_row = [all_tags[i : i + 5] for i in range(0, len(all_tags), 5)]
     for row in all_tags_by_row:
@@ -39,7 +40,7 @@ def _tag_ls(contacts: list[model.Contact]) -> None:
         print("")
 
 
-def _tag_mv(contacts: list[model.Contact], old: str, new: str) -> None:
+def _tag_mv(contacts: Sequence[model.Contact], old: str, new: str) -> None:
     print(f"Changing tag from {old} to {new}.")
 
     all_tags = _get_all_tags(contacts)
@@ -58,7 +59,7 @@ def _tag_mv(contacts: list[model.Contact], old: str, new: str) -> None:
         command_utils.write_contacts_to_disk(contacts)
 
 
-def _tag_repl(contacts: list[model.Contact]) -> None:
+def _tag_repl(contacts: Sequence[model.Contact]) -> None:
     print("Adding tags to contacts...")
     while True:
         try:
@@ -67,13 +68,13 @@ def _tag_repl(contacts: list[model.Contact]) -> None:
             print("Skipping...")
 
 
-def _get_all_tags(contacts: list[model.Contact]) -> list[str]:
+def _get_all_tags(contacts: Sequence[model.Contact]) -> list[str]:
     return list(
         sorted(set(tag for contact in contacts for tag in (contact.tags or [])))
     )
 
 
-def _add_tags_to_contact(contacts: list[model.Contact]) -> None:
+def _add_tags_to_contact(contacts: Sequence[model.Contact]) -> None:
     contact = command_utils.get_contact_by_name(contacts)
     if contact is None:
         return None

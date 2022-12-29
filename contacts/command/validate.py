@@ -3,14 +3,25 @@ from __future__ import annotations
 
 import collections
 import re
+from collections.abc import Sequence
 
 from contacts import model
 from contacts.utils import command_utils, contact_utils
 
-PATTERN_TO_HIGH_SCHOOL_NAME_MAP = {
+_PATTERN_TO_HIGH_SCHOOL_NAME_MAP = {
     re.compile(r"^ABRSH$"): model.HighSchoolName.ACTON_BOXBOROUGH_REGIONAL_HIGH_SCHOOL,
     re.compile(r"^LHS$"): model.HighSchoolName.LEXINGTON_HIGH_SCHOOL,
     re.compile(r"^NHS\d{2}$"): model.HighSchoolName.NEEDHAM_HIGH_SCHOOL,
+}
+
+_PATTERN_TO_EXPECTED_TAG_MAP = {
+    re.compile(r"^Climbing-.+$"): "Climbing",
+    re.compile(r"^CTY.+$"): "CTY",
+    re.compile(r"^HubSpot.+$"): "HubSpot",
+    re.compile(r"^(NHS|NPS).+$"): "Needham",
+    re.compile(r"^NU.+$"): "NU",
+    re.compile(r"^PowerAdvocate.+$"): "PowerAdvocate",
+    re.compile(r"^Sharks.+$"): "Sharks",
 }
 
 
@@ -23,7 +34,7 @@ def run() -> None:
         _validate_tags(contact)
 
 
-def _validate_names(contacts: list[model.Contact]) -> None:
+def _validate_names(contacts: Sequence[model.Contact]) -> None:
     names_counter: collections.Counter[str] = collections.Counter()
     for contact in contacts:
         names_counter[contact_utils.build_name_str(contact)] += 1
@@ -47,9 +58,9 @@ def _validate_education(contact: model.Contact) -> None:
     if not contact.tags:
         return None
 
-    for pattern in PATTERN_TO_HIGH_SCHOOL_NAME_MAP.keys():
+    for pattern in _PATTERN_TO_HIGH_SCHOOL_NAME_MAP:
         if _any_tag_matches_pattern(contact.tags, pattern):
-            _expect_high_school(contact, PATTERN_TO_HIGH_SCHOOL_NAME_MAP[pattern])
+            _expect_high_school(contact, _PATTERN_TO_HIGH_SCHOOL_NAME_MAP[pattern])
 
 
 def _expect_high_school(contact: model.Contact, high_school_name: str) -> None:
@@ -73,26 +84,9 @@ def _validate_tags(contact: model.Contact) -> None:
     if not contact.tags:
         return None
 
-    if _any_tag_matches_pattern(contact.tags, re.compile(r"^Climbing-.+$")):
-        _expect_tag(contact, "Climbing")
-
-    if _any_tag_matches_pattern(contact.tags, re.compile(r"^CTY.+$")):
-        _expect_tag(contact, "CTY")
-
-    if _any_tag_matches_pattern(contact.tags, re.compile(r"^HubSpot.+$")):
-        _expect_tag(contact, "HubSpot")
-
-    if _any_tag_matches_pattern(contact.tags, re.compile(r"^(NHS|NPS).+$")):
-        _expect_tag(contact, "Needham")
-
-    if _any_tag_matches_pattern(contact.tags, re.compile(r"^NU.+$")):
-        _expect_tag(contact, "NU")
-
-    if _any_tag_matches_pattern(contact.tags, re.compile(r"^PowerAdvocate.+$")):
-        _expect_tag(contact, "PowerAdvocate")
-
-    if _any_tag_matches_pattern(contact.tags, re.compile(r"^Sharks.+$")):
-        _expect_tag(contact, "Sharks")
+    for pattern in _PATTERN_TO_EXPECTED_TAG_MAP:
+        if _any_tag_matches_pattern(contact.tags, pattern):
+            _expect_tag(contact, _PATTERN_TO_EXPECTED_TAG_MAP[pattern])
 
 
 def _expect_tag(contact: model.Contact, tag: str) -> None:

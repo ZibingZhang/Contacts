@@ -17,12 +17,12 @@ def run(*, force: bool, write: bool) -> None:
     disk_contacts = command_utils.read_contacts_from_disk()
     icloud_contacts = command_utils.read_contacts_from_icloud(cached=False)
 
-    icloud_id_to_disk_contact_map = {
+    icloud_id_to_disk_contact_map: dict[str, model.DiskContact] = {
         contact.icloud.uuid: contact
         for contact in disk_contacts
         if contact.icloud is not None
     }
-    icloud_id_to_icloud_contact_map = {
+    icloud_id_to_icloud_contact_map: dict[str, model.Contact] = {
         cast(model.ICloudMetadata, contact.icloud).uuid: contact
         for contact in icloud_contacts
     }
@@ -36,7 +36,7 @@ def run(*, force: bool, write: bool) -> None:
 
         print(pretty_print_utils.bordered(json_utils.dumps(new_contact.to_dict())))
 
-        if write or input_utils.yes_no_input("Accept creation?"):
+        if force or input_utils.yes_no_input("Accept creation?"):
             icloud_id_to_icloud_contact_map[icloud_id] = new_contact
             new_contacts.append(new_contact)
 

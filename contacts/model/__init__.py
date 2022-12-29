@@ -27,5 +27,6 @@ SocialProfiles = contact.SocialProfiles
 StreetAddress = contact.StreetAddress
 
 Contact = contact.Contact
+DiskContact = contact.DiskContact
 
 Group = group.Group

@@ -159,3 +159,8 @@ class Contact(dataclasses_utils.DataClassJsonMixin):
             super().__setattr__(key, list(sorted(set(value))))
         else:
             super().__setattr__(key, value)
+
+
+class DiskContact(Contact):
+    id: int
+    mtime: float

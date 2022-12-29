@@ -17,15 +17,19 @@ from contacts.utils import (
 def run(*, cached: bool) -> None:
     icloud_contacts = command_utils.read_contacts_from_icloud(cached=cached)
     disk_contacts = command_utils.read_contacts_from_disk()
+    next_id = len(disk_contacts) + 1
 
     icloud_id_to_icloud_contact_map: dict[str, model.Contact] = {
         cast(model.ICloudMetadata, contact.icloud).uuid: contact
         for contact in icloud_contacts
     }
-    icloud_id_to_disk_contact_map: dict[str, model.Contact] = {
+    icloud_id_to_disk_contact_map: dict[str, model.DiskContact] = {
         contact.icloud.uuid: contact
         for contact in disk_contacts
         if contact.icloud is not None
+    }
+    id_to_disk_contact_map: dict[int, model.DiskContact] = {
+        contact.id: contact for contact in disk_contacts
     }
 
     for icloud_id in (
@@ -35,7 +39,9 @@ def run(*, cached: bool) -> None:
         print(pretty_print_utils.bordered(json_utils.dumps(icloud_contact.to_dict())))
         if input_utils.yes_no_input("Accept creation?"):
             icloud_contact.mtime = time.time()
-            icloud_id_to_disk_contact_map[icloud_id] = icloud_contact
+            icloud_contact.id = next_id
+            next_id += 1
+            icloud_id_to_disk_contact_map[icloud_id] = icloud_contact  # type: ignore
 
     for icloud_id in (
         icloud_id_to_disk_contact_map.keys() & icloud_id_to_icloud_contact_map.keys()
@@ -62,9 +68,9 @@ def run(*, cached: bool) -> None:
                 updated_contact.mtime = time.time()
                 icloud_id_to_disk_contact_map[icloud_id] = updated_contact
 
-    command_utils.write_contacts_to_disk(
-        cast(list, icloud_id_to_disk_contact_map.values())
-    )
+    for contact in icloud_id_to_disk_contact_map.values():
+        id_to_disk_contact_map[contact.id] = contact
+    command_utils.write_contacts_to_disk(id_to_disk_contact_map.values())
 
 
 def _only_etag_updated(diff: dict) -> bool:

@@ -2,14 +2,22 @@
 from __future__ import annotations
 
 import time
-from typing import cast
 
-from contacts.utils import command_utils, dataclasses_utils, input_utils, json_utils, pretty_print_utils
+from contacts import model
+from contacts.utils import (
+    command_utils,
+    dataclasses_utils,
+    input_utils,
+    json_utils,
+    pretty_print_utils,
+)
 
 
 def run() -> None:
     contacts = command_utils.read_contacts_from_disk()
-    id_to_contact_map = {contact.id: contact for contact in contacts}
+    id_to_contact_map: dict[int, model.Contact] = {
+        contact.id: contact for contact in contacts
+    }
 
     updated_contact = command_utils.read_loaded_contact_from_disk()
     current_contact = id_to_contact_map[updated_contact.id]
@@ -25,4 +33,4 @@ def run() -> None:
         if input_utils.yes_no_input("Accept update?"):
             updated_contact.mtime = time.time()
             id_to_contact_map[updated_contact.id] = updated_contact
-            command_utils.write_contacts_to_disk(cast(list, id_to_contact_map.values()))
+            command_utils.write_contacts_to_disk(id_to_contact_map.values())

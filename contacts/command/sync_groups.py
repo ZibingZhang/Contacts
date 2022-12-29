@@ -1,6 +1,6 @@
 """Command to update remote contact groups."""
 import time
-from typing import Callable
+from collections.abc import Callable
 
 from contacts import model
 from contacts.utils import command_utils, uuid_utils
@@ -44,7 +44,7 @@ def _has_tag_predicate_factory(tag: str) -> Callable[[model.Contact], bool]:
 
 
 def _has_phone_number_predicate(contact: model.Contact) -> bool:
-    return bool(contact.phone_numbers)
+    return contact.phone_numbers is not None
 
 
 GROUP_NAME_TO_PREDICATE_MAP: dict[str, Callable[[model.Contact], bool]] = {

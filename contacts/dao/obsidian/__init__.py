@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import configparser
-import os
+import os.path
 import string
-from typing import Sequence
+from collections.abc import Sequence
 
 from contacts import model
 from contacts.common import constant
@@ -51,18 +51,23 @@ class ObsidianDao:
                 self._write_contact(path, contact)
 
     def _write_contact(self, path: str, contact: model.Contact) -> None:
+        header = _TEMPLATE.substitute(
+            display_name=self._build_display_name(contact.name),
+            phone_numbers=self._build_phone_numbers(contact.phone_numbers),
+            tags=self._build_tags(contact.tags),
+        )
+
+        if not os.path.exists(path):
+            with open(path, "w") as f:
+                f.write(header)
+                return None
+
         with open(path, "r+") as f:
             contact_file = f.read()
-            header, body = contact_file.split(_SEPERATOR)
+            _, body = contact_file.split(_SEPERATOR)
             f.seek(0)
             f.truncate()
-            text = _TEMPLATE.substitute(
-                display_name=self._build_display_name(contact.name),
-                phone_numbers=self._build_phone_numbers(contact.phone_numbers),
-                tags=self._build_tags(contact.tags),
-            )
-            text += body
-            f.write(text)
+            f.write(header + body)
 
     @staticmethod
     def _build_display_name(name: model.Name) -> str:

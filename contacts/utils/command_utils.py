@@ -1,7 +1,6 @@
 """High-level utilities for commands."""
 from __future__ import annotations
 
-import json
 import os.path
 from collections.abc import Sequence
 
@@ -20,10 +19,10 @@ from contacts.utils import (
 @progress_utils.annotate("Reading contacts from disk")
 def read_contacts_from_disk(
     *, file_name: str = constant.CONTACTS_FILE_NAME
-) -> list[model.Contact]:
+) -> list[model.DiskContact]:
     contacts = file_io_utils.read_json_array_as_dataclass_objects(
         os.path.join(constant.DATA_DIRECTORY, file_name),
-        model.Contact,
+        model.DiskContact,
     )
     progress_utils.message(f"Read {len(contacts)} contact(s)")
     return contacts
@@ -64,17 +63,17 @@ def write_loaded_contact_to_disk(contact: model.Contact) -> None:
 
 
 @progress_utils.annotate("Reading loaded contact")
-def read_loaded_contact_from_disk() -> model.Contact:
+def read_loaded_contact_from_disk() -> model.DiskContact:
     with open(
         os.path.join(constant.DATA_DIRECTORY, constant.LOADED_CONTACT_FILE_NAME)
     ) as f:
-        return model.Contact.from_json(f.read())
+        return model.DiskContact.from_json(f.read())
 
 
 @progress_utils.annotate("Creating new iCloud contacts")
 def write_new_contacts_to_icloud(contacts: list[model.Contact]) -> None:
     if len(contacts) > 0:
-        icloud_dao.upsert_contacts(contacts)
+        icloud_dao.create_contacts(contacts)
     progress_utils.message(f"Created {len(contacts)} contact(s)")
 
 
@@ -107,7 +106,7 @@ def write_updated_group_to_icloud(
     )
 
 
-def get_contact_by_name(contacts: list[model.Contact]) -> model.Contact | None:
+def get_contact_by_name(contacts: Sequence[model.Contact]) -> model.Contact | None:
     name = input_utils.basic_input(
         "Enter the name of the contact to select", lower=True
     )
@@ -145,7 +144,7 @@ def get_contact_by_name(contacts: list[model.Contact]) -> model.Contact | None:
 
 
 def _get_matching_contacts(
-    contacts: list[model.Contact], name: str
+    contacts: Sequence[model.Contact], name: str
 ) -> list[model.Contact]:
     name = " ".join(name.strip().split())
     matching_contacts = []

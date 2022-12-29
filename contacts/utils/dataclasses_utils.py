@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import Any, Callable, Tuple, TypeVar, Union
+from collections.abc import Callable
+from typing import Any, Tuple, TypeVar, Union
 
 import dataclasses_json
 import jsondiff
@@ -57,10 +58,7 @@ class DataClassJsonMixin(dataclasses_json.DataClassJsonMixin):
     def copy(self: TDataClassJsonMixin) -> TDataClassJsonMixin:
         return self.__class__.from_dict(self.to_dict())
 
-    def patch(self: TDataClassJsonMixin, patch: TDataClassJsonMixin) -> None:
-        if not issubclass(patch.__class__, self.__class__):
-            raise ValueError
-
+    def patch(self: TDataClassJsonMixin, patch: Any) -> None:
         for field in dataclasses.fields(self):
             self_value = getattr(self, field.name)
             patch_value = getattr(patch, field.name)
