@@ -35,7 +35,7 @@ class ObsidianDao:
             os.path.join(root, "data", "contacts", "objects")
         )
 
-    def create_contacts(self, contacts: Sequence[model.Contact]) -> None:
+    def upsert_contacts(self, contacts: Sequence[model.Contact]) -> None:
         for contact in contacts:
             if contact.id is None:
                 continue

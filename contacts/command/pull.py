@@ -62,7 +62,9 @@ def run(*, cached: bool) -> None:
                 updated_contact.mtime = time.time()
                 icloud_id_to_disk_contact_map[icloud_id] = updated_contact
 
-    command_utils.write_contacts_to_disk(list(icloud_id_to_disk_contact_map.values()))
+    command_utils.write_contacts_to_disk(
+        cast(list, icloud_id_to_disk_contact_map.values())
+    )
 
 
 def _only_etag_updated(diff: dict) -> bool:

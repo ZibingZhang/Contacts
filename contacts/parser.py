@@ -23,6 +23,8 @@ def _create_parser() -> argparse.ArgumentParser:
     )
 
     _build_add_command_parser(command_parser)
+    _build_dump_command_parser(command_parser)
+    _build_load_command_parser(command_parser)
     _build_pull_command_parser(command_parser)
     _build_push_command_parser(command_parser)
     _build_tag_command_parser(command_parser)
@@ -37,6 +39,22 @@ def _build_add_command_parser(command_parser: argparse._SubParsersAction) -> Non
         command.Command.ADD.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="add a contact",
+    )
+
+
+def _build_dump_command_parser(command_parser: argparse._SubParsersAction) -> None:
+    command_parser.add_parser(
+        command.Command.DUMP.value,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        help="dump a contact",
+    )
+
+
+def _build_load_command_parser(command_parser: argparse._SubParsersAction) -> None:
+    command_parser.add_parser(
+        command.Command.LOAD.value,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        help="load a contact",
     )
 
 

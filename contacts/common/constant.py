@@ -8,7 +8,8 @@ DATA_DIRECTORY = "data"
 CONFIG_FILE = "config.ini"
 
 CONTACTS_FILE_NAME = "contacts.json"
-NEW_CONTACT_FILE_NAME = "new-contacts.json"
+LOADED_CONTACT_FILE_NAME = "loaded-contact.json"
+NEW_CONTACTS_FILE_NAME = "new-contacts.json"
 
 ICLOUD_CONTACTS_FILE_NAME = "icloud-contacts.json"
 ICLOUD_GROUPS_FILE_NAME = "icloud-groups.json"

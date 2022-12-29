@@ -7,7 +7,7 @@ from contacts.utils import command_utils, contact_utils, input_utils
 
 def run() -> None:
     new_contacts = command_utils.read_contacts_from_disk(
-        file_name=constant.NEW_CONTACT_FILE_NAME
+        file_name=constant.NEW_CONTACTS_FILE_NAME
     )
     contacts = command_utils.read_contacts_from_disk()
 

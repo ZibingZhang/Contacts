@@ -1,11 +1,13 @@
 """Command line commands."""
 import enum
 
-from contacts.command import add, pull, push, sync_groups, tag, validate
+from contacts.command import add, dump, load, pull, push, sync_groups, tag, validate
 
 
 class Command(enum.StrEnum):
     ADD = "add"
+    DUMP = "dump"
+    LOAD = "load"
     PULL = "pull"
     PUSH = "push"
     SYNC_GROUPS = "sync-groups"
@@ -14,6 +16,8 @@ class Command(enum.StrEnum):
 
 
 add = add
+dump = dump
+load = load
 pull = pull
 push = push
 sync_groups = sync_groups

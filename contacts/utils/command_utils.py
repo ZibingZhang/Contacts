@@ -1,18 +1,25 @@
 """High-level utilities for commands."""
 from __future__ import annotations
 
+import json
 import os.path
 from collections.abc import Sequence
 
 from contacts import model
 from contacts.common import constant
 from contacts.dao import icloud_dao, obsidian_dao
-from contacts.utils import contact_utils, file_io_utils, input_utils, progress_utils
+from contacts.utils import (
+    contact_utils,
+    file_io_utils,
+    input_utils,
+    json_utils,
+    progress_utils,
+)
 
 
 @progress_utils.annotate("Reading contacts from disk")
 def read_contacts_from_disk(
-    *, file_name=constant.CONTACTS_FILE_NAME
+    *, file_name: str = constant.CONTACTS_FILE_NAME
 ) -> list[model.Contact]:
     contacts = file_io_utils.read_json_array_as_dataclass_objects(
         os.path.join(constant.DATA_DIRECTORY, file_name),
@@ -37,19 +44,37 @@ def read_groups_from_icloud() -> list[model.Group]:
 
 
 @progress_utils.annotate("Writing contacts to disk")
-def write_contacts_to_disk(contacts: Sequence[model.Contact]) -> None:
+def write_contacts_to_disk(
+    contacts: Sequence[model.Contact], *, file_name: str = constant.CONTACTS_FILE_NAME
+) -> None:
     file_io_utils.write_contacts_as_json_array(
-        os.path.join(constant.DATA_DIRECTORY, constant.CONTACTS_FILE_NAME),
+        os.path.join(constant.DATA_DIRECTORY, file_name),
         contacts,
     )
-    obsidian_dao.create_contacts(contacts)
+    obsidian_dao.upsert_contacts(contacts)
     progress_utils.message(f"Wrote {len(contacts)} contact(s) to disk")
+
+
+@progress_utils.annotate("Loading contact")
+def write_loaded_contact_to_disk(contact: model.Contact) -> None:
+    with open(
+        os.path.join(constant.DATA_DIRECTORY, constant.LOADED_CONTACT_FILE_NAME), "w"
+    ) as f:
+        f.write(json_utils.dumps(contact.to_dict()))
+
+
+@progress_utils.annotate("Reading loaded contact")
+def read_loaded_contact_from_disk() -> model.Contact:
+    with open(
+        os.path.join(constant.DATA_DIRECTORY, constant.LOADED_CONTACT_FILE_NAME)
+    ) as f:
+        return model.Contact.from_json(f.read())
 
 
 @progress_utils.annotate("Creating new iCloud contacts")
 def write_new_contacts_to_icloud(contacts: list[model.Contact]) -> None:
     if len(contacts) > 0:
-        icloud_dao.create_contacts(contacts)
+        icloud_dao.upsert_contacts(contacts)
     progress_utils.message(f"Created {len(contacts)} contact(s)")
 
 
