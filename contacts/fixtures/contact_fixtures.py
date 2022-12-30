@@ -17,5 +17,5 @@ def build(**kwargs) -> model.Contact:
     if "name" not in kwargs:
         kwargs["name"] = model.Name()
     if "icloud" not in kwargs:
-        kwargs["icloud"] = (model.ICloudMetadata(uuid=uuid_utils.generate()),)
+        kwargs["icloud"] = model.ICloudMetadata(uuid=uuid_utils.generate())
     return model.Contact(**kwargs)  # type: ignore
