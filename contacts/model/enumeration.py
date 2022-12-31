@@ -43,6 +43,7 @@ class HighSchoolName(enum.StrEnum):
     CATHOLIC_MEMORIAL = "Catholic Memorial"
     CHAPIN_SCHOOL = "Chapin School"
     COLCHESTER_HIGH_SCHOOL = "Colchester High School"
+    COLUMBIA_HIGH_SCHOOL = "Columbia High School"
     CONCORD_CARLISLE_REGIONAL_HIGH_SCHOOL = "Concord-Carlisle Regional High School"
     DEXTER_SOUTHFIELD_SCHOOL = "Dexter Southfield School"
     DOVER_SHERBORN_HIGH_SCHOOL = "Dover-Sherborn High School"

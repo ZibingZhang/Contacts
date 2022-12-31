@@ -4,7 +4,7 @@ import dataclasses
 from contacts.utils import dataclasses_utils
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class HeaderPositions(dataclasses_utils.DataClassJsonMixin):
     A: int | None = None
     B: int | None = None
@@ -34,7 +34,7 @@ class HeaderPositions(dataclasses_utils.DataClassJsonMixin):
     Z: int | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class ICloudGroup(dataclasses_utils.DataClassJsonMixin):
     contactIds: list[str]
     groupId: str

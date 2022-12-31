@@ -53,7 +53,7 @@ def decoder(date: str | None) -> model.Date | None:
     return model.Date(year=year, month=month, day=day)
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class DateRange(dataclasses_utils.DataClassJsonMixin):
     start: Date | None = dataclasses.field(
         metadata=dataclasses_json.config(
@@ -69,7 +69,7 @@ class DateRange(dataclasses_utils.DataClassJsonMixin):
     )
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class Date(dataclasses_utils.DataClassJsonMixin):
     day: int | None = None
     month: int | None = None

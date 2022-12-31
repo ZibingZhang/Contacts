@@ -28,6 +28,18 @@ def read_contacts_from_disk(
     return contacts
 
 
+@progress_utils.annotate("Reading new contacts from disk")
+def read_new_contacts_from_disk(
+    *, file_name: str = constant.NEW_CONTACTS_FILE_NAME
+) -> list[model.Contact]:
+    contacts = file_io_utils.read_json_array_as_dataclass_objects(
+        os.path.join(constant.DATA_DIRECTORY, file_name),
+        model.Contact,
+    )
+    progress_utils.message(f"Read {len(contacts)} contact(s)")
+    return contacts
+
+
 @progress_utils.annotate("Reading contacts from iCloud")
 def read_contacts_from_icloud(cached: bool = False) -> list[model.Contact]:
     contacts, _ = icloud_dao.read_contacts_and_groups(cached=cached)

@@ -7,7 +7,7 @@ from contacts import model
 from contacts.utils import dataclasses_utils, yaml_utils
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class School(dataclasses_utils.DataClassJsonMixin):
     name: str
     grad_year: int | None = None
@@ -15,20 +15,20 @@ class School(dataclasses_utils.DataClassJsonMixin):
     minors: str | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class Education(dataclasses_utils.DataClassJsonMixin):
     bachelor: School | None = None
     high_school: School | None = None
     master: School | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class Favorites(dataclasses_utils.DataClassJsonMixin):
     candy: str | None = None
     color: str | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class Notes(dataclasses_utils.DataClassJsonMixin):
     chinese_name: str | None = None
     comment: str | None = None

@@ -3,12 +3,12 @@ from __future__ import annotations
 
 import dataclasses
 from collections.abc import Callable
-from typing import Any, Tuple, TypeVar, Union
+from typing import Any, TypeVar
 
 import dataclasses_json
 import jsondiff
 
-TDataClassJsonMixin = TypeVar("TDataClassJsonMixin", bound="DataClassJsonMixin")
+_TDataClassJsonMixin = TypeVar("_TDataClassJsonMixin", bound="DataClassJsonMixin")
 
 
 def diff(dataclass_1: DataClassJsonMixin, dataclass_2: DataClassJsonMixin) -> dict:
@@ -31,14 +31,14 @@ class DataClassJsonMixin(dataclasses_json.DataClassJsonMixin):
     )["dataclasses_json"]
 
     def to_json(
-        self: TDataClassJsonMixin,
+        self: _TDataClassJsonMixin,
         *,
         skipkeys: bool = False,
         ensure_ascii: bool = False,
         check_circular: bool = True,
         allow_nan: bool = True,
-        indent: Union[int, str, None] = None,
-        separators: Tuple[str, str] | None = None,
+        indent: int | str | None = None,
+        separators: tuple[str, str] | None = None,
         default: Callable[..., Any] | None = None,
         sort_keys: bool = False,
         **kw,
@@ -55,10 +55,17 @@ class DataClassJsonMixin(dataclasses_json.DataClassJsonMixin):
             **kw,
         )
 
-    def copy(self: TDataClassJsonMixin) -> TDataClassJsonMixin:
+    def __repr__(self) -> str:
+        dict_repr = ", ".join(
+            f"{k}={v!r}"
+            for k, v in filter(lambda item: item[1] is not None, self.__dict__.items())
+        )
+        return f"{self.__class__.__name__}({dict_repr})"
+
+    def copy(self: _TDataClassJsonMixin) -> _TDataClassJsonMixin:
         return self.__class__.from_dict(self.to_dict())
 
-    def patch(self: TDataClassJsonMixin, patch: Any) -> None:
+    def patch(self: _TDataClassJsonMixin, patch: Any) -> None:
         for field in dataclasses.fields(self):
             self_value = getattr(self, field.name)
             patch_value = getattr(patch, field.name)

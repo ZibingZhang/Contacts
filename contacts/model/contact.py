@@ -10,7 +10,7 @@ from contacts.model import date, enumeration
 from contacts.utils import dataclasses_utils
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class HighSchool(dataclasses_utils.DataClassJsonMixin):
     name: str
     graduation_year: int | None = None
@@ -19,7 +19,7 @@ class HighSchool(dataclasses_utils.DataClassJsonMixin):
         assert self.name in enumeration.HighSchoolName.values()
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class University(dataclasses_utils.DataClassJsonMixin):
     name: str
     graduation_year: int | None = None
@@ -30,20 +30,23 @@ class University(dataclasses_utils.DataClassJsonMixin):
         assert self.name in enumeration.UniversityName.values()
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class Education(dataclasses_utils.DataClassJsonMixin):
     bachelor: University | None = None
     high_school: HighSchool | None = None
+    law: University | None = None
     master: University | None = None
+    medical: University | None = None
+    phd: University | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class EmailAddress(dataclasses_utils.DataClassJsonMixin):
     address: str
     label: str
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class ICloudPhotoCrop(dataclasses_utils.DataClassJsonMixin):
     height: int
     width: int
@@ -51,7 +54,7 @@ class ICloudPhotoCrop(dataclasses_utils.DataClassJsonMixin):
     y: int
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class ICloudPhoto(dataclasses_utils.DataClassJsonMixin):
     crop: ICloudPhotoCrop
     signature: str
@@ -59,14 +62,14 @@ class ICloudPhoto(dataclasses_utils.DataClassJsonMixin):
     whitelisted: bool | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class ICloudMetadata(dataclasses_utils.DataClassJsonMixin):
     uuid: str
     etag: str | None = None
     photo: ICloudPhoto | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class Name(dataclasses_utils.DataClassJsonMixin):
     prefix: str | None = None
     first_name: str | None = None
@@ -77,7 +80,7 @@ class Name(dataclasses_utils.DataClassJsonMixin):
     chinese_name: str | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class PhoneNumber(dataclasses_utils.DataClassJsonMixin):
     number: str
     country_code: int = enumeration.CountryCode.NANP.value
@@ -88,31 +91,31 @@ class PhoneNumber(dataclasses_utils.DataClassJsonMixin):
 
 
 # https://www.facebook.com/help/211813265517027
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class FacebookProfile(dataclasses_utils.DataClassJsonMixin):
     user_id: str | None = None
     username: str | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class GameCenterProfile(dataclasses_utils.DataClassJsonMixin):
     link: str
     username: str
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class InstagramProfile(dataclasses_utils.DataClassJsonMixin):
     username: str
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class SocialProfiles(dataclasses_utils.DataClassJsonMixin):
     facebook: FacebookProfile | None = None
     game_center: GameCenterProfile | None = None
     instagram: InstagramProfile | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class StreetAddress(dataclasses_utils.DataClassJsonMixin):
     label: str
     country: str | None = None
@@ -125,7 +128,7 @@ class StreetAddress(dataclasses_utils.DataClassJsonMixin):
         assert self.country is None or self.country in enumeration.Country.values()
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class Contact(dataclasses_utils.DataClassJsonMixin):
     name: Name
     icloud: ICloudMetadata | None = None

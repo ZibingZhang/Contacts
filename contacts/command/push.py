@@ -50,9 +50,8 @@ def run(*, force: bool, write: bool) -> None:
         disk_contact = icloud_id_to_disk_contact_map[icloud_id]
         icloud_contact = icloud_id_to_icloud_contact_map[icloud_id]
 
-        updated_contact = disk_contact.copy()
-        updated_contact.patch(icloud_contact)
-        diff = dataclasses_utils.diff(updated_contact, disk_contact)
+        diff = dataclasses_utils.diff(icloud_contact, disk_contact)
+        diff = _normalize_diff(diff)
 
         if diff:
             current_contact_display = pretty_print_utils.bordered(
@@ -82,3 +81,12 @@ def run(*, force: bool, write: bool) -> None:
     if write and (len(new_contacts) > 0 or len(updated_contacts) > 0):
         print("Pulling contact(s) to sync etag(s)...")
         command.pull.run(cached=False)
+
+
+def _normalize_diff(diff: dict) -> dict:
+    if diff.get("$insert") is not None:
+        del diff["$insert"]["id"]
+        del diff["$insert"]["mtime"]
+        if not diff["$insert"]:
+            del diff["$insert"]
+        return diff

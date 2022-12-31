@@ -10,7 +10,7 @@ from contacts.dao.icloud.model import date
 from contacts.utils import dataclasses_utils
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class Date(dataclasses_utils.DataClassJsonMixin):
     label: str
     field: model.Date = dataclasses.field(
@@ -21,31 +21,31 @@ class Date(dataclasses_utils.DataClassJsonMixin):
     )
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class EmailAddress(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class IMField(dataclasses_utils.DataClassJsonMixin):
     IMService: str
     userName: str
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class IM(dataclasses_utils.DataClassJsonMixin):
     field: IMField
     label: str
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class Phone(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class Profile(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str | None = None
@@ -54,13 +54,13 @@ class Profile(dataclasses_utils.DataClassJsonMixin):
     userId: str | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class RelatedName(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class StreetAddressField(dataclasses_utils.DataClassJsonMixin):
     country: str | None = None
     countryCode: str | None = None
@@ -71,19 +71,19 @@ class StreetAddressField(dataclasses_utils.DataClassJsonMixin):
     subLocality: str | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class StreetAddress(dataclasses_utils.DataClassJsonMixin):
     field: StreetAddressField
     label: str
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class Url(dataclasses_utils.DataClassJsonMixin):
     field: str
     label: str
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(repr=False)
 class ICloudContact(dataclasses_utils.DataClassJsonMixin):
     contactId: str
     isCompany: bool
