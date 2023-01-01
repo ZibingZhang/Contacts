@@ -89,4 +89,4 @@ def _normalize_diff(diff: dict) -> dict:
         del diff["$insert"]["mtime"]
         if not diff["$insert"]:
             del diff["$insert"]
-        return diff
+    return diff
