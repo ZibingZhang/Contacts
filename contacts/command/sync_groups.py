@@ -8,10 +8,13 @@ from contacts.utils import command_utils, uuid_utils
 
 def run() -> None:
     contacts = command_utils.read_contacts_from_disk()
-    icloud_groups = command_utils.read_groups_from_icloud(cached=False)
-    group_name_to_group_map = {
+    icloud_groups = command_utils.read_groups_from_icloud()
+    group_name_to_icloud_group_map: dict[str, model.Group] = {
         icloud_group.name: icloud_group for icloud_group in icloud_groups
     }
+
+    new_groups: list[model.Group] = []
+    updated_groups: list[model.Group] = []
 
     for name, predicate in GROUP_NAME_TO_PREDICATE_MAP.items():
         contact_uuids = [
@@ -19,8 +22,8 @@ def run() -> None:
             for contact in contacts
             if contact.icloud is not None and predicate(contact)
         ]
-        if name not in group_name_to_group_map.keys():
-            command_utils.write_new_group_to_icloud(
+        if name not in group_name_to_icloud_group_map.keys():
+            new_groups.append(
                 model.Group(
                     icloud=model.group.ICloudMetadata(
                         contact_uuids=contact_uuids,
@@ -30,9 +33,18 @@ def run() -> None:
                 )
             )
         else:
-            group = group_name_to_group_map[name]
+            group = group_name_to_icloud_group_map[name]
+            if set(contact_uuids) == set(group.icloud.contact_uuids):
+                print(f"Skipping iCloud group {name}")
+                continue
             group.icloud.contact_uuids = contact_uuids
-            command_utils.write_updated_group_to_icloud(group)
+            updated_groups.append(group)
+
+    for group in new_groups:
+        command_utils.write_new_group_to_icloud(group)
+        time.sleep(1)
+    for group in updated_groups:
+        command_utils.write_updated_group_to_icloud(group)
         time.sleep(1)
 
 
