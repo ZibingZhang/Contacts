@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 
 from contacts import model
 
@@ -82,3 +83,17 @@ def build_name_and_tags_str(contact: model.Contact) -> str:
         The name and tags of the contact.
     """
     return f"{build_name_str(contact)} -- {contact.tags}"
+
+
+def extract_tags(contacts: Sequence[model.Contact]) -> list[str]:
+    """Extract all tags from the contacts.
+
+    Args:
+        contacts: The contacts.
+
+    Returns:
+        A list of all the tags the contacts have.
+    """
+    return list(
+        sorted(set(tag for contact in contacts for tag in (contact.tags or [])))
+    )

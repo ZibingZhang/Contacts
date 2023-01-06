@@ -35,7 +35,13 @@ def _run_command(cl_args: argparse.Namespace) -> None:
             command.sync_groups.run()
 
         case command.Command.TAG:
-            command.tag.run(tag_action=cl_args.tag_action, action_specific_args=cl_args)
+            match cl_args.tag_action:
+                case command.TagSubcommand.LS:
+                    command.tag_ls.run()
+                case command.TagSubcommand.MV:
+                    command.tag_mv.run(old=cl_args.old, new=cl_args.new)
+                case command.TagSubcommand.REPL:
+                    command.tag_repl.run()
 
         case command.Command.VALIDATE:
             command.validate.run()

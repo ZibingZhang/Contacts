@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse
 
 from contacts import command
-from contacts.command import tag
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -108,12 +107,12 @@ def _build_tag_command_parser(command_parser: argparse._SubParsersAction) -> Non
 
     tag_action_parser = tag_parser.add_subparsers(dest="tag_action", help="tag actions")
 
-    tag_action_parser.add_parser(tag.TagAction.LS.value, help="list all tags")
+    tag_action_parser.add_parser(command.TagSubcommand.LS, help="list all tags")
     mv_tag_action_parser = tag_action_parser.add_parser(
-        tag.TagAction.MV.value, help="rename a tag"
+        command.TagSubcommand.MV, help="rename a tag"
     )
     tag_action_parser.add_parser(
-        tag.TagAction.REPL.value, help="repl to add tags to contacts"
+        command.TagSubcommand.REPL, help="repl to add tags to contacts"
     )
 
     mv_tag_action_parser.add_argument(
