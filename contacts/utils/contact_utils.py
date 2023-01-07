@@ -73,6 +73,18 @@ def build_name_str(contact: model.Contact) -> str:
     return " ".join(name_parts)
 
 
+def build_name_and_id_str(contact: model.Contact) -> str:
+    """Extract the name and id from a contact.
+
+    Args:
+        contact: A contact.
+
+    Returns:
+        The name and id of the contact.
+    """
+    return f"{build_name_str(contact)} ({contact.id})"
+
+
 def build_name_and_tags_str(contact: model.Contact) -> str:
     """Extract the name and tags from a contact.
 

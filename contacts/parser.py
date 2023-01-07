@@ -23,6 +23,7 @@ def _create_parser() -> argparse.ArgumentParser:
 
     _build_add_command_parser(command_parser)
     _build_dump_command_parser(command_parser)
+    _build_families_command_parser(command_parser)
     _build_load_command_parser(command_parser)
     _build_pull_command_parser(command_parser)
     _build_push_command_parser(command_parser)
@@ -35,7 +36,7 @@ def _create_parser() -> argparse.ArgumentParser:
 
 def _build_add_command_parser(command_parser: argparse._SubParsersAction) -> None:
     command_parser.add_parser(
-        command.Command.ADD.value,
+        command.Command.ADD,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="add a contact",
     )
@@ -43,15 +44,23 @@ def _build_add_command_parser(command_parser: argparse._SubParsersAction) -> Non
 
 def _build_dump_command_parser(command_parser: argparse._SubParsersAction) -> None:
     command_parser.add_parser(
-        command.Command.DUMP.value,
+        command.Command.DUMP,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="dump a contact",
     )
 
 
+def _build_families_command_parser(command_parser: argparse._SubParsersAction) -> None:
+    command_parser.add_parser(
+        command.Command.FAMILIES,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        help="view all families",
+    )
+
+
 def _build_load_command_parser(command_parser: argparse._SubParsersAction) -> None:
     command_parser.add_parser(
-        command.Command.LOAD.value,
+        command.Command.LOAD,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="load a contact",
     )
@@ -59,7 +68,7 @@ def _build_load_command_parser(command_parser: argparse._SubParsersAction) -> No
 
 def _build_pull_command_parser(command_parser: argparse._SubParsersAction) -> None:
     pull_parser = command_parser.add_parser(
-        command.Command.PULL.value,
+        command.Command.PULL,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="pull contacts from remote source",
     )
@@ -70,7 +79,7 @@ def _build_pull_command_parser(command_parser: argparse._SubParsersAction) -> No
 
 def _build_push_command_parser(command_parser: argparse._SubParsersAction) -> None:
     push_parser = command_parser.add_parser(
-        command.Command.PUSH.value,
+        command.Command.PUSH,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="push contacts to remote source",
     )
@@ -92,7 +101,7 @@ def _build_sync_groups_command_parser(
     command_parser: argparse._SubParsersAction,
 ) -> None:
     command_parser.add_parser(
-        command.Command.SYNC_GROUPS.value,
+        command.Command.SYNC_GROUPS,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="sync contact groups",
     )
@@ -100,7 +109,7 @@ def _build_sync_groups_command_parser(
 
 def _build_tag_command_parser(command_parser: argparse._SubParsersAction) -> None:
     tag_parser = command_parser.add_parser(
-        command.Command.TAG.value,
+        command.Command.TAG,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="tag contacts",
     )
@@ -125,7 +134,7 @@ def _build_tag_command_parser(command_parser: argparse._SubParsersAction) -> Non
 
 def _build_validate_command_parser(command_parser: argparse._SubParsersAction) -> None:
     command_parser.add_parser(
-        command.Command.VALIDATE.value,
+        command.Command.VALIDATE,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="validate contacts",
     )

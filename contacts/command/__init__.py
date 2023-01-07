@@ -4,6 +4,7 @@ import enum
 from contacts.command import (
     add,
     dump,
+    families,
     load,
     pull,
     push,
@@ -18,6 +19,7 @@ from contacts.command import (
 class Command(enum.StrEnum):
     ADD = "add"
     DUMP = "dump"
+    FAMILIES = "families"
     LOAD = "load"
     PULL = "pull"
     PUSH = "push"
@@ -30,15 +32,3 @@ class TagSubcommand(enum.StrEnum):
     LS = "ls"
     MV = "mv"
     REPL = "repl"
-
-
-add = add
-dump = dump
-load = load
-pull = pull
-push = push
-sync_groups = sync_groups
-tag_ls = tag_ls
-tag_mv = tag_mv
-tag_repl = tag_repl
-validate = validate

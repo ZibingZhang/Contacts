@@ -2,12 +2,9 @@
 from __future__ import annotations
 
 import re
-import typing
 
+from contacts import model
 from contacts.common import error
-
-if typing.TYPE_CHECKING:
-    from contacts import model
 
 NO_YEAR = 1604
 

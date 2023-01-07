@@ -3,15 +3,12 @@ from __future__ import annotations
 
 import dataclasses
 import re
-import typing
 
 import dataclasses_json
 
+from contacts import model
 from contacts.common import error
 from contacts.utils import dataclasses_utils
-
-if typing.TYPE_CHECKING:
-    from contacts import model
 
 
 def encoder(date: model.Date | None) -> str | None:

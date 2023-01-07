@@ -1,14 +1,11 @@
 """Utilities for YAML formatted data."""
 from __future__ import annotations
 
-import typing
 from typing import Any
 
 import yaml
 
-if typing.TYPE_CHECKING:
-    from contacts.utils import dataclasses_utils
-
+from contacts.utils import dataclasses_utils
 
 INDENT_SIZE = 4
 INDENT = " " * INDENT_SIZE

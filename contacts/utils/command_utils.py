@@ -118,6 +118,18 @@ def write_updated_group_to_icloud(
     )
 
 
+@progress_utils.annotate("Reading families")
+def read_families_from_disk(
+    *, file_name: str = constant.FAMILIES_FILE_NAME
+) -> list[model.Family]:
+    families = file_io_utils.read_json_array_as_dataclass_objects(
+        os.path.join(constant.DATA_DIRECTORY, file_name),
+        model.Family,
+    )
+    progress_utils.message(f"Read {len(families)} families(s)")
+    return families
+
+
 def get_contact_by_name(contacts: Sequence[model.Contact]) -> model.Contact | None:
     name = input_utils.basic_input(
         "Enter the name of the contact to select", lower=True

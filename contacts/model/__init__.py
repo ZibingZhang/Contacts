@@ -1,5 +1,5 @@
 """Contact models."""
-from contacts.model import contact, date, enumeration, group
+from contacts.model import contact, date, enumeration, family, group
 
 Date = date.Date
 DateRange = date.DateRange
@@ -29,4 +29,5 @@ StreetAddress = contact.StreetAddress
 Contact = contact.Contact
 DiskContact = contact.DiskContact
 
+Family = family.Family
 Group = group.Group

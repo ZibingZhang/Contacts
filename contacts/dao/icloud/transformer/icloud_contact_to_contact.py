@@ -2,14 +2,10 @@
 from __future__ import annotations
 
 import re
-import typing
 
 from contacts import model
+from contacts.dao import icloud
 from contacts.dao.icloud.model import notes as nt
-
-if typing.TYPE_CHECKING:
-    from contacts.dao import icloud
-
 
 PHONE_NUMBER_REGEX = re.compile(r"^\+\d+$")
 

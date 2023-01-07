@@ -130,9 +130,13 @@ class StreetAddress(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass(repr=False)
 class Contact(dataclasses_utils.DataClassJsonMixin):
+    # Required
     name: Name
-    icloud: ICloudMetadata | None = None
+
+    # Unique id
     id: int | None = None
+
+    # Information
     birthday: date.Date | None = dataclasses.field(
         default=None,
         metadata=dataclasses_json.config(
@@ -145,12 +149,17 @@ class Contact(dataclasses_utils.DataClassJsonMixin):
     email_addresses: list[EmailAddress] | None = None
     favorite: dict | None = None
     friends_friend: str | None = None
-    mtime: float | None = None
     notes: str | None = None
     phone_numbers: list[PhoneNumber] | None = None
     social_profiles: SocialProfiles | None = None
     street_addresses: list[StreetAddress] | None = None
     tags: list[str] | None = None
+
+    # Meta information
+    mtime: float | None = None
+
+    # iCloud specific
+    icloud: ICloudMetadata | None = None
 
     def __setattr__(self, key: str, value: Any) -> None:
         if key == "email_addresses" and value is not None:

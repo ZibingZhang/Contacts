@@ -1,14 +1,11 @@
 """Command to start the tag repl."""
 from __future__ import annotations
 
-import typing
 from collections.abc import Sequence
 
+from contacts import model
 from contacts.common import error
 from contacts.utils import command_utils, contact_utils, input_utils
-
-if typing.TYPE_CHECKING:
-    from contacts import model
 
 
 def run() -> None:

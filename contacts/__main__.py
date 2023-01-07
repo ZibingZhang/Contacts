@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import typing
+import argparse
 
 from contacts import command, parser
 from contacts.common import error
 from contacts.dao import icloud_dao
-
-if typing.TYPE_CHECKING:
-    import argparse
 
 
 def _run_command(cl_args: argparse.Namespace) -> None:
@@ -17,6 +14,9 @@ def _run_command(cl_args: argparse.Namespace) -> None:
 
         case command.Command.DUMP:
             command.dump.run()
+
+        case command.Command.FAMILIES:
+            command.families.run()
 
         case command.Command.LOAD:
             command.load.run()
