@@ -1,6 +1,4 @@
 """Constants."""
-from __future__ import annotations
-
 from contacts import model
 
 CACHE_DIRECTORY = "cache"
