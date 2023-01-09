@@ -82,4 +82,4 @@ def write_dataclass_objects_as_json_array(
 
 
 def _contact_key(contact: model.Contact) -> str:
-    return f"{contact.name.last_name}{contact.name.first_name}{contact.tags}"
+    return f"{contact.name.last_name or ' '}{contact.name.first_name}{contact.tags}"
