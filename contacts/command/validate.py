@@ -18,9 +18,12 @@ _PATTERN_TO_EXPECTED_TAG_MAP = {
     re.compile(r"^Climbing-.+$"): "Climbing",
     re.compile(r"^CTY.+$"): "CTY",
     re.compile(r"^HubSpot.+$"): "HubSpot",
+    re.compile(r"^NHS.*$"): "NHS",
+    re.compile(r"^NHS\d{2}$"): "NPS",
     re.compile(r"^(NHS|NPS).+$"): "Needham",
     re.compile(r"^NU.+$"): "NU",
     re.compile(r"^PowerAdvocate.+$"): "PowerAdvocate",
+    re.compile(r"^SAB$"): "Boston",
     re.compile(r"^Sharks.+$"): "Sharks",
 }
 
@@ -59,11 +62,13 @@ def _validate_education(contact: model.Contact) -> None:
         return None
 
     for pattern in _PATTERN_TO_HIGH_SCHOOL_NAME_MAP:
-        if _any_tag_matches_pattern(contact.tags, pattern):
-            _expect_high_school(contact, _PATTERN_TO_HIGH_SCHOOL_NAME_MAP[pattern])
+        if tag := _any_tag_matches_pattern(contact.tags, pattern):
+            _expect_high_school(contact, tag, _PATTERN_TO_HIGH_SCHOOL_NAME_MAP[pattern])
 
 
-def _expect_high_school(contact: model.Contact, high_school_name: str) -> None:
+def _expect_high_school(
+    contact: model.Contact, tag: str, high_school_name: str
+) -> None:
     contact_name = contact_utils.build_name_str(contact)
     if contact.education is None:
         print(f"{contact_name} missing education")
@@ -77,7 +82,11 @@ def _expect_high_school(contact: model.Contact, high_school_name: str) -> None:
         contact.education.high_school.name == model.HighSchoolName.NEEDHAM_HIGH_SCHOOL
         and contact.education.high_school.graduation_year is None
     ):
-        print(f"{contact_name} missing graduation year")
+        graduation_year = 2000 + int(tag[-2:])
+        if contact.education.high_school.graduation_year is None:
+            print(f"{contact_name} missing high school graduation year")
+        elif graduation_year != contact.education.high_school.graduation_year:
+            print(f"{contact_name} mismatched high school graduation year")
 
 
 def _validate_tags(contact: model.Contact) -> None:
@@ -94,5 +103,8 @@ def _expect_tag(contact: model.Contact, tag: str) -> None:
         print(f"{contact_utils.build_name_str(contact)} missing {tag} tag")
 
 
-def _any_tag_matches_pattern(tags: list[str], pattern: re.Pattern) -> bool:
-    return any(pattern.match(tag) for tag in tags)
+def _any_tag_matches_pattern(tags: list[str], pattern: re.Pattern) -> str | False:
+    for tag in tags:
+        if pattern.match(tag):
+            return tag
+    return False

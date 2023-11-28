@@ -2,8 +2,6 @@
 from __future__ import annotations
 
 import json
-import re
-from typing import cast
 
 from contacts.dao import icloud
 
@@ -24,8 +22,9 @@ class ICloudContactManager:
         self._groups_update_url = "%s/card" % self._groups_endpoint
 
         self._pref_token = ""
-        self._sync_token_prefix = ""
-        self._sync_token_number = -1
+        self._sync_token = ""
+        # self._sync_token_prefix = ""
+        # self._sync_token_number = -1
         self._params.update(
             {
                 "clientVersion": "2.1",
@@ -36,7 +35,8 @@ class ICloudContactManager:
 
     @property
     def sync_token(self) -> str:
-        return f"{self._sync_token_prefix}{self._sync_token_number}"
+        return self._sync_token
+        # return f"{self._sync_token_prefix}{self._sync_token_number}"
 
     def create_contacts(self, contacts: list[icloud.model.ICloudContact]) -> None:
         """Create multiple contacts.
@@ -81,7 +81,7 @@ class ICloudContactManager:
             params=params,
             data=json.dumps(body),
         ).json()
-        self._update_sync_token(resp["syncToken"])
+        # self._update_sync_token(resp["syncToken"])
 
     def create_group(self, group: icloud.model.ICloudGroup) -> None:
         """Create a contact group.
@@ -162,6 +162,11 @@ class ICloudContactManager:
         contacts = [
             icloud.model.ICloudContact.from_dict(contact) for contact in raw_contacts
         ]
+        for group in raw_groups:
+            try:
+                del group["headerPositions"]["#"]
+            except KeyError:
+                pass
         groups = [icloud.model.ICloudGroup.from_dict(group) for group in raw_groups]
 
         return contacts, groups
@@ -170,14 +175,18 @@ class ICloudContactManager:
         etag = contact.etag
         if etag is None:
             return None
-        last_sync_number = int(cast(re.Match, re.search(r"(?<=^C=)\d+", etag))[0])
-        if last_sync_number >= self._sync_token_number:
-            etag = re.sub(r"^C=\d+", f"C={self._sync_token_number}", etag)
+        # last_sync_number = int(cast(re.Match, re.search(r"(?<=^C=)\d+", etag))[0])
+        # if last_sync_number >= self._sync_token_number:
+        #     etag = re.sub(r"^C=\d+", f"C={self._sync_token_number}", etag)
         contact.etag = etag
 
     def _update_sync_token(self, sync_token: str) -> None:
-        self._sync_token_prefix = cast(re.Match, re.search(r"^.*S=", sync_token))[0]
-        self._sync_token_number = int(cast(re.Match, re.search(r"\d+$", sync_token))[0])
+        self._sync_token = sync_token
+        # try:
+        # self._sync_token_prefix = cast(re.Match, re.search(r"^.*S=", sync_token))[0]
+        # self._sync_token_number = int(cast(re.Match, re.search(r"\d+$", sync_token))[0])
+        # except TypeError:
+        #     pass
 
     @staticmethod
     def _build_contacts_request_body(

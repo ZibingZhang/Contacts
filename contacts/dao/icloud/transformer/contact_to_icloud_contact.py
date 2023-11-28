@@ -27,6 +27,7 @@ def contact_to_icloud_contact(contact: model.Contact) -> icloud.model.ICloudCont
         isCompany=False,
         isGuardianApproved=False,
         lastName=contact.name.last_name,
+        middleName=contact.name.middle_name,
         nickName=contact.name.nickname,
         photo=contact.icloud.photo,
         prefix=contact.name.prefix,

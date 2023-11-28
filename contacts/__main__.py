@@ -19,7 +19,7 @@ def _run_command(cl_args: argparse.Namespace) -> None:
             command.families.run()
 
         case command.Command.LOAD:
-            command.load.run()
+            command.load.run(name=cl_args.name)
 
         case command.Command.PULL:
             if not cl_args.cached:
@@ -37,11 +37,13 @@ def _run_command(cl_args: argparse.Namespace) -> None:
         case command.Command.TAG:
             match cl_args.tag_action:
                 case command.TagSubcommand.LS:
-                    command.tag_ls.run()
+                    command.tag_ls.run(tags=cl_args.tags)
                 case command.TagSubcommand.MV:
                     command.tag_mv.run(old=cl_args.old, new=cl_args.new)
                 case command.TagSubcommand.REPL:
                     command.tag_repl.run()
+                case _:
+                    raise RuntimeError(f"Missing subcommand")
 
         case command.Command.VALIDATE:
             command.validate.run()

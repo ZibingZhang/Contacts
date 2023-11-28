@@ -1,6 +1,5 @@
-from contacts.dao import icloud, obsidian
+from contacts.dao import icloud
 
-__all__ = ["icloud_dao", "obsidian_dao"]
+__all__ = ["icloud_dao"]
 
 icloud_dao = icloud.ICloudDao()
-obsidian_dao = obsidian.ObsidianDao()

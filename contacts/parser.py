@@ -36,7 +36,7 @@ def _create_parser() -> argparse.ArgumentParser:
 
 def _build_add_command_parser(command_parser: argparse._SubParsersAction) -> None:
     command_parser.add_parser(
-        command.Command.ADD,
+        command.Command.ADD.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="add a contact",
     )
@@ -44,7 +44,7 @@ def _build_add_command_parser(command_parser: argparse._SubParsersAction) -> Non
 
 def _build_dump_command_parser(command_parser: argparse._SubParsersAction) -> None:
     command_parser.add_parser(
-        command.Command.DUMP,
+        command.Command.DUMP.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="dump a contact",
     )
@@ -52,23 +52,24 @@ def _build_dump_command_parser(command_parser: argparse._SubParsersAction) -> No
 
 def _build_families_command_parser(command_parser: argparse._SubParsersAction) -> None:
     command_parser.add_parser(
-        command.Command.FAMILIES,
+        command.Command.FAMILIES.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="view all families",
     )
 
 
 def _build_load_command_parser(command_parser: argparse._SubParsersAction) -> None:
-    command_parser.add_parser(
-        command.Command.LOAD,
+    load_parser = command_parser.add_parser(
+        command.Command.LOAD.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="load a contact",
     )
+    load_parser.add_argument("name", nargs="?")
 
 
 def _build_pull_command_parser(command_parser: argparse._SubParsersAction) -> None:
     pull_parser = command_parser.add_parser(
-        command.Command.PULL,
+        command.Command.PULL.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="pull contacts from remote source",
     )
@@ -79,7 +80,7 @@ def _build_pull_command_parser(command_parser: argparse._SubParsersAction) -> No
 
 def _build_push_command_parser(command_parser: argparse._SubParsersAction) -> None:
     push_parser = command_parser.add_parser(
-        command.Command.PUSH,
+        command.Command.PUSH.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="push contacts to remote source",
     )
@@ -101,7 +102,7 @@ def _build_sync_groups_command_parser(
     command_parser: argparse._SubParsersAction,
 ) -> None:
     command_parser.add_parser(
-        command.Command.SYNC_GROUPS,
+        command.Command.SYNC_GROUPS.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="sync contact groups",
     )
@@ -109,21 +110,21 @@ def _build_sync_groups_command_parser(
 
 def _build_tag_command_parser(command_parser: argparse._SubParsersAction) -> None:
     tag_parser = command_parser.add_parser(
-        command.Command.TAG,
+        command.Command.TAG.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="tag contacts",
     )
 
     tag_action_parser = tag_parser.add_subparsers(dest="tag_action", help="tag actions")
 
-    tag_action_parser.add_parser(command.TagSubcommand.LS, help="list all tags")
+    ls_tag_action_parser = tag_action_parser.add_parser(
+        command.TagSubcommand.LS, help="list all tags"
+    )
+    ls_tag_action_parser.add_argument("tags", nargs="*")
+
     mv_tag_action_parser = tag_action_parser.add_parser(
         command.TagSubcommand.MV, help="rename a tag"
     )
-    tag_action_parser.add_parser(
-        command.TagSubcommand.REPL, help="repl to add tags to contacts"
-    )
-
     mv_tag_action_parser.add_argument(
         "old",
     )
@@ -131,10 +132,14 @@ def _build_tag_command_parser(command_parser: argparse._SubParsersAction) -> Non
         "new",
     )
 
+    tag_action_parser.add_parser(
+        command.TagSubcommand.REPL, help="repl to add tags to contacts"
+    )
+
 
 def _build_validate_command_parser(command_parser: argparse._SubParsersAction) -> None:
     command_parser.add_parser(
-        command.Command.VALIDATE,
+        command.Command.VALIDATE.value,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         help="validate contacts",
     )

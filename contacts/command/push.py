@@ -48,6 +48,7 @@ def run(*, force: bool, write: bool) -> None:
     updated_contacts = []
     for icloud_id in disk_contact_ids & icloud_contact_ids:
         disk_contact = icloud_id_to_disk_contact_map[icloud_id]
+        _remove_unsynced_fields(disk_contact)
         icloud_contact = icloud_id_to_icloud_contact_map[icloud_id]
 
         diff = dataclasses_utils.diff(icloud_contact, disk_contact)
@@ -81,6 +82,13 @@ def run(*, force: bool, write: bool) -> None:
     if write and (len(new_contacts) > 0 or len(updated_contacts) > 0):
         print("Pulling contact(s) to sync etag(s)...")
         command.pull.run(cached=False)
+
+
+def _remove_unsynced_fields(contact: model.DiskContact) -> None:
+    try:
+        del contact.social_profiles.instagram.finsta_usernames
+    except AttributeError:
+        pass
 
 
 def _normalize_diff(diff: dict) -> dict:

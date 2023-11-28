@@ -8,6 +8,7 @@ from contacts.dao import icloud
 from contacts.dao.icloud.model import notes as nt
 
 PHONE_NUMBER_REGEX = re.compile(r"^\+\d+$")
+AMERICAN_NUMBER_REGEX = re.compile(r"\d{10}")
 
 
 def icloud_contact_to_contact(
@@ -47,6 +48,7 @@ def icloud_contact_to_contact(
             prefix=icloud_contact.prefix,
             first_name=icloud_contact.firstName,
             nickname=icloud_contact.nickName,
+            middle_name=icloud_contact.middleName,
             last_name=icloud_contact.lastName,
             suffix=icloud_contact.suffix,
         ),
@@ -95,8 +97,21 @@ def _transform_phone_numbers(
 ) -> list[model.PhoneNumber]:
     phone_numbers = []
     for icloud_phone in icloud_phones:
+        # TODO: more permanent fix later
+        icloud_phone.field = re.sub(r"[\s()-]", "", icloud_phone.field)
+
         if not PHONE_NUMBER_REGEX.match(icloud_phone.field):
+            if AMERICAN_NUMBER_REGEX.match(icloud_phone.field):
+                phone_numbers.append(
+                    model.PhoneNumber(
+                        country_code=model.CountryCode.NANP,
+                        label=icloud_phone.label,
+                        number=icloud_phone.field,
+                    )
+                )
+                continue
             raise ValueError(f"Invalid phone number format: {icloud_phone.field}")
+
         for country_code in model.CountryCode:
             if not icloud_phone.field.startswith(f"+{country_code}"):
                 continue
@@ -138,10 +153,22 @@ def _transform_social_profiles(
                 social_profiles.instagram = model.InstagramProfile(
                     username=icloud_profile.user
                 )
-            case _:
-                raise ValueError(
-                    f"Unsupported social profile label: {icloud_profile.label}"
+            case "instagram.com":
+                if icloud_profile.field is None:
+                    raise ValueError("Missing username for Instagram profile")
+                social_profiles.instagram = model.InstagramProfile(
+                    username=icloud_profile.field
                 )
+            case _:
+                if icloud_profile.field.startswith("http://www.instagram.com"):
+                    social_profiles.instagram = model.InstagramProfile(
+                        username=icloud_profile.user
+                    )
+                else:
+                    print(icloud_profile)
+                    raise ValueError(
+                        f"Unsupported social profile label: {icloud_profile.label}"
+                    )
     return social_profiles
 
 

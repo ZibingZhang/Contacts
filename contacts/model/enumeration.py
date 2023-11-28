@@ -4,6 +4,7 @@ import functools
 
 
 class Country(enum.StrEnum):
+    IRELAND = "Ireland"
     UNITED_STATES = "United States"
 
     @staticmethod
@@ -45,6 +46,7 @@ class HighSchoolName(enum.StrEnum):
     COLCHESTER_HIGH_SCHOOL = "Colchester High School"
     COLUMBIA_HIGH_SCHOOL = "Columbia High School"
     CONCORD_CARLISLE_REGIONAL_HIGH_SCHOOL = "Concord-Carlisle Regional High School"
+    DANA_HALL_SCHOOL = "Dana Hall School"
     DEXTER_SOUTHFIELD_SCHOOL = "Dexter Southfield School"
     DOVER_SHERBORN_HIGH_SCHOOL = "Dover-Sherborn High School"
     FONTBONNE_ACADEMY = "Fontbonne Academy"

@@ -106,6 +106,7 @@ class GameCenterProfile(dataclasses_utils.DataClassJsonMixin):
 @dataclasses.dataclass(repr=False)
 class InstagramProfile(dataclasses_utils.DataClassJsonMixin):
     username: str
+    finsta_usernames: list[str] | None = None
 
 
 @dataclasses.dataclass(repr=False)

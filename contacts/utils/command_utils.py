@@ -6,7 +6,7 @@ from collections.abc import Sequence
 
 from contacts import model
 from contacts.common import constant
-from contacts.dao import icloud_dao, obsidian_dao
+from contacts.dao import icloud_dao
 from contacts.utils import (
     contact_utils,
     file_io_utils,
@@ -62,7 +62,6 @@ def write_contacts_to_disk(
         os.path.join(constant.DATA_DIRECTORY, file_name),
         contacts,
     )
-    obsidian_dao.upsert_contacts(contacts)
     progress_utils.message(f"Wrote {len(contacts)} contact(s) to disk")
 
 
@@ -130,10 +129,15 @@ def read_families_from_disk(
     return families
 
 
-def get_contact_by_name(contacts: Sequence[model.Contact]) -> model.Contact | None:
-    name = input_utils.basic_input(
-        "Enter the name of the contact to select", lower=True
-    )
+def get_contact_by_name(
+    contacts: Sequence[model.Contact], name: str | None = None
+) -> model.Contact | None:
+    if name is None:
+        name = input_utils.basic_input(
+            "Enter the name of the contact to select", lower=True
+        )
+    else:
+        name = name.lower()
 
     matching_contacts = _get_matching_contacts(contacts, name)
     if len(matching_contacts) == 0:
