@@ -43,7 +43,7 @@ def _run_command(cl_args: argparse.Namespace) -> None:
                 case command.TagSubcommand.REPL:
                     command.tag_repl.run()
                 case _:
-                    raise RuntimeError(f"Missing subcommand")
+                    raise RuntimeError("Missing subcommand")
 
         case command.Command.VALIDATE:
             command.validate.run()

@@ -1,6 +1,21 @@
 """iCloud request and response models."""
 from contacts.dao.icloud.model import icloud_contact, icloud_group
 
+__all__ = [
+    "ICloudContact",
+    "ICloudGroup",
+    "Date",
+    "EmailAddress",
+    "IMField",
+    "IM",
+    "Phone",
+    "Profile",
+    "RelatedName",
+    "StreetAddressField",
+    "StreetAddress",
+    "Url",
+]
+
 ICloudContact = icloud_contact.ICloudContact
 ICloudGroup = icloud_group.ICloudGroup
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 import collections
 import re
 from collections.abc import Sequence
+from typing import Literal
 
 from contacts import model
 from contacts.utils import command_utils, contact_utils
@@ -19,7 +20,7 @@ _PATTERN_TO_EXPECTED_TAG_MAP = {
     re.compile(r"^CTY.+$"): "CTY",
     re.compile(r"^HubSpot.+$"): "HubSpot",
     re.compile(r"^NHS.*$"): "NHS",
-    re.compile(r"^NHS\d{2}$"): "NPS",
+    re.compile(r"^NHS$"): "NPS",
     re.compile(r"^(NHS|NPS).+$"): "Needham",
     re.compile(r"^NU.+$"): "NU",
     re.compile(r"^PowerAdvocate.+$"): "PowerAdvocate",
@@ -103,7 +104,9 @@ def _expect_tag(contact: model.Contact, tag: str) -> None:
         print(f"{contact_utils.build_name_str(contact)} missing {tag} tag")
 
 
-def _any_tag_matches_pattern(tags: list[str], pattern: re.Pattern) -> str | False:
+def _any_tag_matches_pattern(
+    tags: list[str], pattern: re.Pattern
+) -> str | Literal[False]:
     for tag in tags:
         if pattern.match(tag):
             return tag

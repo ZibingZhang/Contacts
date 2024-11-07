@@ -39,7 +39,7 @@ def icloud_contact_to_contact(
 
     contact = model.Contact(
         birthday=icloud_contact.birthday,
-        icloud=model.contact.ICloudMetadata(
+        icloud=model.contact.ICloudContactMetadata(
             etag=icloud_contact.etag,
             photo=icloud_contact.photo,
             uuid=icloud_contact.contactId,
@@ -74,7 +74,12 @@ def icloud_contact_to_contact(
         )
 
     if icloud_contact.notes:
-        _extract_from_notes(contact, nt.Notes.from_string(icloud_contact.notes))
+        try:
+            # 欧凌悦
+            _extract_from_notes(contact, nt.Notes.from_string(icloud_contact.notes))
+        except Exception as e:
+            print(contact)
+            raise e
 
     return contact
 
@@ -162,7 +167,7 @@ def _transform_social_profiles(
             case _:
                 if icloud_profile.field.startswith("http://www.instagram.com"):
                     social_profiles.instagram = model.InstagramProfile(
-                        username=icloud_profile.user
+                        username=icloud_profile.user or ""
                     )
                 else:
                     print(icloud_profile)

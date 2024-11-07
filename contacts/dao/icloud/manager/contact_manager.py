@@ -76,7 +76,8 @@ class ICloudContactManager:
                 "syncToken": self.sync_token,
             }
         )
-        resp = self._session.post(
+        # resp =
+        self._session.post(
             self._contacts_update_url,
             params=params,
             data=json.dumps(body),

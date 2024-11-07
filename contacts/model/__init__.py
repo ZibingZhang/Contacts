@@ -20,7 +20,7 @@ University = contact.University
 
 Education = contact.Education
 EmailAddresss = contact.EmailAddress
-ICloudMetadata = contact.ICloudMetadata
+ICloudMetadata = contact.ICloudContactMetadata
 Name = contact.Name
 PhoneNumber = contact.PhoneNumber
 SocialProfiles = contact.SocialProfiles

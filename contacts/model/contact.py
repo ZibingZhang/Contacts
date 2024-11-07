@@ -56,14 +56,14 @@ class ICloudPhotoCrop(dataclasses_utils.DataClassJsonMixin):
 
 @dataclasses.dataclass(repr=False)
 class ICloudPhoto(dataclasses_utils.DataClassJsonMixin):
-    crop: ICloudPhotoCrop
-    signature: str
     url: str
+    crop: ICloudPhotoCrop | None = None
+    signature: str | None = None
     whitelisted: bool | None = None
 
 
 @dataclasses.dataclass(repr=False)
-class ICloudMetadata(dataclasses_utils.DataClassJsonMixin):
+class ICloudContactMetadata(dataclasses_utils.DataClassJsonMixin):
     uuid: str
     etag: str | None = None
     photo: ICloudPhoto | None = None
@@ -160,7 +160,7 @@ class Contact(dataclasses_utils.DataClassJsonMixin):
     mtime: float | None = None
 
     # iCloud specific
-    icloud: ICloudMetadata | None = None
+    icloud: ICloudContactMetadata | None = None
 
     def __setattr__(self, key: str, value: Any) -> None:
         if key == "email_addresses" and value is not None:

@@ -86,7 +86,7 @@ def run(*, force: bool, write: bool) -> None:
 
 def _remove_unsynced_fields(contact: model.DiskContact) -> None:
     try:
-        del contact.social_profiles.instagram.finsta_usernames
+        del contact.social_profiles.instagram.finsta_usernames  # type: ignore
     except AttributeError:
         pass
 

@@ -25,7 +25,7 @@ def run() -> None:
         if name not in group_name_to_icloud_group_map.keys():
             new_groups.append(
                 model.Group(
-                    icloud=model.group.ICloudMetadata(
+                    icloud=model.group.ICloudGroupMetadata(
                         contact_uuids=contact_uuids,
                         uuid=uuid_utils.generate(),
                     ),

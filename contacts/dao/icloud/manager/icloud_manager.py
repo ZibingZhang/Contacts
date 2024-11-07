@@ -1,8 +1,10 @@
 """General iCloud api wrapper."""
 from __future__ import annotations
 
+import base64
 import functools
 import getpass
+import hashlib
 import http.cookiejar as cookielib
 import json
 import logging
@@ -11,6 +13,8 @@ import re
 import tempfile
 import uuid
 from typing import Any, TypedDict
+
+import srp
 
 from contacts.dao import icloud
 from contacts.dao.icloud.manager import exception
@@ -24,14 +28,11 @@ class ICloudManager:
     Handles the authentication required to access iCloud services.
     """
 
-    AUTH_ENDPOINT = "https://idmsa.apple.com/appleauth/auth"
-    HOME_ENDPOINT = "https://www.icloud.com"
-    SETUP_ENDPOINT = "https://setup.icloud.com/setup/ws/1"
-
     def __init__(
         self,
         apple_id: str | None = None,
         password: str | None = None,
+        domain: str = "com",
         cookie_directory: str | None = None,
         verify: bool = True,
         client_id: str | None = None,
@@ -41,6 +42,16 @@ class ICloudManager:
             raise ValueError(
                 "'apple_id' and 'password' required for initial instantiation"
             )
+        if domain == "com":
+            self.AUTH_ENDPOINT = "https://idmsa.apple.com/appleauth/auth"
+            self.HOME_ENDPOINT = "https://www.icloud.com"
+            self.SETUP_ENDPOINT = "https://setup.icloud.com/setup/ws/1"
+        elif domain == "cn":
+            self.AUTH_ENDPOINT = "https://idmsa.apple.com.cn/appleauth/auth"
+            self.HOME_ENDPOINT = "https://www.icloud.com.cn"
+            self.SETUP_ENDPOINT = "https://setup.icloud.com.cn/setup/ws/1"
+        else:
+            raise NotImplementedError(f"Domain '{domain}' is not supported yet")
 
         self.user: _User = {"accountName": apple_id, "password": password}
         self.data: dict[str, Any] = {}
@@ -65,20 +76,13 @@ class ICloudManager:
             if not os.path.exists(self._cookie_directory):
                 os.mkdir(self._cookie_directory, 0o700)
 
-        LOGGER.debug("Using session file %s" % self.session_path)
+        session_path = os.path.join(
+            self._cookie_directory,
+            "".join([c for c in self.user["accountName"] if re.match(r"\w", c)])
+            + ".session",
+        )
 
-        self.session_data = {}
-        try:
-            with open(self.session_path) as session_f:
-                self.session_data = json.load(session_f)
-        except FileNotFoundError:
-            LOGGER.debug("Session file does not exist")
-        if client_id := self.session_data.get("client_id"):
-            self.client_id = client_id
-        else:
-            self.session_data.update({"client_id": self.client_id})
-
-        self.session = icloud.manager.ICloudSession(self)
+        self.session = icloud.manager.ICloudSession(self, session_path)
         self.session.verify = verify
         self.session.headers.update(
             {"Origin": self.HOME_ENDPOINT, "Referer": "%s/" % self.HOME_ENDPOINT}
@@ -109,15 +113,6 @@ class ICloudManager:
         return os.path.join(
             self._cookie_directory,
             "".join([c for c in self.user["accountName"] if re.match(r"\w", c)]),
-        )
-
-    @property
-    def session_path(self) -> str:
-        """Get path for session data file."""
-        return os.path.join(
-            self._cookie_directory,
-            "".join([c for c in self.user["accountName"] if re.match(r"\w", c)])
-            + ".session",
         )
 
     @property
@@ -207,7 +202,7 @@ class ICloudManager:
         subsequent logins will not cause additional e-mails from Apple.
         """
         login_successful = False
-        if self.session_data.get("session_token") and not force_refresh:
+        if self.session.data.get("session_token") and not force_refresh:
             LOGGER.debug("Checking session token validity")
             try:
                 self.data = self._validate_token()
@@ -235,24 +230,81 @@ class ICloudManager:
         if not login_successful:
             LOGGER.debug("Authenticating as %s" % self.user["accountName"])
 
-            data: dict[str, Any] = dict(self.user)
-
-            data["rememberMe"] = True
-            data["trustTokens"] = []
-            if self.session_data.get("trust_token"):
-                data["trustTokens"] = [self.session_data.get("trust_token")]
-
             headers = self._get_auth_headers()
 
-            if scnt := self.session_data.get("scnt"):
+            if scnt := self.session.data.get("scnt"):
                 headers["scnt"] = scnt
 
-            if session_id := self.session_data.get("session_id"):
+            if session_id := self.session.data.get("session_id"):
                 headers["X-Apple-ID-Session-Id"] = session_id
+
+            class SrpPassword:
+                def __init__(self, password: str):
+                    self.password = password
+
+                def set_encrypt_info(
+                    self, salt: bytes, iterations: int, key_length: int
+                ):
+                    self.salt = salt
+                    self.iterations = iterations
+                    self.key_length = key_length
+
+                def encode(self):
+                    password_hash = hashlib.sha256(
+                        self.password.encode("utf-8")
+                    ).digest()
+                    return hashlib.pbkdf2_hmac(
+                        "sha256", password_hash, salt, iterations, key_length
+                    )
+
+            srp_password = SrpPassword(self.user["password"])
+            srp.rfc5054_enable()
+            srp.no_username_in_x()
+            usr = srp.User(
+                self.user["accountName"],
+                srp_password,
+                hash_alg=srp.SHA256,
+                ng_type=srp.NG_2048,
+            )
+            uname, A = usr.start_authentication()
+            data = {
+                "a": base64.b64encode(A).decode(),
+                "accountName": uname,
+                "protocols": ["s2k", "s2k_fo"],
+            }
+            try:
+                response = self.session.post(
+                    "%s/signin/init" % self.AUTH_ENDPOINT,
+                    data=json.dumps(data),
+                    headers=headers,
+                )
+                response.raise_for_status()
+            except exception.ICloudAPIResponseException as error:
+                msg = "Failed to initiate srp authentication."
+                raise exception.ICloudFailedLoginException(msg, error) from error
+            body = response.json()
+            salt = base64.b64decode(body["salt"])
+            b = base64.b64decode(body["b"])
+            c = body["c"]
+            iterations = body["iteration"]
+            key_length = 32
+            srp_password.set_encrypt_info(salt, iterations, key_length)
+            m1 = usr.process_challenge(salt, b)
+            m2 = usr.H_AMK
+            data = {
+                "accountName": uname,
+                "c": c,
+                "m1": base64.b64encode(m1).decode(),
+                "m2": base64.b64encode(m2).decode(),
+                "rememberMe": True,
+                "trustTokens": [],
+            }
+            if self.session.data.get("trust_token"):
+                data["trustTokens"] = [self.session.data.get("trust_token")]
 
             try:
                 self.session.post(
-                    "%s/signin" % self.AUTH_ENDPOINT,
+                    "%s/signin/complete" % self.AUTH_ENDPOINT,
                     params={"isRememberMeEnabled": "true"},
                     data=json.dumps(data),
                     headers=headers,
@@ -262,6 +314,8 @@ class ICloudManager:
                 raise exception.ICloudFailedLoginException(msg, error)
 
             self._authenticate_with_token()
+
+        self.params.update({"dsid": self.data["dsInfo"]["dsid"]})
 
         self._webservices = self.data["webservices"]
 
@@ -278,10 +332,10 @@ class ICloudManager:
     def _authenticate_with_token(self) -> None:
         """Authenticate using session token."""
         data = {
-            "accountCountryCode": self.session_data.get("account_country"),
-            "dsWebAuthToken": self.session_data.get("session_token"),
+            "accountCountryCode": self.session.data.get("account_country"),
+            "dsWebAuthToken": self.session.data.get("session_token"),
             "extended_login": True,
-            "trustToken": self.session_data.get("trust_token", ""),
+            "trustToken": self.session.data.get("trust_token", ""),
         }
 
         try:
@@ -324,7 +378,7 @@ class ICloudManager:
 
     def _get_auth_headers(self, overrides=None) -> dict[str, str]:
         headers = {
-            "Accept": "*/*",
+            "Accept": "application/json, text/javascript",
             "Content-Type": "application/json",
             "X-Apple-OAuth-Client-Id": (
                 "d39ba9916b7251055b22c7f910e2ea796ee65e98b2ddecea8f5dde8d9d1a815d"
@@ -380,10 +434,10 @@ class ICloudManager:
 
         headers = self._get_auth_headers({"Accept": "application/json"})
 
-        if scnt := self.session_data.get("scnt"):
+        if scnt := self.session.data.get("scnt"):
             headers["scnt"] = scnt
 
-        if session_id := self.session_data.get("session_id"):
+        if session_id := self.session.data.get("session_id"):
             headers["X-Apple-ID-Session-Id"] = session_id
 
         try:
@@ -408,10 +462,10 @@ class ICloudManager:
         """Request session trust to avoid user log in going forward."""
         headers = self._get_auth_headers()
 
-        if scnt := self.session_data.get("scnt"):
+        if scnt := self.session.data.get("scnt"):
             headers["scnt"] = scnt
 
-        if session_id := self.session_data.get("session_id"):
+        if session_id := self.session.data.get("session_id"):
             headers["X-Apple-ID-Session-Id"] = session_id
 
         try:

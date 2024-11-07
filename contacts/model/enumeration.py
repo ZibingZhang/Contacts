@@ -21,6 +21,7 @@ class CountryCode(enum.IntEnum):
     BRAZIL = 55
     CHILE = 56
     MALAYSIA = 60
+    MEXICO = 52
     HONG_KONG = 852
     CHINA = 86
     TAIWAN = 886
@@ -52,6 +53,7 @@ class HighSchoolName(enum.StrEnum):
     FONTBONNE_ACADEMY = "Fontbonne Academy"
     LEXINGTON_HIGH_SCHOOL = "Lexington High School"
     LINCOLN_SUDBURY_REGIONAL_HIGH_SCHOOL = "Lincoln-Sudbury Regional High School"
+    MALDEN_HIGH_SCHOOL = "Malden High School"
     MILTON_ACADEMY = "Milton Academy"
     NATICK_HIGH_SCHOOL = "Natick High School"
     NEEDHAM_HIGH_SCHOOL = "Needham High School"

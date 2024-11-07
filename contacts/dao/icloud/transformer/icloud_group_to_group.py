@@ -15,7 +15,7 @@ def icloud_group_to_group(icloud_group: icloud.model.ICloudGroup) -> model.Group
         The transformed model.Group.
     """
     return model.Group(
-        icloud=model.group.ICloudMetadata(
+        icloud=model.group.ICloudGroupMetadata(
             contact_uuids=icloud_group.contactIds,
             etag=icloud_group.etag,
             uuid=icloud_group.groupId,

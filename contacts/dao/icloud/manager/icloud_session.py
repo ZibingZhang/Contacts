@@ -19,6 +19,8 @@ HEADER_DATA = {
     "X-Apple-ID-Session-Id": "session_id",
     "X-Apple-Session-Token": "session_token",
     "X-Apple-TwoSV-Trust-Token": "trust_token",
+    "X-Apple-I-Rscd": "apple_rscd",
+    "X-Apple-I-Ercd": "apple_ercd",
     "scnt": "scnt",
 }
 
@@ -26,10 +28,25 @@ HEADER_DATA = {
 class ICloudSession(requests.Session):
     """iCloud session."""
 
-    def __init__(self, manager: icloud.manager.ICloudManager) -> None:
+    def __init__(self, manager: icloud.manager.ICloudManager, path: str) -> None:
         super().__init__()
+
+        LOGGER.debug("Using session file %s" % path)
+
+        self.data = {}
+        self.path = path
         self.manager = manager
         self.cookies: cookielib.LWPCookieJar | None = None  # type: ignore
+
+        try:
+            with open(path) as file:
+                self.data = json.load(file)
+        except FileNotFoundError:
+            LOGGER.debug("Session file does not exist")
+        if client_id := self.data.get("client_id"):
+            self.client_id = client_id
+        else:
+            self.data.update({"client_id": self.manager.client_id})
 
     def request(  # type: ignore
         self, method: str | bytes, url: str | bytes, **kwargs
@@ -55,13 +72,13 @@ class ICloudSession(requests.Session):
         for header in HEADER_DATA:
             if response.headers.get(header):
                 session_arg = HEADER_DATA[header]
-                self.manager.session_data.update(
+                self.data.update(
                     {session_arg: response.headers.get(header)}
                 )
 
         # Save session_data to file
-        with open(self.manager.session_path, "w") as outfile:
-            json.dump(self.manager.session_data, outfile)
+        with open(self.path, "w") as outfile:
+            json.dump(self.data, outfile)
             LOGGER.debug("Saved session data to file")
 
         # Save cookies to file
