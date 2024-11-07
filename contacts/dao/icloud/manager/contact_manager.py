@@ -9,10 +9,10 @@ from contacts.dao import icloud
 class ICloudContactManager:
     """Manages CRUD operations on iCloud contacts and groups."""
 
-    def __init__(self, manager: icloud.manager.ICloudManager) -> None:
-        self._session = manager
-        self._params = manager.params
-        self._service_root = manager.get_webservice_url("contacts")
+    def __init__(self, session: icloud.manager.ICloudSession) -> None:
+        self._session = session
+        self._params = session.params
+        self._service_root = session.get_webservice_url("contacts")
         self._contacts_endpoint = "%s/co" % self._service_root
         self._contacts_refresh_url = "%s/startup" % self._contacts_endpoint
         self._contacts_next_url = "%s/contacts" % self._contacts_endpoint

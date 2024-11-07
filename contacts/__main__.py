@@ -10,7 +10,8 @@ from contacts.dao import icloud_dao
 def _run_command(cl_args: argparse.Namespace) -> None:
     import logging
     import sys
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     match cl_args.command:
         case command.Command.ADD:

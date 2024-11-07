@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+import dataclasses
 import functools
 import getpass
 import hashlib
@@ -13,13 +14,13 @@ import os.path
 import re
 import tempfile
 import uuid
-from typing import Any, TypedDict, NoReturn, cast
+from typing import Any, NoReturn, cast
 
 import requests
 import srp
 
 from contacts.dao import icloud
-from contacts.dao.icloud.manager import exception, password_filter
+from contacts.dao.icloud.manager import exception
 
 LOG = logging.getLogger(__name__)
 
@@ -53,7 +54,7 @@ class ICloudSession(requests.Session):
         verify: bool = True,
         client_id: str | None = None,
         with_family: bool = True,
-        china_mainland: bool = False
+        china_mainland: bool = False,
     ) -> None:
         super().__init__()
 
@@ -66,69 +67,40 @@ class ICloudSession(requests.Session):
             self.HOME_ENDPOINT = "https://www.icloud.com.cn"
             self.SETUP_ENDPOINT = "https://setup.icloud.com.cn/setup/ws/1"
 
-        self.user: _User = {"accountName": apple_id, "password": password}
+        self.user = _User(account_name=apple_id, password=password)
         self.data: dict[str, Any] = {}
         self.params: dict[str, str] = {}
         self.client_id = client_id or ("auth-%s" % str(uuid.uuid1()).lower())
         self.with_family = with_family
-
-        self.password_filter = password_filter.PasswordFilter(password)
-        LOG.addFilter(self.password_filter)
-
-        if cookie_directory:
-            cookie_directory = os.path.expanduser(
-                os.path.normpath(cookie_directory)
-            )
-            if not os.path.exists(cookie_directory):
-                os.mkdir(cookie_directory, 0o700)
-        else:
-            topdir = os.path.join(tempfile.gettempdir(), "pyicloud")
-            cookie_directory = os.path.join(topdir, getpass.getuser())
-            if not os.path.exists(topdir):
-                os.mkdir(topdir, 0o777)
-            if not os.path.exists(cookie_directory):
-                os.mkdir(cookie_directory, 0o700)
-
-        cookiejar_path = os.path.join(
-            cookie_directory,
-            "".join([c for c in self.user["accountName"] if re.match(r"\w", c)]),
-        )
-        session_path = os.path.join(
-            cookie_directory,
-            "".join([c for c in self.user["accountName"] if re.match(r"\w", c)])
-            + ".session",
-        )
-
-        try:
-            with open(session_path) as file:
-                self.session_data = json.load(file)
-        except FileNotFoundError:
-            LOG.debug("Session file does not exist")
-        if client_id := self.session_data.get("client_id"):
-            self.client_id = client_id
-        else:
-            self.session_data.update({"client_id": self.client_id})
-
-        LOG.debug("Using session file %s" % session_path)
-
-        self.session_path = session_path
-        self.cookiejar_path = cookiejar_path
-
         self.verify = verify
         self.headers.update(
             {"Origin": self.HOME_ENDPOINT, "Referer": "%s/" % self.HOME_ENDPOINT}
         )
 
-        self.cookies: cookielib.LWPCookieJar = cookielib.LWPCookieJar(filename=cookiejar_path)
-        if os.path.exists(cookiejar_path):
-            try:
-                self.cookies.load(ignore_discard=True, ignore_expires=True)
-                LOG.debug("Read cookies from %s" % cookiejar_path)
-            except (FileNotFoundError, ValueError):
-                # Most likely a pickled cookiejar from earlier versions.
-                # The cookiejar will get replaced with a valid one after
-                # successful authentication.
-                LOG.warning("Failed to read cookiejar %s" % cookiejar_path)
+        self.password_filter = _PasswordFilter(password)
+        LOG.addFilter(self.password_filter)
+
+        cookie_directory = ICloudSession._init_cookie_directory(cookie_directory)
+        account_file_name = "".join(
+            [c for c in self.user.account_name if re.match(r"\w", c)]
+        )
+        self.cookiejar_path = os.path.join(cookie_directory, account_file_name)
+        self.session_path = os.path.join(
+            cookie_directory, account_file_name + ".session"
+        )
+
+        self.session_data = ICloudSession._load_session_data(self.session_path)
+
+        if client_id := self.session_data.get("client_id"):
+            self.client_id = client_id
+        else:
+            self.session_data.update({"client_id": self.client_id})
+
+        LOG.debug("Using session file %s" % self.session_path)
+
+        self.cookies: cookielib.LWPCookieJar = ICloudSession._load_cookies(
+            self.cookiejar_path
+        )  # type: ignore
 
         self._webservices: dict[str, dict[str, str]] = {}
         self.authenticate()
@@ -159,9 +131,7 @@ class ICloudSession(requests.Session):
     @property
     def trusted_devices(self) -> dict:
         """Returns devices trusted for two-step authentication."""
-        request = self.get(
-            "%s/listDevices" % self.SETUP_ENDPOINT, params=self.params
-        )
+        request = self.get("%s/listDevices" % self.SETUP_ENDPOINT, params=self.params)
         return request.json().get("devices")
 
     def login(self) -> None:
@@ -239,18 +209,16 @@ class ICloudSession(requests.Session):
                 and app["canLaunchWithOneFactor"] is True
             ):
                 LOG.debug(
-                    "Authenticating as %s for %s" % (self.user["accountName"], service)
+                    "Authenticating as %s for %s" % (self.user.account_name, service)
                 )
                 try:
                     self._authenticate_with_credentials_service(service)
                     login_successful = True
                 except exception.ICloudFailedLoginException:
-                    LOG.debug(
-                        "Could not log into manager. Attempting brand new login."
-                    )
+                    LOG.debug("Could not log into manager. Attempting brand new login.")
 
         if not login_successful:
-            LOG.debug("Authenticating as %s" % self.user["accountName"])
+            LOG.debug("Authenticating as %s" % self.user.account_name)
 
             headers = self._get_auth_headers()
 
@@ -260,30 +228,11 @@ class ICloudSession(requests.Session):
             if session_id := self.session_data.get("session_id"):
                 headers["X-Apple-ID-Session-Id"] = session_id
 
-            class SrpPassword:
-                def __init__(self, password: str):
-                    self.password = password
-
-                def set_encrypt_info(
-                    self, salt: bytes, iterations: int, key_length: int
-                ):
-                    self.salt = salt
-                    self.iterations = iterations
-                    self.key_length = key_length
-
-                def encode(self):
-                    password_hash = hashlib.sha256(
-                        self.password.encode("utf-8")
-                    ).digest()
-                    return hashlib.pbkdf2_hmac(
-                        "sha256", password_hash, salt, iterations, key_length
-                    )
-
-            srp_password = SrpPassword(self.user["password"])
+            srp_password = _SrpPassword(self.user.password)
             srp.rfc5054_enable()
             srp.no_username_in_x()
             usr = srp.User(
-                self.user["accountName"],
+                self.user.account_name,
                 srp_password,
                 hash_alg=srp.SHA256,
                 ng_type=srp.NG_2048,
@@ -373,14 +322,12 @@ class ICloudSession(requests.Session):
         """Authenticate to a specific manager using credentials."""
         data = {
             "appName": service,
-            "apple_id": self.user["accountName"],
-            "password": self.user["password"],
+            "apple_id": self.user.account_name,
+            "password": self.user.password,
         }
 
         try:
-            self.post(
-                "%s/accountLogin" % self.SETUP_ENDPOINT, data=json.dumps(data)
-            )
+            self.post("%s/accountLogin" % self.SETUP_ENDPOINT, data=json.dumps(data))
 
             self.data = self._validate_token()
         except exception.ICloudAPIResponseException as error:
@@ -525,9 +472,7 @@ class ICloudSession(requests.Session):
         for header in HEADER_DATA:
             if response.headers.get(header):
                 session_arg = HEADER_DATA[header]
-                self.session_data.update(
-                    {session_arg: response.headers.get(header)}
-                )
+                self.session_data.update({session_arg: response.headers.get(header)})
 
         # Save session_data to file
         with open(self.session_path, "w") as outfile:
@@ -602,11 +547,8 @@ class ICloudSession(requests.Session):
         return response
 
     def _raise_error(self, code: int | str | None, reason: str) -> NoReturn:
-        if (
-            self.requires_2sa
-            and reason == "Missing X-APPLE-WEBAUTH-TOKEN cookie"
-        ):
-            raise exception.ICloud2SARequiredException(self.user["accountName"])
+        if self.requires_2sa and reason == "Missing X-APPLE-WEBAUTH-TOKEN cookie":
+            raise exception.ICloud2SARequiredException(self.user.account_name)
         if code in ("ZONE_NOT_FOUND", "AUTHENTICATION_FAILED"):
             reason = (
                 "Please log into https://icloud.com/ to manually "
@@ -630,7 +572,79 @@ class ICloudSession(requests.Session):
         LOG.error(api_error)
         raise api_error
 
+    @staticmethod
+    def _init_cookie_directory(cookie_directory: str | None) -> str:
+        if cookie_directory:
+            cookie_directory = os.path.expanduser(os.path.normpath(cookie_directory))
+            if not os.path.exists(cookie_directory):
+                os.mkdir(cookie_directory, 0o700)
+        else:
+            topdir = os.path.join(tempfile.gettempdir(), "pyicloud")
+            cookie_directory = os.path.join(topdir, getpass.getuser())
+            if not os.path.exists(topdir):
+                os.mkdir(topdir, 0o777)
+            if not os.path.exists(cookie_directory):
+                os.mkdir(cookie_directory, 0o700)
+        return cookie_directory
 
-class _User(TypedDict):
-    accountName: str
+    @staticmethod
+    def _load_session_data(session_path: str) -> dict:
+        try:
+            with open(session_path) as file:
+                return json.load(file)
+        except FileNotFoundError:
+            LOG.debug("Session file does not exist")
+            return {}
+
+    @staticmethod
+    def _load_cookies(cookiejar_path: str) -> cookielib.LWPCookieJar:
+        cookies = cookielib.LWPCookieJar(filename=cookiejar_path)
+        if os.path.exists(cookiejar_path):
+            try:
+                cookies.load(ignore_discard=True, ignore_expires=True)
+                LOG.debug("Read cookies from %s" % cookiejar_path)
+            except (FileNotFoundError, ValueError):
+                # Most likely a pickled cookiejar from earlier versions.
+                # The cookiejar will get replaced with a valid one after
+                # successful authentication.
+                LOG.warning("Failed to read cookiejar %s" % cookiejar_path)
+        return cookies
+
+
+@dataclasses.dataclass
+class _User:
+    account_name: str
     password: str
+
+
+class _SrpPassword:
+    def __init__(self, password: str):
+        self.password = password
+        self.salt = b""
+        self.iterations = 0
+        self.key_length = 0
+
+    def set_encrypt_info(self, salt: bytes, iterations: int, key_length: int):
+        self.salt = salt
+        self.iterations = iterations
+        self.key_length = key_length
+
+    def encode(self):
+        password_hash = hashlib.sha256(self.password.encode("utf-8")).digest()
+        return hashlib.pbkdf2_hmac(
+            "sha256", password_hash, self.salt, self.iterations, self.key_length
+        )
+
+
+class _PasswordFilter(logging.Filter):
+    """Hides the password when logging."""
+
+    def __init__(self, password: str) -> None:
+        super().__init__(password)
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        message = record.getMessage()
+        if self.name in message:
+            record.msg = message.replace(self.name, "*" * 8)
+            record.args = ()
+        return True
