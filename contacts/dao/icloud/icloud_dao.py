@@ -37,10 +37,10 @@ class ICloudDao:
         config.read(constant.CONFIG_FILE)
         username = config["login"]["username"]
         password = config["login"]["password"]
-        icloud_manager = manager.ICloudManager(username, password)
-        icloud_manager.login()
+        icloud_session = manager.ICloudSession(username, password)
+        icloud_session.login()
         self._authenticated = True
-        self._contact_manager = icloud_manager.contact_manager
+        self._contact_manager = icloud_session.contact_manager
 
     def read_contacts_and_groups(
         self,

@@ -10,7 +10,7 @@ class ICloudContactManager:
     """Manages CRUD operations on iCloud contacts and groups."""
 
     def __init__(self, manager: icloud.manager.ICloudManager) -> None:
-        self._session = manager.session
+        self._session = manager
         self._params = manager.params
         self._service_root = manager.get_webservice_url("contacts")
         self._contacts_endpoint = "%s/co" % self._service_root
