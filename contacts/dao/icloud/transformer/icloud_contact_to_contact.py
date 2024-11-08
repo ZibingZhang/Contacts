@@ -75,7 +75,6 @@ def icloud_contact_to_contact(
 
     if icloud_contact.notes:
         try:
-            # 欧凌悦
             _extract_from_notes(contact, nt.Notes.from_string(icloud_contact.notes))
         except Exception as e:
             print(contact)
